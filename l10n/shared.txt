@@ -1,0 +1,58 @@
+# Web catalog keys the app uses (firmware webui/src/i18n/<lang>.json). A plural is listed by its
+# base name. tool/gen_l10n.py turns them into lib/l10n/app_<lang>.arb.
+
+# navigation
+nav.player
+nav.source
+nav.settings
+
+# sources and their cards
+src.off
+src.bt
+src.airplay
+src.radio
+src.card
+src.servers
+src.usb
+srcsub.phone_on
+srcsub.phone_off
+srcsub.servers
+srcsub.tracks
+srcsub.card_none
+srcsub.stations
+srcsub.radio_none
+srcsub.airplay_wait
+srcsub.usb_on
+srcsub.usb_wait
+
+# what is playing
+now.no_device
+now.airplay_waiting
+now.airplay_pick
+now.usb_waiting
+now.usb_pick
+now.off
+now.pick
+now.connecting
+now.cover
+
+# transport and volume
+transport.play
+transport.pause
+transport.prev
+transport.next
+volume.label
+volume.mute
+volume.unmute
+unit.khz
+unit.kbps
+unit.bit
+
+# settings
+sys.scheme
+sys.scheme_amber
+sys.scheme_blue
+sys.scheme_green
+sys.scheme_red
+lang.as_panel
+page.language

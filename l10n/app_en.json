@@ -1,0 +1,10 @@
+{
+  "mob.app_name": "ModESP Streamer",
+  "mob.panel": "Panel",
+  "mob.demo_panel": "Demo panel",
+  "mob.demo_note": "A made-up panel, to see the app without the device",
+  "mob.app": "App",
+  "mob.lang_phone": "Same as the phone",
+  "mob.licenses": "Licences",
+  "mob.in_web": "This is in the panel's web interface"
+}

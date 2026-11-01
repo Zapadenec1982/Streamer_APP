@@ -1,0 +1,239 @@
+{
+  "@@locale": "en",
+  "navPlayer": "Player",
+  "@navPlayer": {
+    "description": "nav.player"
+  },
+  "navSource": "Source",
+  "@navSource": {
+    "description": "nav.source"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "nav.settings"
+  },
+  "srcOff": "Off",
+  "@srcOff": {
+    "description": "src.off"
+  },
+  "srcBt": "Bluetooth",
+  "@srcBt": {
+    "description": "src.bt"
+  },
+  "srcAirplay": "AirPlay",
+  "@srcAirplay": {
+    "description": "src.airplay"
+  },
+  "srcRadio": "Radio",
+  "@srcRadio": {
+    "description": "src.radio"
+  },
+  "srcCard": "Card",
+  "@srcCard": {
+    "description": "src.card"
+  },
+  "srcServers": "Media servers",
+  "@srcServers": {
+    "description": "src.servers"
+  },
+  "srcUsb": "USB",
+  "@srcUsb": {
+    "description": "src.usb"
+  },
+  "srcsubPhoneOn": "Phone connected",
+  "@srcsubPhoneOn": {
+    "description": "srcsub.phone_on"
+  },
+  "srcsubPhoneOff": "No phone connected",
+  "@srcsubPhoneOff": {
+    "description": "srcsub.phone_off"
+  },
+  "srcsubServers": "On the home network",
+  "@srcsubServers": {
+    "description": "srcsub.servers"
+  },
+  "srcsubTracks": "{n, plural, one{{n} track} few{{n} tracks} many{{n} tracks} other{{n} tracks}}",
+  "@srcsubTracks": {
+    "description": "srcsub.tracks",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "srcsubCardNone": "No card, or an empty one",
+  "@srcsubCardNone": {
+    "description": "srcsub.card_none"
+  },
+  "srcsubStations": "{n, plural, one{{n} station in the list} few{{n} stations in the list} many{{n} stations in the list} other{{n} stations in the list}}",
+  "@srcsubStations": {
+    "description": "srcsub.stations",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "srcsubRadioNone": "No stations",
+  "@srcsubRadioNone": {
+    "description": "srcsub.radio_none"
+  },
+  "srcsubAirplayWait": "Waiting for an iPhone or a Mac",
+  "@srcsubAirplayWait": {
+    "description": "srcsub.airplay_wait"
+  },
+  "srcsubUsbOn": "Computer connected",
+  "@srcsubUsbOn": {
+    "description": "srcsub.usb_on"
+  },
+  "srcsubUsbWait": "Waiting for a computer",
+  "@srcsubUsbWait": {
+    "description": "srcsub.usb_wait"
+  },
+  "nowNoDevice": "No phone connected",
+  "@nowNoDevice": {
+    "description": "now.no_device"
+  },
+  "nowAirplayWaiting": "Waiting for a device",
+  "@nowAirplayWaiting": {
+    "description": "now.airplay_waiting"
+  },
+  "nowAirplayPick": "Choose “{name}” on your phone",
+  "@nowAirplayPick": {
+    "description": "now.airplay_pick",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nowUsbWaiting": "Waiting for a computer",
+  "@nowUsbWaiting": {
+    "description": "now.usb_waiting"
+  },
+  "nowUsbPick": "Choose “{name}” as the computer's output",
+  "@nowUsbPick": {
+    "description": "now.usb_pick",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nowOff": "Output off",
+  "@nowOff": {
+    "description": "now.off"
+  },
+  "nowPick": "Choose what to play",
+  "@nowPick": {
+    "description": "now.pick"
+  },
+  "nowConnecting": "Connecting…",
+  "@nowConnecting": {
+    "description": "now.connecting"
+  },
+  "nowCover": "Cover",
+  "@nowCover": {
+    "description": "now.cover"
+  },
+  "transportPlay": "Play",
+  "@transportPlay": {
+    "description": "transport.play"
+  },
+  "transportPause": "Pause",
+  "@transportPause": {
+    "description": "transport.pause"
+  },
+  "transportPrev": "Previous",
+  "@transportPrev": {
+    "description": "transport.prev"
+  },
+  "transportNext": "Next",
+  "@transportNext": {
+    "description": "transport.next"
+  },
+  "volumeLabel": "Volume",
+  "@volumeLabel": {
+    "description": "volume.label"
+  },
+  "volumeMute": "Mute",
+  "@volumeMute": {
+    "description": "volume.mute"
+  },
+  "volumeUnmute": "Unmute",
+  "@volumeUnmute": {
+    "description": "volume.unmute"
+  },
+  "unitKhz": "kHz",
+  "@unitKhz": {
+    "description": "unit.khz"
+  },
+  "unitKbps": "kbit/s",
+  "@unitKbps": {
+    "description": "unit.kbps"
+  },
+  "unitBit": "bit",
+  "@unitBit": {
+    "description": "unit.bit"
+  },
+  "sysScheme": "Colour scheme",
+  "@sysScheme": {
+    "description": "sys.scheme"
+  },
+  "sysSchemeAmber": "Amber",
+  "@sysSchemeAmber": {
+    "description": "sys.scheme_amber"
+  },
+  "sysSchemeBlue": "Blue",
+  "@sysSchemeBlue": {
+    "description": "sys.scheme_blue"
+  },
+  "sysSchemeGreen": "Green",
+  "@sysSchemeGreen": {
+    "description": "sys.scheme_green"
+  },
+  "sysSchemeRed": "Red",
+  "@sysSchemeRed": {
+    "description": "sys.scheme_red"
+  },
+  "langAsPanel": "Same as the panel",
+  "@langAsPanel": {
+    "description": "lang.as_panel"
+  },
+  "pageLanguage": "Language",
+  "@pageLanguage": {
+    "description": "page.language"
+  },
+  "mobApp": "App",
+  "@mobApp": {
+    "description": "mob.app"
+  },
+  "mobAppName": "ModESP Streamer",
+  "@mobAppName": {
+    "description": "mob.app_name"
+  },
+  "mobDemoNote": "A made-up panel, to see the app without the device",
+  "@mobDemoNote": {
+    "description": "mob.demo_note"
+  },
+  "mobDemoPanel": "Demo panel",
+  "@mobDemoPanel": {
+    "description": "mob.demo_panel"
+  },
+  "mobInWeb": "This is in the panel's web interface",
+  "@mobInWeb": {
+    "description": "mob.in_web"
+  },
+  "mobLangPhone": "Same as the phone",
+  "@mobLangPhone": {
+    "description": "mob.lang_phone"
+  },
+  "mobLicenses": "Licences",
+  "@mobLicenses": {
+    "description": "mob.licenses"
+  },
+  "mobPanel": "Panel",
+  "@mobPanel": {
+    "description": "mob.panel"
+  }
+}

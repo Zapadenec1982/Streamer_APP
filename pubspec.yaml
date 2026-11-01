@@ -1,0 +1,29 @@
+name: streamer
+description: "Remote control for the ModESP Streamer network player."
+publish_to: 'none'
+
+# build-name is Android's versionName, build-number its versionCode.
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.1.2
+  intl: ^0.20.3
+  shared_preferences: ^2.5.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # lib/l10n/*.arb → lib/l10n/app_localizations*.dart (l10n.yaml)
+  generate: true

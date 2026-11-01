@@ -1,0 +1,6 @@
+# The ARB files are written by tool/gen_l10n.py; never edit them by hand.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
