@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: firmware
+        run: echo "ref=$(cat tool/firmware_ref)" >> "$GITHUB_OUTPUT"
+
+      # The panel's colour table and the web's catalogs, at the firmware commit the app's
+      # generated files were made from (tool/firmware_ref).
+      - uses: actions/checkout@v7
+        with:
+          repository: Zapadenec1982/ModESP_Streamer
+          ref: ${{ steps.firmware.outputs.ref }}
+          path: firmware
+          sparse-checkout: |
+            modules/ui_lvgl/src
+            tools/ui
+            webui/src/i18n
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: stable
+          cache: true
+
+      - name: Generated files match the firmware
+        env:
+          MODESP_PLAYER_ROOT: firmware
+        run: |
+          python3 tool/gen_theme.py --check
+          python3 tool/gen_l10n.py --check
+
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: streamer-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
