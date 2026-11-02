@@ -57,6 +57,19 @@ Future<void> main(List<String> args) async {
       'card ${c.card.name}${c.active ? ' (playing)' : ''}: ${text(c.status)}',
     );
   }
+  stdout.writeln(
+    'sound: bass ${s.sound.bass}, treble ${s.sound.treble}, loudness ${s.sound.loudness}, '
+    'eq ${s.sound.eqOn}, leveler ${s.sound.leveler}',
+  );
+  final api = PanelDeviceApi(link);
+  final sounds = await api.soundPresets();
+  stdout.writeln(
+    'sounds: ${sounds.preset} of ${sounds.presets} (rev ${sounds.rev})',
+  );
+  final list = await api.stations();
+  stdout.writeln(
+    'stations: ${list.stations.length}, presets ${list.presets}, playing ${s.radio.current}',
+  );
   await sub.cancel();
-  await link.dispose();
+  api.dispose();
 }
