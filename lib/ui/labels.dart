@@ -91,6 +91,43 @@ extension Words on AppLocalizations {
     _ => id,
   };
 
+  /// A message the panel publishes — `@key`, then name=value arguments, each behind U+001F —
+  /// in the page's language: the web's msg() (webui/src/lib/msg.js). A key the app does not word
+  /// — a folder whose name starts with "@" — is shown as it is.
+  String message(String raw) {
+    final m = _message.firstMatch(raw);
+    if (m == null) return raw;
+    final key = m[1]!;
+    final args = <String, String>{};
+    for (final part in raw.substring(1 + key.length).split('\u001f').skip(1)) {
+      final eq = part.indexOf('=');
+      if (eq > 0) args[part.substring(0, eq)] = part.substring(eq + 1);
+    }
+    String a(String name) => args[name] ?? '{$name}';
+    return switch (key) {
+      'app.loading' => appLoading,
+      'dlna.servers' => dlnaServers,
+      'dlna.searching' => dlnaSearching,
+      'dlna.st_servers' => dlnaStServers(a('n')),
+      'dlna.st_page' => dlnaStPage(a('n')),
+      'dlna.st_no_socket' => dlnaStNoSocket,
+      'dlna.st_bad_id' => dlnaStBadId,
+      'dlna.st_unreachable' => dlnaStUnreachable,
+      'dlna.st_garbled' => dlnaStGarbled,
+      'dlna.st_page_size' => dlnaStPageSize,
+      'dlna.st_no_total' => dlnaStNoTotal,
+      'dlna.st_bad_list' => dlnaStBadList,
+      'dlna.st_broken_list' => dlnaStBrokenList,
+      'dlna.st_cancelled' => dlnaStCancelled,
+      'dlna.st_too_deep' => dlnaStTooDeep,
+      'dlna.st_playing' => dlnaStPlaying(a('title')),
+      'dlna.st_not_searched' => dlnaStNotSearched,
+      'dlna.unsupported' => dlnaUnsupported,
+      'dlna.queued' => dlnaQueued(a('title')),
+      _ => raw,
+    };
+  }
+
   /// The panel's colour scheme `ui.theme` by name.
   String schemeName(int scheme) => switch (scheme) {
     1 => sysSchemeBlue,
@@ -138,6 +175,8 @@ extension Words on AppLocalizations {
     return out.join(' ');
   }
 }
+
+final _message = RegExp(r'^@([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)(?:\u001f|$)');
 
 IconData cardIcon(SourceCard card) => switch (card) {
   SourceCard.bt => Icons.bluetooth,

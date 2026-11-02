@@ -167,17 +167,88 @@ void main() {
     expect(find.text('Оберіть «ModESP» на телефоні'), findsOneWidget);
   });
 
-  testWidgets('the media servers card points to the web instead of switching', (
-    tester,
-  ) async {
+  testWidgets('the media servers card opens their browser: servers, folders, '
+      'a track that plays', (tester) async {
     await pumpApp(tester);
+    Future<void> settle() async {
+      for (var i = 0; i < 8; i++) {
+        await tester.pump(const Duration(milliseconds: 300));
+      }
+    }
+
     await tester.tap(find.text('Джерело'));
     await tester.pumpAndSettle();
+    // rows are named by their tiles: the mini-player shows what the phone plays meanwhile
     await tester.tap(find.text('Медіасервери'));
-    await tester.pump();
-    expect(find.text('Це — у вебінтерфейсі стрімера'), findsOneWidget);
-    expect(api.current.now.source, SourceId.bt);
+    await settle();
+    expect(find.text('Медіасервери DLNA'), findsOne);
+    // none found yet: the page looks for them by itself, as the glass does
+    expect(find.text('Attic NAS'), findsOne);
+    await tester.tap(find.widgetWithText(ListTile, 'Attic NAS'));
+    await settle();
+    expect(find.text('Music'), findsOne);
+    await tester.tap(find.widgetWithText(ListTile, 'Live Recordings'));
+    await settle();
+    expect(find.text('Формат не підтримується'), findsOne);
+    // the path: «Медіасервери › Attic NAS › Live Recordings»; a crumb climbs back up
+    await tester.tap(find.widgetWithText(TextButton, 'Attic NAS'));
+    await settle();
+    await tester.tap(find.widgetWithText(ListTile, 'Music'));
+    await settle();
+    await tester.tap(find.widgetWithText(ListTile, 'Lantern Theory'));
+    await settle();
+    await tester.tap(find.widgetWithText(ListTile, 'Amber Hours'));
+    await settle();
+    await tester.tap(find.widgetWithText(ListTile, 'Morning Static'));
+    await settle();
+    expect(api.current.now.kind, NowKind.dlna);
+    expect(
+      find.text('Morning Static'),
+      findsOne,
+      reason: 'the Player shows it',
+    );
+    expect(find.text('Медіасервери DLNA'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets('the card\'s library: every track, a filter, a tap plays one', (
+    tester,
+  ) async {
+    await api.selectSource(SourceId.card);
+    await pumpApp(tester);
+    await tester.tap(find.byTooltip('Бібліотека картки'));
+    await tester.pumpAndSettle();
+    expect(find.text('16 треків'), findsOne);
+    expect(find.text('01 Glasshouse'), findsOne);
+    await tester.enterText(find.byType(TextField), 'orchard');
+    await tester.pumpAndSettle();
+    expect(find.text('4 з 16'), findsOne);
+    await tester.tap(find.text('03 Last Ferry'));
+    await tester.pumpAndSettle();
+    expect(api.current.now.title, isA<TextLabel>());
+    expect((api.current.now.title as TextLabel).text, 'Last Ferry');
+    expect(find.text('Бібліотека картки'), findsNothing);
+  });
+
+  testWidgets(
+    'the card\'s queue: shuffle and repeat, and a slider that seeks',
+    (tester) async {
+      await api.selectSource(SourceId.card);
+      await pumpApp(tester);
+      await tester.tap(find.byTooltip('Повтор вимкнено'));
+      await tester.pumpAndSettle();
+      expect(api.current.now.repeat, 1);
+      expect(find.byTooltip('Повтор одного треку'), findsOne);
+      await tester.tap(find.byTooltip('Випадковий порядок'));
+      await tester.pumpAndSettle();
+      expect(api.current.now.shuffle, isTrue);
+      // the first slider is the track's
+      await tester.drag(find.byType(Slider).first, const Offset(120, 0));
+      await tester.pumpAndSettle();
+      expect(api.current.now.position, greaterThan(Duration.zero));
+      await tester.pump(const Duration(seconds: 3));
+    },
+  );
 
   // The web's layout was checked at 390×844, 390×664 and 360×740; the app keeps to the same, and
   // to Android's largest text (200 %), here as a plain ×2 — harder than Android's own scaling,

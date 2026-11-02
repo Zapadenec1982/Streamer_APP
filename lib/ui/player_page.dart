@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../device/demo_art.dart';
 import '../device/models.dart';
@@ -125,6 +126,7 @@ class PlayerPage extends ConsumerWidget {
                       _Progress(
                         position: now.position ?? Duration.zero,
                         duration: now.duration!,
+                        seekable: now.seekable,
                       ),
                     const SizedBox(height: 8),
                     _Transport(now: now),
@@ -213,7 +215,8 @@ class _Cover extends ConsumerWidget {
   }
 }
 
-/// «Звук» and, where the panel has the night leveler, the moon — the web's Player foot.
+/// «Звук», where the panel has the night leveler the moon, and for the card and a media server
+/// the way to their list — the web's Player foot, the glass's list button (screen_now.cpp).
 class _SoundRow extends ConsumerWidget {
   const _SoundRow();
 
@@ -221,6 +224,13 @@ class _SoundRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final leveler = ref.watch(snapshotProvider.select((s) => s.sound.leveler));
+    final list = switch (ref.watch(
+      snapshotProvider.select((s) => s.now.kind),
+    )) {
+      NowKind.card => ('/player/library', l.pageLibrary),
+      NowKind.dlna => ('/player/dlna', l.pageDlna),
+      _ => null,
+    };
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -238,6 +248,14 @@ class _SoundRow extends ConsumerWidget {
                 act(context, ref, (api) => api.setLeveler(!leveler)),
             icon: const Icon(Icons.bedtime_outlined),
             selectedIcon: const Icon(Icons.bedtime),
+          ),
+        ],
+        if (list case (final route, final label)?) ...[
+          const SizedBox(width: 12),
+          IconButton.outlined(
+            tooltip: label,
+            onPressed: () => context.go(route),
+            icon: const Icon(Icons.queue_music),
           ),
         ],
       ],
@@ -284,48 +302,127 @@ class _SubtitleRow extends StatelessWidget {
   }
 }
 
-class _Progress extends StatelessWidget {
-  const _Progress({required this.position, required this.duration});
+/// Where in the track: a bar, or — where the source can seek and someone is there to take it — a
+/// slider. A position asked for stays shown until the panel reports one near it.
+class _Progress extends ConsumerStatefulWidget {
+  const _Progress({
+    required this.position,
+    required this.duration,
+    required this.seekable,
+  });
 
   final Duration position;
   final Duration duration;
+  final bool seekable;
+
+  @override
+  ConsumerState<_Progress> createState() => _ProgressState();
+}
+
+class _ProgressState extends ConsumerState<_Progress> {
+  /// Seconds under the finger.
+  double? _dragging;
+
+  /// The second asked for, until the panel reports one near it.
+  int? _sought;
+  Timer? _giveUp;
+
+  @override
+  void didUpdateWidget(_Progress old) {
+    super.didUpdateWidget(old);
+    final sought = _sought;
+    if (sought != null && (widget.position.inSeconds - sought).abs() <= 2) {
+      _sought = null;
+      _giveUp?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    _giveUp?.cancel();
+    super.dispose();
+  }
+
+  void _seek(double seconds) {
+    final to = seconds.round();
+    setState(() {
+      _dragging = null;
+      _sought = to;
+    });
+    _giveUp?.cancel();
+    _giveUp = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _sought = null);
+    });
+    act(context, ref, (api) => api.seek(to));
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme.labelSmall;
-    final value = (position.inMilliseconds / duration.inMilliseconds).clamp(
-      0.0,
-      1.0,
+    final total = widget.duration.inMilliseconds / 1000;
+    final at =
+        (_dragging ??
+                _sought?.toDouble() ??
+                widget.position.inMilliseconds / 1000)
+            .clamp(0.0, total);
+    final here = Duration(milliseconds: (at * 1000).round());
+    final clocks = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(clock(here), style: text),
+        Text(clock(widget.duration), style: text),
+      ],
     );
-    // TalkBack hears «0:56 of 3:42», not a bar's percent and two loose clocks
-    return Semantics(
-      container: true,
-      label: l.progressPosition,
-      value: l.mobOfTime(clock(position), clock(duration)),
-      child: ExcludeSemantics(
-        child: Column(
-          children: [
-            LinearProgressIndicator(
-              value: value,
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(2),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(clock(position), style: text),
-                Text(clock(duration), style: text),
-              ],
-            ),
-          ],
+    if (!widget.seekable) {
+      // TalkBack hears «0:56 of 3:42», not a bar's percent and two loose clocks
+      return Semantics(
+        container: true,
+        label: l.progressPosition,
+        value: l.mobOfTime(clock(here), clock(widget.duration)),
+        child: ExcludeSemantics(
+          child: Column(
+            children: [
+              LinearProgressIndicator(
+                value: total > 0 ? at / total : 0,
+                minHeight: 4,
+                borderRadius: BorderRadius.circular(2),
+              ),
+              const SizedBox(height: 6),
+              clocks,
+            ],
+          ),
         ),
-      ),
+      );
+    }
+    return Column(
+      children: [
+        MergeSemantics(
+          child: Semantics(
+            label: l.progressPosition,
+            child: Slider(
+              value: at,
+              max: total,
+              semanticFormatterCallback: (v) => l.mobOfTime(
+                clock(Duration(seconds: v.round())),
+                clock(widget.duration),
+              ),
+              onChanged: (v) => setState(() => _dragging = v),
+              onChangeEnd: _seek,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ExcludeSemantics(child: clocks),
+        ),
+      ],
     );
   }
 }
 
+/// Previous, play or pause, next — with the card's shuffle and repeat at the sides, as the web
+/// has them. Dimmed while nobody is there to take them (Bluetooth with no phone).
 class _Transport extends ConsumerWidget {
   const _Transport({required this.now});
 
@@ -340,43 +437,82 @@ class _Transport extends ConsumerWidget {
     if (!now.canToggle && !now.canPrevious && !now.canNext) {
       return const SizedBox(height: 72);
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+    final live = now.live;
+    final repeat = now.repeat;
+    final shuffle = now.shuffle ?? false;
+    final buttons = <Widget>[
+      if (repeat != null)
         IconButton(
-          iconSize: 36,
-          constraints: const BoxConstraints.tightFor(width: 64, height: 64),
-          tooltip: l.transportPrev,
-          onPressed: now.canPrevious
-              ? () => press(TransportAction.previous)
+          tooltip: l.transportShuffle,
+          isSelected: shuffle,
+          onPressed: live
+              ? () => act(context, ref, (api) => api.setShuffle(!shuffle))
               : null,
-          icon: const Icon(Icons.skip_previous),
+          icon: const Icon(Icons.shuffle),
         ),
-        const SizedBox(width: 24),
-        if (now.canToggle)
-          SizedBox.square(
-            dimension: 72,
-            child: IconButton.filled(
-              iconSize: 40,
-              tooltip: now.playing ? l.transportPause : l.transportPlay,
-              style: IconButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: colors.onPrimary,
-              ),
-              onPressed: () => press(TransportAction.toggle),
-              icon: Icon(now.playing ? Icons.pause : Icons.play_arrow),
+      IconButton(
+        iconSize: 36,
+        constraints: const BoxConstraints.tightFor(width: 64, height: 64),
+        tooltip: l.transportPrev,
+        onPressed: live && now.canPrevious
+            ? () => press(TransportAction.previous)
+            : null,
+        icon: const Icon(Icons.skip_previous),
+      ),
+      if (now.canToggle)
+        SizedBox.square(
+          dimension: 72,
+          child: IconButton.filled(
+            iconSize: 40,
+            tooltip: now.playing ? l.transportPause : l.transportPlay,
+            style: IconButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
             ),
+            onPressed: live ? () => press(TransportAction.toggle) : null,
+            icon: Icon(now.playing ? Icons.pause : Icons.play_arrow),
           ),
-        if (now.canToggle) const SizedBox(width: 24),
-        IconButton(
-          iconSize: 36,
-          constraints: const BoxConstraints.tightFor(width: 64, height: 64),
-          tooltip: l.transportNext,
-          onPressed: now.canNext ? () => press(TransportAction.next) : null,
-          icon: const Icon(Icons.skip_next),
         ),
-      ],
-    );
+      IconButton(
+        iconSize: 36,
+        constraints: const BoxConstraints.tightFor(width: 64, height: 64),
+        tooltip: l.transportNext,
+        onPressed: live && now.canNext
+            ? () => press(TransportAction.next)
+            : null,
+        icon: const Icon(Icons.skip_next),
+      ),
+      if (repeat != null)
+        IconButton(
+          tooltip: switch (repeat) {
+            1 => l.transportRepeatOne,
+            2 => l.transportRepeatAll,
+            _ => l.transportRepeatOff,
+          },
+          isSelected: repeat > 0,
+          onPressed: live
+              ? () =>
+                    act(context, ref, (api) => api.setRepeat((repeat + 1) % 3))
+              : null,
+          icon: Icon(repeat == 1 ? Icons.repeat_one : Icons.repeat),
+        ),
+    ];
+    // with the queue's two at the sides the row spreads over the width; without them the three
+    // stand together, 24 dp apart
+    return repeat != null
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: buttons,
+          )
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final (i, b) in buttons.indexed) ...[
+                if (i > 0) const SizedBox(width: 24),
+                b,
+              ],
+            ],
+          );
   }
 }
 

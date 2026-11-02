@@ -53,6 +53,40 @@ class PanelDeviceApi implements DeviceApi {
   }
 
   @override
+  Future<void> seek(int seconds) {
+    // where the source that plays takes a position (now.js seekKey)
+    final key = face(link.state).seekKey;
+    if (key == null) return Future.value();
+    return link.write({key: seconds < 0 ? 0 : seconds});
+  }
+
+  @override
+  Future<void> setRepeat(int mode) =>
+      link.write({Keys.playerRepeat.name: mode.clamp(0, 2)});
+
+  @override
+  Future<void> setShuffle(bool on) => link.write({Keys.playerShuffle.name: on});
+
+  @override
+  Future<LibraryPage> library({int from = 0, int count = 200}) async =>
+      libraryOf(
+        await link.getJson('/api/library', {'from': '$from', 'n': '$count'}),
+      );
+
+  /// The path first, then the command, in one body: the player reads the one with the other.
+  @override
+  Future<void> playTrack(String path) =>
+      link.write({Keys.playerTrack.name: path, Keys.playerCmd.name: 1});
+
+  @override
+  Future<DlnaView> dlnaView() async =>
+      dlnaViewOf(await link.getJson('/api/dlna/browser'));
+
+  @override
+  Future<void> dlnaCommand(int code) =>
+      link.write({Keys.dlnaBrowseCmd.name: code});
+
+  @override
   Future<void> selectSource(SourceId source) => link.write({
     Keys.audioSource.name: source.value,
     // the radio plays as it is chosen, as the glass and the web do (screen_src.cpp)
@@ -201,6 +235,8 @@ DeviceSnapshot snapshotOf(
       _ => null,
     },
     hostname: Keys.mdnsHostname.of(s) ?? '',
+    cardIndex: Keys.playerIndex.of(s) ?? -1,
+    cardCount: Keys.playerCount.of(s) ?? 0,
     sound: SoundState(
       bass: Keys.audioBassDb.of(s) ?? 0,
       treble: Keys.audioTrebleDb.of(s) ?? 0,
@@ -301,6 +337,55 @@ NowPlaying nowOf(Face f, Map<String, Object?> s) {
     position: track ? _seconds(f.pos) : null,
     duration: track ? _seconds(f.dur) : null,
     coverKey: cover > 0 ? '$cover' : null,
+    live: f.live,
+    seekable: f.seekKey != null && f.live,
+    repeat: f.repeat,
+    shuffle: f.shuffle,
+  );
+}
+
+/// `GET /api/library?from=&n=`: one page of the card's index.
+LibraryPage libraryOf(Object? json) {
+  final d = json is Map ? json : const {};
+  int number(String k, int or) => d[k] is int ? d[k] as int : or;
+  return LibraryPage(
+    gen: number('gen', 0),
+    busy: d['busy'] == true,
+    count: number('count', 0),
+    cursor: number('cursor', -1),
+    root: d['root'] is String ? d['root'] as String : '',
+    from: number('from', 0),
+    rows: [
+      for (final r in d['rows'] is List ? d['rows'] as List : const [])
+        if (r is String) r,
+    ],
+  );
+}
+
+/// `GET /api/dlna/browser`: the browser's snapshot.
+DlnaView dlnaViewOf(Object? json) {
+  final d = json is Map ? json : const {};
+  String text(Map m, String k) => m[k] is String ? m[k] as String : '';
+  return DlnaView(
+    revision: d['revision'] is int ? d['revision'] as int : 0,
+    busy: d['busy'] == true,
+    servers: d['servers'] == true,
+    canBack: d['can_back'] == true,
+    count: d['count'] is int ? d['count'] as int : 0,
+    next: d['next'] == true,
+    previous: d['previous'] == true,
+    title: text(d, 'title'),
+    status: text(d, 'status'),
+    rows: [
+      for (final r in d['rows'] is List ? d['rows'] as List : const [])
+        if (r is Map)
+          DlnaRow(
+            title: text(r, 'title'),
+            artist: text(r, 'artist'),
+            folder: r['folder'] == true,
+            playable: r['playable'] == true,
+          ),
+    ],
   );
 }
 

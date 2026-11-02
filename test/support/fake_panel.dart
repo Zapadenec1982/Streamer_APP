@@ -42,6 +42,26 @@ class FakePanel {
       'presets': [1, 0, 9, -1, -1, -1],
     },
   };
+
+  /// The card's index (`/api/library`): paths under [libraryRoot].
+  List<String> library = const [];
+  int libraryGen = 1;
+  String libraryRoot = '/sdcard';
+
+  /// The DLNA browser's snapshot (`/api/dlna/browser`), as the panel sends it.
+  Map<String, Object?> dlna = const {
+    'revision': 1,
+    'busy': false,
+    'servers': true,
+    'can_back': false,
+    'count': 0,
+    'next': false,
+    'previous': false,
+    'title': '@dlna.servers',
+    'status': '@dlna.st_not_searched',
+    'rows': [],
+  };
+
   final requests =
       <({String method, String path, String? contentType, Object? body})>[];
   int connections = 0;
@@ -164,6 +184,21 @@ class FakePanel {
         return _reply(req, 200, {'rev': eqRev});
       case ('GET', '/api/stations'):
         return _reply(req, 200, stations);
+      case ('GET', '/api/library'):
+        final from = int.tryParse(req.uri.queryParameters['from'] ?? '') ?? 0;
+        final n = int.tryParse(req.uri.queryParameters['n'] ?? '') ?? 100;
+        final start = from.clamp(0, library.length);
+        return _reply(req, 200, {
+          'gen': libraryGen,
+          'busy': false,
+          'count': library.length,
+          'cursor': -1,
+          'root': libraryRoot,
+          'from': start,
+          'rows': library.sublist(start, (start + n).clamp(0, library.length)),
+        });
+      case ('GET', '/api/dlna/browser'):
+        return _reply(req, 200, dlna);
       case ('GET', '/api/cover'):
         final bytes = cover;
         if (bytes == null) return _reply(req, 404, {'error': 'not_found'});

@@ -196,6 +196,22 @@
   "@transportNext": {
     "description": "transport.next"
   },
+  "transportRepeatOff": "Repeat off",
+  "@transportRepeatOff": {
+    "description": "transport.repeat_off"
+  },
+  "transportRepeatOne": "Repeat one track",
+  "@transportRepeatOne": {
+    "description": "transport.repeat_one"
+  },
+  "transportRepeatAll": "Repeat the queue",
+  "@transportRepeatAll": {
+    "description": "transport.repeat_all"
+  },
+  "transportShuffle": "Shuffle",
+  "@transportShuffle": {
+    "description": "transport.shuffle"
+  },
   "volumeLabel": "Volume",
   "@volumeLabel": {
     "description": "volume.label"
@@ -477,6 +493,212 @@
   "pageLanguage": "Language",
   "@pageLanguage": {
     "description": "page.language"
+  },
+  "pageLibrary": "Card library",
+  "@pageLibrary": {
+    "description": "page.library"
+  },
+  "pageDlna": "DLNA media servers",
+  "@pageDlna": {
+    "description": "page.dlna"
+  },
+  "libFilter": "Filter",
+  "@libFilter": {
+    "description": "lib.filter"
+  },
+  "libFilterPh": "Title or folder",
+  "@libFilterPh": {
+    "description": "lib.filter_ph"
+  },
+  "libBusy": "The card is still being read…",
+  "@libBusy": {
+    "description": "lib.busy"
+  },
+  "libFound": "{n} of {total}",
+  "@libFound": {
+    "description": "lib.found",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "libReading": "Reading the list… {n} of {total}",
+  "@libReading": {
+    "description": "lib.reading",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "libUnavailable": "The library is not available: {e}",
+  "@libUnavailable": {
+    "description": "lib.unavailable",
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "libEmpty": "The card is empty or cannot be read",
+  "@libEmpty": {
+    "description": "lib.empty"
+  },
+  "libNothing": "Nothing found",
+  "@libNothing": {
+    "description": "lib.nothing"
+  },
+  "libPlaying": "Playing",
+  "@libPlaying": {
+    "description": "lib.playing"
+  },
+  "dlnaPath": "Path",
+  "@dlnaPath": {
+    "description": "dlna.path"
+  },
+  "dlnaServers": "Media servers",
+  "@dlnaServers": {
+    "description": "dlna.servers"
+  },
+  "dlnaUp": "One level up",
+  "@dlnaUp": {
+    "description": "dlna.up"
+  },
+  "dlnaPrev": "Previous page",
+  "@dlnaPrev": {
+    "description": "dlna.prev"
+  },
+  "dlnaNext": "Next page",
+  "@dlnaNext": {
+    "description": "dlna.next"
+  },
+  "dlnaFind": "Find servers",
+  "@dlnaFind": {
+    "description": "dlna.find"
+  },
+  "dlnaSearching": "Looking for servers…",
+  "@dlnaSearching": {
+    "description": "dlna.searching"
+  },
+  "dlnaStServers": "Servers: {n}",
+  "@dlnaStServers": {
+    "description": "dlna.st_servers",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "dlnaStPage": "On this page: {n}",
+  "@dlnaStPage": {
+    "description": "dlna.st_page",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "dlnaStNoSocket": "Search unavailable: no socket",
+  "@dlnaStNoSocket": {
+    "description": "dlna.st_no_socket"
+  },
+  "dlnaStBadId": "Invalid folder ID",
+  "@dlnaStBadId": {
+    "description": "dlna.st_bad_id"
+  },
+  "dlnaStUnreachable": "The server is unreachable or its answer too large",
+  "@dlnaStUnreachable": {
+    "description": "dlna.st_unreachable"
+  },
+  "dlnaStGarbled": "The server's answer made no sense",
+  "@dlnaStGarbled": {
+    "description": "dlna.st_garbled"
+  },
+  "dlnaStPageSize": "The server ignored the page size",
+  "@dlnaStPageSize": {
+    "description": "dlna.st_page_size"
+  },
+  "dlnaStNoTotal": "The server did not say how many items the folder has",
+  "@dlnaStNoTotal": {
+    "description": "dlna.st_no_total"
+  },
+  "dlnaStBadList": "The server's list made no sense",
+  "@dlnaStBadList": {
+    "description": "dlna.st_bad_list"
+  },
+  "dlnaStBrokenList": "The folder's list is damaged",
+  "@dlnaStBrokenList": {
+    "description": "dlna.st_broken_list"
+  },
+  "dlnaStCancelled": "Cancelled",
+  "@dlnaStCancelled": {
+    "description": "dlna.st_cancelled"
+  },
+  "dlnaStTooDeep": "The folder is nested too deep",
+  "@dlnaStTooDeep": {
+    "description": "dlna.st_too_deep"
+  },
+  "dlnaStPlaying": "Playing: {title}",
+  "@dlnaStPlaying": {
+    "description": "dlna.st_playing",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dlnaStNotSearched": "No search for servers yet",
+  "@dlnaStNotSearched": {
+    "description": "dlna.st_not_searched"
+  },
+  "dlnaUnavailable": "The DLNA browser is not available: {e}",
+  "@dlnaUnavailable": {
+    "description": "dlna.unavailable",
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "dlnaNone": "No media servers found on the network",
+  "@dlnaNone": {
+    "description": "dlna.none"
+  },
+  "dlnaEmpty": "The folder is empty",
+  "@dlnaEmpty": {
+    "description": "dlna.empty"
+  },
+  "dlnaUnsupported": "Format not supported",
+  "@dlnaUnsupported": {
+    "description": "dlna.unsupported"
+  },
+  "dlnaQueue": "Play next",
+  "@dlnaQueue": {
+    "description": "dlna.queue"
+  },
+  "dlnaQueued": "Next: {title}",
+  "@dlnaQueued": {
+    "description": "dlna.queued",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "common.cancel"
+  },
+  "appLoading": "Loading…",
+  "@appLoading": {
+    "description": "app.loading"
   },
   "mobAddPanel": "Add a streamer",
   "@mobAddPanel": {

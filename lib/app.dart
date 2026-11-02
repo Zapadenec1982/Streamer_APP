@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 import 'theme/app_theme.dart';
+import 'ui/dlna_page.dart';
+import 'ui/library_page.dart';
 import 'ui/link_state.dart';
 import 'ui/panels_page.dart';
 import 'ui/phone_keys.dart';
@@ -32,6 +34,14 @@ final routerProvider = Provider<GoRouter>(
                     path: 'stations',
                     builder: (context, state) => const StationsPage(),
                   ),
+                  GoRoute(
+                    path: 'library',
+                    builder: (context, state) => const LibraryPage(),
+                  ),
+                  GoRoute(
+                    path: 'dlna',
+                    builder: (context, state) => const DlnaPage(),
+                  ),
                 ],
               ),
             ],
@@ -42,6 +52,12 @@ final routerProvider = Provider<GoRouter>(
                 path: '/source',
                 builder: (context, state) =>
                     const PanelPage(child: SourcePage()),
+                routes: [
+                  GoRoute(
+                    path: 'dlna',
+                    builder: (context, state) => const DlnaPage(),
+                  ),
+                ],
               ),
             ],
           ),

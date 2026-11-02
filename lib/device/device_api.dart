@@ -18,6 +18,14 @@ abstract interface class DeviceApi {
 
   Future<void> transport(TransportAction action);
 
+  /// Moves the track to [seconds], where the source can seek ([NowPlaying.seekable]).
+  Future<void> seek(int seconds);
+
+  /// The card's queue: repeat 0 off, 1 one track, 2 all.
+  Future<void> setRepeat(int mode);
+
+  Future<void> setShuffle(bool on);
+
   Future<void> selectSource(SourceId source);
 
   /// The sounds the panel offers and the one it plays.
@@ -50,6 +58,18 @@ abstract interface class DeviceApi {
 
   /// The catalog station that plays, into the list.
   Future<void> keepStation();
+
+  /// A page of the card's index, at most [count] rows from [from].
+  Future<LibraryPage> library({int from = 0, int count = 200});
+
+  /// Plays the card's track at [path] — the root and the row (`trackPath`).
+  Future<void> playTrack(String path);
+
+  /// The DLNA browser as it is now.
+  Future<DlnaView> dlnaView();
+
+  /// A browser command, packed with its row and revision (`browseCode`).
+  Future<void> dlnaCommand(int code);
 
   /// A page of the panel's web interface ("system/sound/eq"), or null where there is none.
   Uri? web(String route);

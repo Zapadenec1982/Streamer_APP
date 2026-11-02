@@ -248,6 +248,47 @@ class NoPanelApi implements DeviceApi {
   Future<void> selectSource(SourceId source) async {}
 
   @override
+  Future<void> seek(int seconds) async {}
+
+  @override
+  Future<void> setRepeat(int mode) async {}
+
+  @override
+  Future<void> setShuffle(bool on) async {}
+
+  @override
+  Future<LibraryPage> library({int from = 0, int count = 200}) async =>
+      const LibraryPage(
+        gen: 0,
+        busy: false,
+        count: 0,
+        cursor: -1,
+        root: '',
+        from: 0,
+        rows: [],
+      );
+
+  @override
+  Future<void> playTrack(String path) async {}
+
+  @override
+  Future<DlnaView> dlnaView() async => const DlnaView(
+    revision: 0,
+    busy: false,
+    servers: true,
+    canBack: false,
+    count: 0,
+    next: false,
+    previous: false,
+    title: '',
+    status: '',
+    rows: [],
+  );
+
+  @override
+  Future<void> dlnaCommand(int code) async {}
+
+  @override
   Future<SoundPresets> soundPresets() async =>
       const SoundPresets(rev: 0, preset: '', presets: []);
 

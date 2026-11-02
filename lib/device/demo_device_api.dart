@@ -1,23 +1,56 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'demo_art.dart';
 import 'device_api.dart';
+import 'media.dart';
 import 'models.dart';
 
 class _Track {
-  const _Track(this.title, this.artist, this.seconds, this.art);
+  const _Track(
+    this.title,
+    this.artist,
+    this.seconds,
+    this.art, {
+    this.album,
+    this.rel,
+  });
 
   final String title;
   final String artist;
   final int seconds;
 
-  /// Its cover: a [DemoArt] palette and pattern.
+  /// Its cover: a [DemoArt] palette and pattern — the album's, for one of the card's.
   final (int, int) art;
+
+  /// The card's: its album, and its path under the card's root.
+  final String? album;
+  final String? rel;
 
   Duration get duration => Duration(seconds: seconds);
 
-  String get coverKey => DemoArt.key(art.$1, art.$2, title);
+  String get coverKey => DemoArt.key(art.$1, art.$2, album ?? title);
+}
+
+/// A media server's entry: a folder, or a track.
+class _Node {
+  const _Node.folder(this.title, this.children)
+    : folder = true,
+      artist = '',
+      art = (0, 0),
+      playable = false;
+
+  const _Node.track(this.title, this.artist, this.art, {this.playable = true})
+    : folder = false,
+      children = const [];
+
+  final String title;
+  final bool folder;
+  final List<_Node> children;
+  final String artist;
+  final (int, int) art;
+  final bool playable;
 }
 
 /// A made-up panel, so the app can be seen without one — by a store's reviewer, and while it is
@@ -34,7 +67,10 @@ class DemoDeviceApi implements DeviceApi {
   static const panelName = 'ModESP';
   static const phoneName = 'Phone';
   static int get stationCount => _stations.length;
-  static const cardTrackCount = 248;
+  static int get cardTrackCount => _cardTracks.length;
+
+  /// Where the card's tracks are, as `GET /api/library` names it.
+  static const cardRoot = '/sdcard';
 
   static const _second = Duration(seconds: 1);
   static const _tuning = Duration(milliseconds: 1500);
@@ -45,11 +81,104 @@ class DemoDeviceApi implements DeviceApi {
     _Track('Seven Quiet Rooms', 'Lantern Theory', 198, (2, 2)),
     _Track('Copper Lanterns', 'Northbound Echo', 301, (3, 1)),
   ];
-  static const _cardTracks = [
-    _Track('Glasshouse', 'Cedar Line', 234, (4, 2)),
-    _Track('Low Tide Lamps', 'Cedar Line', 216, (1, 0)),
-    _Track('Northern Window', 'Cedar Line', 252, (5, 3)),
+
+  /// The card: the demo's own albums, a folder each under the card's root.
+  static const _albums = [
+    (
+      'Cedar Line',
+      'Northern Window',
+      (5, 3),
+      [
+        ('Glasshouse', 234),
+        ('Low Tide Lamps', 216),
+        ('Northern Window', 252),
+        ('Paper Harbour', 201),
+        ('Slow Weather', 243),
+      ],
+    ),
+    (
+      'Lantern Theory',
+      'Amber Hours',
+      (0, 0),
+      [
+        ('Amber Hours', 222),
+        ('Seven Quiet Rooms', 198),
+        ('Morning Static', 231),
+        ('The Long Hallway', 264),
+      ],
+    ),
+    (
+      'Northbound Echo',
+      'Copper Lanterns',
+      (3, 1),
+      [
+        ('Tidewater Static', 245),
+        ('Copper Lanterns', 301),
+        ('Salt Roads', 219),
+      ],
+    ),
+    (
+      'Glass Orchard',
+      'Field Notes',
+      (4, 2),
+      [
+        ('Greenhouse Light', 207),
+        ('Field Notes', 233),
+        ('Last Ferry', 256),
+        ('Orchard Road', 198),
+      ],
+    ),
   ];
+  static final List<_Track> _cardTracks = [
+    for (final (artist, album, art, tracks) in _albums)
+      for (final (i, (title, seconds)) in tracks.indexed)
+        _Track(
+          title,
+          artist,
+          seconds,
+          art,
+          album: album,
+          rel: '$artist/$album/${'${i + 1}'.padLeft(2, '0')} $title.flac',
+        ),
+  ];
+
+  /// The media servers on the demo's network, with folders and tracks of its own.
+  static const _servers = [
+    _Node.folder('Attic NAS', [
+      _Node.folder('Music', [
+        _Node.folder('Glass Orchard', [
+          _Node.folder('Field Notes', [
+            _Node.track('Greenhouse Light', 'Glass Orchard', (4, 2)),
+            _Node.track('Field Notes', 'Glass Orchard', (4, 2)),
+            _Node.track('Last Ferry', 'Glass Orchard', (4, 2)),
+            _Node.track('Orchard Road', 'Glass Orchard', (4, 2)),
+          ]),
+        ]),
+        _Node.folder('Lantern Theory', [
+          _Node.folder('Amber Hours', [
+            _Node.track('Amber Hours', 'Lantern Theory', (0, 0)),
+            _Node.track('Seven Quiet Rooms', 'Lantern Theory', (0, 0)),
+            _Node.track('Morning Static', 'Lantern Theory', (0, 0)),
+          ]),
+        ]),
+      ]),
+      _Node.folder('Live Recordings', [
+        _Node.track('Harbour Session', 'Northbound Echo', (
+          3,
+          1,
+        ), playable: false),
+      ]),
+    ]),
+    _Node.folder('Living Room PC', [
+      _Node.folder('Audio', [
+        _Node.track('Paper Harbour', 'Cedar Line', (5, 3)),
+        _Node.track('Slow Weather', 'Cedar Line', (5, 3)),
+      ]),
+    ]),
+  ];
+
+  /// Rows a page, as the panel's browser asks a server for them.
+  static const _browsePage = 12;
   static const _stations = [
     ('Radio Lantern', 'Lantern Theory - Amber Hours'),
     ('Northbound FM', 'Northbound Echo - Tidewater Static'),
@@ -87,9 +216,19 @@ class DemoDeviceApi implements DeviceApi {
   int _phoneTrack = 0;
   bool _phonePlaying = true;
   Duration _phonePosition = const Duration(seconds: 56);
-  int _cardTrack = 0;
+  int _cardIndex = 0;
   bool _cardPlaying = true;
   Duration _cardPosition = Duration.zero;
+  int _repeat = 0;
+  bool _shuffle = false;
+  final _random = Random(7);
+  bool _found = false;
+  final _path = <_Node>[];
+  int _page = 0;
+  int _browseRev = 1;
+  String _browseStatus = '@dlna.st_not_searched';
+  _Node? _dlna;
+  bool _dlnaPlaying = false;
   int _station = 0;
   final _presets = [0, 1, 2, -1, -1, -1];
   int _listRev = 1;
@@ -122,14 +261,22 @@ class DemoDeviceApi implements DeviceApi {
 
   @override
   Future<void> selectSource(SourceId source) async {
-    if (source == _source) return;
+    if (source == _source && _dlna == null) return;
     _source = source;
+    _dlna = null;
     if (source == SourceId.radio) _tuningLeft = _tuning;
     _emit();
   }
 
   @override
   Future<void> transport(TransportAction action) async {
+    // a track from a media server rides the radio's source, and has only play and pause here
+    if (_dlna != null && _source == SourceId.radio) {
+      if (action != TransportAction.toggle) return;
+      _dlnaPlaying = !_dlnaPlaying;
+      _emit();
+      return;
+    }
     switch ((_source, action)) {
       case (SourceId.bt, TransportAction.toggle):
         _phonePlaying = !_phonePlaying;
@@ -139,8 +286,12 @@ class DemoDeviceApi implements DeviceApi {
         _phonePlaying = true;
       case (SourceId.card, TransportAction.toggle):
         _cardPlaying = !_cardPlaying;
+      case (SourceId.card, TransportAction.next) when _shuffle:
+        _cardIndex = _shuffled();
+        _cardPosition = Duration.zero;
+        _cardPlaying = true;
       case (SourceId.card, _):
-        _cardTrack = _step(_cardTrack, _cardTracks.length, action);
+        _cardIndex = _step(_cardIndex, _cardTracks.length, action);
         _cardPosition = Duration.zero;
         _cardPlaying = true;
       case (SourceId.radio, TransportAction.previous || TransportAction.next):
@@ -166,8 +317,12 @@ class DemoDeviceApi implements DeviceApi {
     }
     if (_source == SourceId.card && _cardPlaying) {
       _cardPosition += elapsed;
-      if (_cardPosition >= _cardTracks[_cardTrack].duration) {
-        _cardTrack = (_cardTrack + 1) % _cardTracks.length;
+      if (_cardPosition >= _cardTracks[_cardIndex].duration) {
+        _cardIndex = _repeat == 1
+            ? _cardIndex
+            : _shuffle
+            ? _shuffled()
+            : (_cardIndex + 1) % _cardTracks.length;
         _cardPosition = Duration.zero;
       }
       changed = true;
@@ -177,6 +332,141 @@ class DemoDeviceApi implements DeviceApi {
       changed = true;
     }
     if (changed) _emit();
+  }
+
+  @override
+  Future<void> seek(int seconds) async {
+    if (_source != SourceId.card) return;
+    final end = _cardTracks[_cardIndex].seconds;
+    _cardPosition = Duration(seconds: seconds.clamp(0, end));
+    _emit();
+  }
+
+  @override
+  Future<void> setRepeat(int mode) async {
+    _repeat = mode.clamp(0, 2);
+    _emit();
+  }
+
+  @override
+  Future<void> setShuffle(bool on) async {
+    _shuffle = on;
+    _emit();
+  }
+
+  @override
+  Future<LibraryPage> library({int from = 0, int count = 200}) async {
+    final rows = [for (final t in _cardTracks) t.rel!];
+    final start = from.clamp(0, rows.length);
+    return LibraryPage(
+      gen: 1,
+      busy: false,
+      count: rows.length,
+      cursor: _cardIndex,
+      root: cardRoot,
+      from: start,
+      rows: rows.sublist(start, min(start + count, rows.length)),
+    );
+  }
+
+  @override
+  Future<void> playTrack(String path) async {
+    final i = _cardTracks.indexWhere(
+      (t) => trackPath(cardRoot, t.rel!) == path,
+    );
+    if (i < 0) return;
+    _source = SourceId.card;
+    _dlna = null;
+    _cardIndex = i;
+    _cardPosition = Duration.zero;
+    _cardPlaying = true;
+    _emit();
+  }
+
+  /// The folder on screen: the server, then each folder opened under it.
+  List<_Node> get _rows =>
+      _path.isEmpty ? (_found ? _servers : const []) : _path.last.children;
+
+  @override
+  Future<DlnaView> dlnaView() async {
+    final all = _rows;
+    final start = _path.isEmpty ? 0 : _page * _browsePage;
+    final page = _path.isEmpty
+        ? all
+        : all.skip(start).take(_browsePage).toList();
+    return DlnaView(
+      revision: _browseRev,
+      busy: false,
+      servers: _path.isEmpty,
+      canBack: _path.isNotEmpty,
+      count: page.length,
+      next: _path.isNotEmpty && start + _browsePage < all.length,
+      previous: _path.isNotEmpty && _page > 0,
+      title: _path.isEmpty ? '@dlna.servers' : _path.last.title,
+      status: _browseStatus,
+      rows: [
+        for (final n in page)
+          DlnaRow(
+            title: n.title,
+            artist: n.artist,
+            folder: n.folder,
+            playable: n.playable,
+          ),
+      ],
+    );
+  }
+
+  /// The browser's commands, as dlna_client takes them: one chosen from a snapshot that has moved
+  /// on does nothing.
+  @override
+  Future<void> dlnaCommand(int code) async {
+    final command = code & 15, row = code >> 4 & 255;
+    if ((code >> 12 & 0xffff) != (_browseRev & 0xffff)) return;
+    final view = await dlnaView();
+    final rows = _rows;
+    final at = (_path.isEmpty ? 0 : _page * _browsePage) + row;
+    switch (command) {
+      case Browse.discover:
+        _found = true;
+        _path.clear();
+        _page = 0;
+        _browseStatus = '@dlna.st_servers\u001fn=${_servers.length}';
+      case Browse.open when row < view.count:
+        final node = rows[at];
+        if (node.folder) {
+          _path.add(node);
+          _page = 0;
+          _browseStatus =
+              '@dlna.st_page\u001fn=${min(node.children.length, _browsePage)}';
+        } else if (node.playable) {
+          _dlna = node;
+          _dlnaPlaying = true;
+          _source = SourceId.radio;
+          _browseStatus = '@dlna.st_playing\u001ftitle=${node.title}';
+        } else {
+          _browseStatus = '@dlna.unsupported';
+        }
+      case Browse.back when _path.isNotEmpty:
+        _path.removeLast();
+        _page = 0;
+      case Browse.next when view.next:
+        _page++;
+      case Browse.previous when view.previous:
+        _page--;
+      case Browse.queue when row < view.count:
+        _browseStatus = '@dlna.queued\u001ftitle=${rows[at].title}';
+        _emit();
+        return;
+      default:
+        return;
+    }
+    _browseRev++;
+    _emit();
+  }
+
+  int _shuffled() {
+    final n = _cardTracks.length;
+    return (_cardIndex + 1 + _random.nextInt(n - 1)) % n;
   }
 
   @override
@@ -236,7 +526,9 @@ class DemoDeviceApi implements DeviceApi {
 
   @override
   Future<void> listen(int index) async {
-    if (index < 0 || index >= _stations.length || index == _station) return;
+    if (index < 0 || index >= _stations.length) return;
+    if (index == _station && _dlna == null) return;
+    _dlna = null;
     _station = index;
     _tuningLeft = _tuning;
     _emit();
@@ -309,6 +601,8 @@ class DemoDeviceApi implements DeviceApi {
       ],
       volume: _volume,
       muted: _muted,
+      cardIndex: _cardIndex,
+      cardCount: _cardTracks.length,
       sound: SoundState(
         bass: _bass,
         treble: _treble,
@@ -326,8 +620,11 @@ class DemoDeviceApi implements DeviceApi {
     );
   }
 
-  bool _isActive(SourceCard card) =>
-      card != SourceCard.servers && card.source == _source;
+  bool _isActive(SourceCard card) => switch (card) {
+    SourceCard.servers => _source == SourceId.radio && _dlna != null,
+    SourceCard.radio => _source == SourceId.radio && _dlna == null,
+    _ => card.source == _source,
+  };
 
   Label _status(SourceCard card, NowPlaying now) {
     final playingTitle = _isActive(card) && now.playing ? _plain(now) : null;
@@ -337,9 +634,9 @@ class DemoDeviceApi implements DeviceApi {
       SourceCard.radio =>
         playingTitle ?? LineLabel(CatalogLine.stations, count: stationCount),
       SourceCard.card =>
-        playingTitle ??
-            const LineLabel(CatalogLine.tracks, count: cardTrackCount),
-      SourceCard.servers => const LineLabel(CatalogLine.servers),
+        playingTitle ?? LineLabel(CatalogLine.tracks, count: cardTrackCount),
+      SourceCard.servers =>
+        playingTitle ?? const LineLabel(CatalogLine.servers),
       SourceCard.usb => const LineLabel(CatalogLine.usbWait),
     };
   }
@@ -347,7 +644,7 @@ class DemoDeviceApi implements DeviceApi {
   /// The card's line while its source plays: what plays, in the panel's own words.
   static Label? _plain(NowPlaying now) => switch ((now.title, now.subtitle)) {
     (TextLabel(:final text), TextLabel(text: final sub))
-        when now.source == SourceId.radio =>
+        when now.kind == NowKind.radio =>
       TextLabel(sub.isEmpty ? text : sub),
     (TextLabel(:final text), _) => TextLabel(text),
     _ => null,
@@ -372,7 +669,7 @@ class DemoDeviceApi implements DeviceApi {
           coverKey: t.coverKey,
         );
       case SourceId.card:
-        final t = _cardTracks[_cardTrack];
+        final t = _cardTracks[_cardIndex];
         return NowPlaying(
           kind: NowKind.card,
           title: TextLabel(t.title),
@@ -385,6 +682,20 @@ class DemoDeviceApi implements DeviceApi {
           position: _cardPosition,
           duration: t.duration,
           coverKey: t.coverKey,
+          seekable: true,
+          repeat: _repeat,
+          shuffle: _shuffle,
+        );
+      case SourceId.radio when _dlna != null:
+        final n = _dlna!;
+        return NowPlaying(
+          kind: NowKind.dlna,
+          title: TextLabel(n.title),
+          subtitle: TextLabel(n.artist),
+          format: 'FLAC 44.1 kHz 16 bit',
+          playing: _dlnaPlaying,
+          canToggle: true,
+          coverKey: DemoArt.key(n.art.$1, n.art.$2, n.title),
         );
       case SourceId.radio:
         final (name, line) = _stations[_station];

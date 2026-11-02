@@ -75,6 +75,14 @@ abstract final class Keys {
   );
   static const radioWebAct = StateKey<int>('radio.web_act', writable: true);
   static const radioFavAdd = StateKey<bool>('radio.fav_add', writable: true);
+  static const playerTrack = StateKey<String>('player.track', writable: true);
+  static const playerCmd = StateKey<int>('player.cmd', writable: true);
+  static const playerIndex = StateKey<int>('player.index');
+  static const playerRepeat = StateKey<int>('player.repeat', writable: true);
+  static const playerShuffle = StateKey<bool>('player.shuffle', writable: true);
+  static const playerSeekS = StateKey<int>('player.seek_s', writable: true);
+  static const radioSeekS = StateKey<int>('radio.seek_s', writable: true);
+  static const dlnaBrowseCmd = StateKey<int>('dlna.browse_cmd', writable: true);
   static const mdnsHostname = StateKey<String>(
     'system.mdns_hostname',
     framework: true,
@@ -115,6 +123,14 @@ abstract final class Keys {
     radioWebUuid,
     radioWebAct,
     radioFavAdd,
+    playerTrack,
+    playerCmd,
+    playerIndex,
+    playerRepeat,
+    playerShuffle,
+    playerSeekS,
+    radioSeekS,
+    dlnaBrowseCmd,
     mdnsHostname,
   ];
 }

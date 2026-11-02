@@ -40,7 +40,7 @@ enum NowKind {
 }
 
 /// The Source page's cards, in the panel's order (screen_src.cpp CARDS). The media servers ride
-/// the radio's source; the app opens them in the panel's web interface.
+/// the radio's source; their card opens the browser.
 enum SourceCard {
   bt(SourceId.bt),
   airplay(SourceId.airplay),
@@ -125,6 +125,10 @@ class NowPlaying {
     this.position,
     this.duration,
     this.coverKey,
+    this.live = true,
+    this.seekable = false,
+    this.repeat,
+    this.shuffle,
   });
 
   final NowKind kind;
@@ -147,6 +151,16 @@ class NowPlaying {
 
   /// What the cover is of; null when there is none.
   final String? coverKey;
+
+  /// Someone is there to take the transport: Bluetooth needs a phone, AirPlay a remote.
+  final bool live;
+
+  /// The position can be moved — a card's track, a stream that seeks.
+  final bool seekable;
+
+  /// The card's queue: repeat 0 off, 1 one track, 2 all; null where the source has no queue.
+  final int? repeat;
+  final bool? shuffle;
 
   SourceId get source => kind.source;
 }
@@ -191,6 +205,8 @@ class DeviceSnapshot {
     this.sound = const SoundState(),
     this.radio = const StationState(),
     this.hostname = '',
+    this.cardIndex = -1,
+    this.cardCount = 0,
   });
 
   /// The panel's device name — what AirPlay and Bluetooth list it by.
@@ -199,6 +215,11 @@ class DeviceSnapshot {
   /// The panel's mDNS host name ("modesp-2c4c"): what the app knows it by, however it was added;
   /// empty until it says so, and for the demo.
   final String hostname;
+
+  /// The card's queue: the track it is on, by its place in the library (−1 for none), and how
+  /// many tracks the card has — a new count is a new card.
+  final int cardIndex;
+  final int cardCount;
 
   /// `ui.theme`: the panel's colour scheme, which the app wears too.
   final int scheme;
@@ -303,4 +324,87 @@ class StationList {
   final List<int> presets;
 
   static const presetCount = 6;
+}
+
+/// One page of the card's index (`GET /api/library`).
+class LibraryPage {
+  const LibraryPage({
+    required this.gen,
+    required this.busy,
+    required this.count,
+    required this.cursor,
+    required this.root,
+    required this.from,
+    required this.rows,
+  });
+
+  /// Moves whenever the panel builds the index again.
+  final int gen;
+
+  /// The panel is still reading the card.
+  final bool busy;
+  final int count;
+
+  /// The track the queue is on, −1 for none.
+  final int cursor;
+
+  /// The folder the rows are under.
+  final String root;
+  final int from;
+
+  /// Paths under [root].
+  final List<String> rows;
+}
+
+/// The DLNA browser as it is now (`GET /api/dlna/browser`) — one browser for the glass, the web and
+/// the app.
+class DlnaView {
+  const DlnaView({
+    required this.revision,
+    required this.busy,
+    required this.servers,
+    required this.canBack,
+    required this.count,
+    required this.next,
+    required this.previous,
+    required this.title,
+    required this.status,
+    required this.rows,
+  });
+
+  /// Every command names the revision it was chosen from.
+  final int revision;
+
+  /// Something is being fetched.
+  final bool busy;
+
+  /// The rows are servers, not a folder's entries.
+  final bool servers;
+  final bool canBack;
+  final int count;
+
+  /// More pages either way.
+  final bool next;
+  final bool previous;
+
+  /// The folder's name, or the catalog message of the servers' list (`@dlna.servers`).
+  final String title;
+
+  /// A catalog message (`@dlna.*`, arguments after U+001F).
+  final String status;
+  final List<DlnaRow> rows;
+}
+
+class DlnaRow {
+  const DlnaRow({
+    required this.title,
+    this.artist = '',
+    this.folder = false,
+    this.playable = false,
+  });
+
+  final String title;
+  final String artist;
+  final bool folder;
+  final bool playable;
 }
