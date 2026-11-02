@@ -1,0 +1,17 @@
+ModESP Streamer is the remote for a ModESP Streamer network player: the panel with its own touch screen that plays Bluetooth, AirPlay, internet radio, a memory card, media servers and sound from a computer over USB.
+
+The app shows what plays and puts the everyday controls in your hand:
+
+• Player: the cover, the title and the artist, where the sound comes from and in what format. Play, pause and skip as far as the source allows. The volume, with the phone's own volume buttons too.
+• Sources: every source the panel has, with what it would play now. A tap switches.
+• Radio: the station between ‹ and ›, six preset buttons (a tap listens, a hold stores what plays) and the whole station list.
+• Sound: the panel's sound presets, Bass and Treble, loudness, and the night leveler that keeps quiet and loud passages close together.
+• Several panels: found on your Wi-Fi by themselves or added by address, and remembered.
+
+The deeper settings (the equalizer, the speakers, Wi-Fi, updates) stay in the panel's own web interface, a tap away.
+
+The app speaks English, Ukrainian, German and Polish, wears the panel's colour scheme, and works with TalkBack and large text.
+
+No panel yet? Open the demo on the first screen: a made-up panel with its own tracks and stations shows everything the app does.
+
+What it needs: a ModESP Streamer panel on the same Wi-Fi network as the phone. The app talks only to that panel, on your home network. No account, no cloud, no ads, no tracking.
