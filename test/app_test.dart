@@ -156,7 +156,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Медіасервери'));
     await tester.pump();
-    expect(find.text('Це — у вебінтерфейсі панелі'), findsOneWidget);
+    expect(find.text('Це — у вебінтерфейсі стрімера'), findsOneWidget);
     expect(api.current.now.source, SourceId.bt);
   });
 
@@ -332,7 +332,7 @@ void main() {
     await tester.pump();
     expect(find.text('Підключення…'), findsOne);
     await tester.pump(const Duration(seconds: 11));
-    expect(find.text("Немає зв'язку з панеллю"), findsOne);
+    expect(find.text("Немає зв'язку зі стрімером"), findsOne);
     // at once, not at the end of the backoff
     final resumed = silent.resumed;
     await tester.tap(find.text('Повторити'));
@@ -341,9 +341,9 @@ void main() {
     expect(silent.resumed, resumed + 1);
     expect(find.text('Підключення…'), findsOne);
     await tester.pump(const Duration(seconds: 11));
-    await tester.tap(find.text('Інша панель'));
+    await tester.tap(find.text('Інший стрімер'));
     await tester.pumpAndSettle();
-    expect(find.text('Демо-панель'), findsOne);
+    expect(find.text('Демо-стрімер'), findsOne);
   });
 
   testWidgets(
@@ -422,7 +422,7 @@ void main() {
     api.dispose();
     api = FailingDemo();
     await pumpApp(tester);
-    final said = find.text("Немає зв'язку з панеллю");
+    final said = find.text("Немає зв'язку зі стрімером");
     await tester.tap(find.byTooltip('Вимкнути звук'));
     await tester.pumpAndSettle();
     expect(said, findsOneWidget);
@@ -508,8 +508,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Підключіть панель'), findsOneWidget);
-    expect(find.text('Знайти панель'), findsOneWidget);
+    expect(find.text('Підключіть стрімер'), findsOneWidget);
+    expect(find.text('Знайти стрімер'), findsOneWidget);
     await tester.tap(find.text('Спробувати демо'));
     await tester.pumpAndSettle();
     expect(find.text('BLUETOOTH'), findsOneWidget);

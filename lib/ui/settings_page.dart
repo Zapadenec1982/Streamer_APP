@@ -60,7 +60,7 @@ class SettingsPage extends ConsumerWidget {
             leading: const Icon(Icons.palette_outlined),
             title: Text(l.sysScheme),
             subtitle: Text(
-              '${l.schemeName(snapshot.scheme)} · ${l.langAsPanel}',
+              '${l.schemeName(snapshot.scheme)} · ${l.mobAsStreamer}',
             ),
           ),
           ListTile(

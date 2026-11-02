@@ -61,11 +61,7 @@ unit.kbps
 unit.bit
 
 # the link to the panel
-conn.lost
-app.error
 app.retry
-err.code
-err.bad_request
 auth.title
 auth.user
 auth.pass
@@ -129,5 +125,4 @@ sys.scheme_amber
 sys.scheme_blue
 sys.scheme_green
 sys.scheme_red
-lang.as_panel
 page.language

@@ -224,30 +224,9 @@
   "@unitBit": {
     "description": "unit.bit"
   },
-  "connLost": "Lost the connection to the panel. Reconnecting…",
-  "@connLost": {
-    "description": "conn.lost"
-  },
-  "appError": "Cannot reach the panel",
-  "@appError": {
-    "description": "app.error"
-  },
   "appRetry": "Retry",
   "@appRetry": {
     "description": "app.retry"
-  },
-  "errCode": "The panel answered: {code}",
-  "@errCode": {
-    "description": "err.code",
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
-  "errBadRequest": "The panel did not accept the request",
-  "@errBadRequest": {
-    "description": "err.bad_request"
   },
   "authTitle": "Sign in",
   "@authTitle": {
@@ -495,15 +474,11 @@
   "@sysSchemeRed": {
     "description": "sys.scheme_red"
   },
-  "langAsPanel": "Same as the panel",
-  "@langAsPanel": {
-    "description": "lang.as_panel"
-  },
   "pageLanguage": "Language",
   "@pageLanguage": {
     "description": "page.language"
   },
-  "mobAddPanel": "Add a panel",
+  "mobAddPanel": "Add a streamer",
   "@mobAddPanel": {
     "description": "mob.add_panel"
   },
@@ -511,7 +486,7 @@
   "@mobAdded": {
     "description": "mob.added"
   },
-  "mobAddress": "Panel address",
+  "mobAddress": "Streamer address",
   "@mobAddress": {
     "description": "mob.address"
   },
@@ -527,7 +502,11 @@
   "@mobAppName": {
     "description": "mob.app_name"
   },
-  "mobBusy": "The panel already serves three clients. Trying again…",
+  "mobAsStreamer": "Same as the streamer",
+  "@mobAsStreamer": {
+    "description": "mob.as_streamer"
+  },
+  "mobBusy": "The streamer already serves three clients. Trying again…",
   "@mobBusy": {
     "description": "mob.busy"
   },
@@ -535,19 +514,32 @@
   "@mobByAddress": {
     "description": "mob.by_address"
   },
+  "mobConnLost": "Lost the connection to the streamer. Reconnecting…",
+  "@mobConnLost": {
+    "description": "mob.conn_lost"
+  },
   "mobConnect": "Connect",
   "@mobConnect": {
     "description": "mob.connect"
   },
-  "mobDemoNote": "A made-up panel, to see the app without the device",
+  "mobDemoNote": "A made-up streamer, to see the app without the device",
   "@mobDemoNote": {
     "description": "mob.demo_note"
   },
-  "mobDemoPanel": "Demo panel",
+  "mobDemoPanel": "Demo streamer",
   "@mobDemoPanel": {
     "description": "mob.demo_panel"
   },
-  "mobFind": "Find a panel",
+  "mobErrCode": "The streamer answered: {code}",
+  "@mobErrCode": {
+    "description": "mob.err_code",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "mobFind": "Find a streamer",
   "@mobFind": {
     "description": "mob.find"
   },
@@ -563,7 +555,7 @@
   "@mobHintStore": {
     "description": "mob.hint_store"
   },
-  "mobInWeb": "This is in the panel's web interface",
+  "mobInWeb": "This is in the streamer's web interface",
   "@mobInWeb": {
     "description": "mob.in_web"
   },
@@ -575,19 +567,23 @@
   "@mobLicenses": {
     "description": "mob.licenses"
   },
-  "mobNoPanel": "Connect a panel",
+  "mobNoLink": "Cannot reach the streamer",
+  "@mobNoLink": {
+    "description": "mob.no_link"
+  },
+  "mobNoPanel": "Connect a streamer",
   "@mobNoPanel": {
     "description": "mob.no_panel"
   },
-  "mobNoPanelNote": "The phone and the panel need to be on the same Wi-Fi",
+  "mobNoPanelNote": "The phone and the streamer need to be on the same Wi-Fi",
   "@mobNoPanelNote": {
     "description": "mob.no_panel_note"
   },
-  "mobNoneFound": "No panels on this network",
+  "mobNoneFound": "No streamers on this network",
   "@mobNoneFound": {
     "description": "mob.none_found"
   },
-  "mobNotPanel": "There is no ModESP panel at this address",
+  "mobNotPanel": "There is no ModESP streamer at this address",
   "@mobNotPanel": {
     "description": "mob.not_panel"
   },
@@ -607,23 +603,23 @@
   "@mobOnNetwork": {
     "description": "mob.on_network"
   },
-  "mobOtherPanel": "Another panel",
+  "mobOtherPanel": "Another streamer",
   "@mobOtherPanel": {
     "description": "mob.other_panel"
   },
-  "mobPanel": "Panel",
+  "mobPanel": "Streamer",
   "@mobPanel": {
     "description": "mob.panel"
   },
-  "mobPanelSettings": "Panel settings",
+  "mobPanelSettings": "Streamer settings",
   "@mobPanelSettings": {
     "description": "mob.panel_settings"
   },
-  "mobPanels": "Panels",
+  "mobPanels": "Streamers",
   "@mobPanels": {
     "description": "mob.panels"
   },
-  "mobSearching": "Looking for panels…",
+  "mobSearching": "Looking for streamers…",
   "@mobSearching": {
     "description": "mob.searching"
   },
