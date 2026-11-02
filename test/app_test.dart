@@ -174,6 +174,34 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
   });
 
+  testWidgets('a run of presses shows one popup that follows it, then none', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    final popup = find.bySemanticsLabel(RegExp(r'^Гучність \d+$'));
+    Future<void> press() => tester.runAsync(() async {
+      phone.press(1);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
+    // one press, then the button held: Android repeats it every ~50 ms, a frame every 16
+    await press();
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 4; i++) {
+      await press();
+      for (var frame = 0; frame < 3; frame++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+    }
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(popup, findsOneWidget);
+    expect(find.bySemanticsLabel('Гучність 42'), findsOneWidget);
+    expect(api.current.volume, 42);
+    // not a popup for each press, one after another, once the volume is there
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(popup, findsNothing);
+  });
+
   testWidgets(
     'the Sound sheet: a sound, Bass, Treble, loudness, the way to the equalizer',
     (tester) async {
