@@ -28,6 +28,28 @@ class StateKey<T extends Object> {
   }
 }
 
+/// A sound setting a slider moves: its key, and the range and step the panel holds it to (the
+/// modules' manifests; test/keys_test.dart holds them to protocol/state_meta.json).
+enum AudioSetting {
+  loudness(Keys.audioLoudness, 0, 100, 10),
+  loudRef(Keys.audioLoudRef, 20, 100, 1),
+  width(Keys.audioWidth, 0, 200, 5),
+  monoBass(Keys.audioMonoBassHz, 0, 300, 10),
+  subsonic(Keys.audioHpHz, 0, 80, 5),
+  bassLimiter(Keys.audioBassXoHz, 0, 250, 10),
+  portLift(Keys.audioPortLiftDb, 0, 6, 1),
+
+  /// Tenths of a dB: above 0 the left channel is quieter, below it the right.
+  balance(Keys.audioBalanceDb10, -60, 60, 5);
+
+  const AudioSetting(this.key, this.min, this.max, this.step);
+
+  final StateKey<int> key;
+  final int min;
+  final int max;
+  final int step;
+}
+
 abstract final class Keys {
   static const audioSource = StateKey<int>('audio.source', writable: true);
   static const audioSources = StateKey<int>('audio.sources');
@@ -74,6 +96,43 @@ abstract final class Keys {
   static const audioPortHz = StateKey<int>('audio.port_hz', writable: true);
   static const audioPortLiftDb = StateKey<int>(
     'audio.port_lift_db',
+    writable: true,
+  );
+  static const audioPortSrc = StateKey<int>('audio.port_src', writable: true);
+  static const audioPortMeas = StateKey<bool>(
+    'audio.port_meas',
+    writable: true,
+  );
+  static const audioPortMeasCh = StateKey<int>(
+    'audio.port_meas_ch',
+    writable: true,
+  );
+  static const audioPortMeasHz = StateKey<double>('audio.port_meas_hz');
+  static const audioPortMeasStatus = StateKey<String>('audio.port_meas_status');
+  static const audioBalanceDb10 = StateKey<int>(
+    'audio.balance_db10',
+    writable: true,
+  );
+  static const audioWidth = StateKey<int>('audio.width', writable: true);
+  static const audioMonoBassHz = StateKey<int>(
+    'audio.mono_bass_hz',
+    writable: true,
+  );
+  static const audioBassXoHz = StateKey<int>(
+    'audio.bass_xo_hz',
+    writable: true,
+  );
+  static const audioLoudRef = StateKey<int>('audio.loud_ref', writable: true);
+  static const audioToneMode = StateKey<int>('audio.tone_mode', writable: true);
+  static const audioToneHz = StateKey<int>('audio.tone_hz', writable: true);
+  static const audioToneDb10 = StateKey<int>('audio.tone_db10', writable: true);
+  static const audioToneCh = StateKey<int>('audio.tone_ch', writable: true);
+  static const audioCalPortOff = StateKey<bool>(
+    'audio.cal_port_off',
+    writable: true,
+  );
+  static const audioCalVolCap = StateKey<int>(
+    'audio.cal_vol_cap',
     writable: true,
   );
   static const radioStation = StateKey<int>('radio.station', writable: true);
@@ -140,6 +199,22 @@ abstract final class Keys {
     audioSpkType,
     audioPortHz,
     audioPortLiftDb,
+    audioPortSrc,
+    audioPortMeas,
+    audioPortMeasCh,
+    audioPortMeasHz,
+    audioPortMeasStatus,
+    audioBalanceDb10,
+    audioWidth,
+    audioMonoBassHz,
+    audioBassXoHz,
+    audioLoudRef,
+    audioToneMode,
+    audioToneHz,
+    audioToneDb10,
+    audioToneCh,
+    audioCalPortOff,
+    audioCalVolCap,
     radioStation,
     radioListRev,
     radioUrl,

@@ -1,0 +1,1832 @@
+{
+ "_comment": "Written by tool/speaker_cases.mjs from the firmware's speakers.js and calib.js - do not edit by hand.",
+ "tone": {
+  "modes": [
+   0,
+   1,
+   2
+  ],
+  "channels": [
+   1,
+   2,
+   3
+  ],
+  "defaults": {
+   "mode": 0,
+   "hz": 1000,
+   "db10": -260,
+   "ch": 3
+  },
+  "cal_max_s": 60
+ },
+ "wizard": [
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "choose",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "next",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "done",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "accept",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "skip",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "keep",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "stop",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 0,
+   "action": "retry",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "choose",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "next",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "done",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 62.4,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 62,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 62.5,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 63,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 29.5,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 30,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 80.4,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 80,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "accept",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "skip",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "keep",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "stop",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 1,
+   "action": "retry",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "choose",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "next",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 62.4,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 62.5,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 29.4,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 29.5,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 80.4,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 80.5,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 25,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": 95,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "done",
+   "hz": null,
+   "writes": {
+    "audio.spk_type": 2
+   }
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "accept",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "skip",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "keep",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "stop",
+   "hz": null,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 62.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 62.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 29.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 29.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 80.4,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 80.5,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 25,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": 95,
+   "writes": null
+  },
+  {
+   "type": 2,
+   "action": "retry",
+   "hz": null,
+   "writes": null
+  }
+ ],
+ "port": [
+  {
+   "hz": 62.6,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 63,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 62.6,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 63,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 45,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 45,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 45,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 45,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 44.5,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 45,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 44.5,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 45,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 20,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 30,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 20,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 30,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 120,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 80,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 120,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 80,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 30,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 30,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 30,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 30,
+    "audio.port_src": 1
+   }
+  },
+  {
+   "hz": 80,
+   "measured": true,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 80,
+    "audio.port_src": 3
+   }
+  },
+  {
+   "hz": 80,
+   "measured": false,
+   "writes": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 80,
+    "audio.port_src": 1
+   }
+  }
+ ],
+ "states": [
+  {
+   "state": {},
+   "port": {
+    "hz": 0,
+    "measured": false
+   },
+   "title": "spk.unset",
+   "line": "",
+   "hz": null,
+   "again": false
+  },
+  {
+   "state": {
+    "audio.port_hz": 62,
+    "audio.port_src": 1
+   },
+   "port": {
+    "hz": 62,
+    "measured": false
+   },
+   "title": "spk.unset",
+   "line": "spk.port_manual",
+   "hz": 62,
+   "again": false
+  },
+  {
+   "state": {
+    "audio.port_hz": 62,
+    "audio.port_src": 3
+   },
+   "port": {
+    "hz": 62,
+    "measured": true
+   },
+   "title": "spk.unset",
+   "line": "spk.port_measured",
+   "hz": 62,
+   "again": false
+  },
+  {
+   "state": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 62,
+    "audio.port_src": 3
+   },
+   "port": {
+    "hz": 62,
+    "measured": true
+   },
+   "title": "spk.ported",
+   "line": "spk.port_measured",
+   "hz": 62,
+   "again": true
+  },
+  {
+   "state": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 55,
+    "audio.port_src": 1
+   },
+   "port": {
+    "hz": 55,
+    "measured": false
+   },
+   "title": "spk.ported",
+   "line": "spk.port_manual",
+   "hz": 55,
+   "again": true
+  },
+  {
+   "state": {
+    "audio.spk_type": 1,
+    "audio.port_hz": 55,
+    "audio.port_src": 0
+   },
+   "port": {
+    "hz": 55,
+    "measured": false
+   },
+   "title": "spk.ported",
+   "line": "spk.port_manual",
+   "hz": 55,
+   "again": true
+  },
+  {
+   "state": {
+    "audio.spk_type": 1
+   },
+   "port": {
+    "hz": 0,
+    "measured": false
+   },
+   "title": "spk.ported",
+   "line": "spk.port_none",
+   "hz": 0,
+   "again": true
+  },
+  {
+   "state": {
+    "audio.spk_type": 2,
+    "audio.port_hz": 62,
+    "audio.port_src": 3
+   },
+   "port": {
+    "hz": 0,
+    "measured": false
+   },
+   "title": "spk.closed",
+   "line": "",
+   "hz": null,
+   "again": true
+  },
+  {
+   "state": {
+    "audio.spk_type": 2
+   },
+   "port": {
+    "hz": 0,
+    "measured": false
+   },
+   "title": "spk.closed",
+   "line": "",
+   "hz": null,
+   "again": true
+  }
+ ],
+ "meter": [
+  {
+   "status": "",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "",
+   "measuring": false,
+   "outcome": "idle"
+  },
+  {
+   "status": "@cal.m_progress\u001fhz=45\u001fk=21\u001fn=41",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_progress\u001fhz=45\u001fk=21\u001fn=41",
+   "measuring": false,
+   "outcome": "idle"
+  },
+  {
+   "status": "@cal.m_found\u001fhz=62",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_found\u001fhz=62",
+   "measuring": false,
+   "outcome": "found"
+  },
+  {
+   "status": "@cal.m_doubtful\u001fhz=62",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_doubtful\u001fhz=62",
+   "measuring": false,
+   "outcome": "doubtful"
+  },
+  {
+   "status": "@cal.m_outside\u001fhz=95",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_outside\u001fhz=95",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_no_dip",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_no_dip",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_no_tone",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_no_tone",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_mic_open",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_mic_open",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_mic_read",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_mic_read",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_no_memory",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_no_memory",
+   "measuring": false,
+   "outcome": "failed"
+  },
+  {
+   "status": "@cal.m_stopped",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_stopped",
+   "measuring": false,
+   "outcome": "idle"
+  },
+  {
+   "status": "@cal.m_interrupted",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_interrupted",
+   "measuring": false,
+   "outcome": "idle"
+  },
+  {
+   "status": "@cal.m_silence",
+   "measuring": true,
+   "outcome": "running"
+  },
+  {
+   "status": "@cal.m_silence",
+   "measuring": false,
+   "outcome": "idle"
+  }
+ ],
+ "sub": [
+  {
+   "hz": 30,
+   "sub": 24
+  },
+  {
+   "hz": 45,
+   "sub": 36
+  },
+  {
+   "hz": 62,
+   "sub": 50
+  },
+  {
+   "hz": 63,
+   "sub": 50
+  },
+  {
+   "hz": 80,
+   "sub": 64
+  }
+ ],
+ "ref": [
+  {
+   "volume": 42,
+   "volMax": 100,
+   "ref": 42
+  },
+  {
+   "volume": 50,
+   "volMax": 85,
+   "ref": 43
+  },
+  {
+   "volume": 10,
+   "volMax": 100,
+   "ref": 20
+  },
+  {
+   "volume": 100,
+   "volMax": 100,
+   "ref": 100
+  },
+  {
+   "volume": 0,
+   "volMax": 40,
+   "ref": 20
+  },
+  {
+   "volume": 100,
+   "volMax": 40,
+   "ref": 40
+  },
+  {
+   "volume": 77,
+   "volMax": 55,
+   "ref": 42
+  }
+ ],
+ "shown": [
+  {
+   "ref": 43,
+   "volMax": 85,
+   "shown": 51
+  },
+  {
+   "ref": 42,
+   "volMax": 100,
+   "shown": 42
+  },
+  {
+   "ref": 20,
+   "volMax": 40,
+   "shown": 50
+  },
+  {
+   "ref": 100,
+   "volMax": 40,
+   "shown": 100
+  },
+  {
+   "ref": 100,
+   "volMax": 100,
+   "shown": 100
+  },
+  {
+   "ref": 55,
+   "volMax": 55,
+   "shown": 100
+  }
+ ]
+}

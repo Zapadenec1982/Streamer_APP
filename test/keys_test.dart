@@ -24,6 +24,16 @@ void main() {
     });
   }
 
+  for (final setting in AudioSetting.values) {
+    test('${setting.name}: the range a slider moves in is the firmware\'s', () {
+      final entry = meta[setting.key.name]!;
+      expect(
+        (entry['min'], entry['max'], entry['step']),
+        (setting.min, setting.max, setting.step),
+      );
+    });
+  }
+
   test('every key the face reads is one the firmware has', () {
     final source = File('lib/device/face.dart').readAsStringSync();
     final read = RegExp(r"s\['([a-z_]+\.[a-z_0-9]+)'\]")

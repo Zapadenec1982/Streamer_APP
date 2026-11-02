@@ -49,6 +49,7 @@ jobs:
           python3 tool/sync_state_meta.py --check
           python3 tool/sync_eq_vectors.py --check
           node tool/eq_cases.mjs --check
+          node tool/speaker_cases.mjs --check
 
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test
