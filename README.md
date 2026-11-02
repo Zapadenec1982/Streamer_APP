@@ -29,6 +29,9 @@ Nothing the firmware already defines is written a second time:
 |---|---|---|
 | `lib/theme/m3_schemes.g.dart` | `tool/gen_theme.py` | the panel's colour schemes, `modules/ui_lvgl/src/ui_m3.cpp` (read by its own `tools/ui/web_tokens.py`) |
 | `lib/l10n/app_<lang>.arb` | `tool/gen_l10n.py` | the web's catalogs `webui/src/i18n/<lang>.json`, the keys in `l10n/shared.txt`; app-only strings are in `l10n/app_<lang>.json` |
+| `protocol/state_meta.json` | `tool/sync_state_meta.py` | the state keys, from the modules' manifests (`modules/<name>/manifest.json`) as `tools/generate_ui.py` projects them |
+| `protocol/now_faces.json` | `tool/now_faces.mjs` (Node, local) | what the web shows for a state: the firmware's `webui/src/stores/now.js` run on the cases written there; the Dart port `lib/device/face.dart` is tested on it |
 
-Both scripts read a firmware checkout named by `MODESP_PLAYER_ROOT` (default `../modesp-player`)
-and take `--check`. `tool/firmware_ref` is the firmware commit CI checks them against.
+The scripts read a firmware checkout named by `MODESP_PLAYER_ROOT` (default `../modesp-player`)
+and take `--check`. `now_faces.mjs` also needs the firmware's `webui/node_modules`, so CI tests
+only the Dart side of it. `tool/firmware_ref` is the firmware commit CI checks them against.

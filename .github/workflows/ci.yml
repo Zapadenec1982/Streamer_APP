@@ -14,15 +14,15 @@ jobs:
       - id: firmware
         run: echo "ref=$(cat tool/firmware_ref)" >> "$GITHUB_OUTPUT"
 
-      # The panel's colour table and the web's catalogs, at the firmware commit the app's
-      # generated files were made from (tool/firmware_ref).
+      # The panel's colour table, the web's catalogs and the modules' manifests, at the firmware
+      # commit the app's generated files were made from (tool/firmware_ref).
       - uses: actions/checkout@v7
         with:
           repository: Zapadenec1982/ModESP_Streamer
           ref: ${{ steps.firmware.outputs.ref }}
           path: firmware
           sparse-checkout: |
-            modules/ui_lvgl/src
+            modules
             tools/ui
             webui/src/i18n
 
@@ -43,6 +43,7 @@ jobs:
         run: |
           python3 tool/gen_theme.py --check
           python3 tool/gen_l10n.py --check
+          python3 tool/sync_state_meta.py --check
 
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test

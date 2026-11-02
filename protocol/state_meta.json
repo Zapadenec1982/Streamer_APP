@@ -1,0 +1,1206 @@
+{
+  "airplay.active_mode": {
+    "type": "int",
+    "access": "read"
+  },
+  "airplay.active_mode_label": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.album": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.artist": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "airplay.dur_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "airplay.enabled": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "airplay.mode": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "airplay2",
+        "label": "AirPlay 2"
+      },
+      {
+        "value": 1,
+        "id": "windows",
+        "label": "AirPlay 1 · сумісність із Windows"
+      }
+    ]
+  },
+  "airplay.mode_error": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.mode_status": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.name": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.pos_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "airplay.remote": {
+    "type": "bool",
+    "access": "read"
+  },
+  "airplay.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "airplay.switching": {
+    "type": "bool",
+    "access": "read"
+  },
+  "airplay.title": {
+    "type": "string",
+    "access": "read"
+  },
+  "audio.amp_cal": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.amp_clip_db10": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "0.1 dBFS",
+    "min": -240,
+    "max": 0,
+    "step": 5
+  },
+  "audio.amp_src": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "datasheet",
+        "label": "З даташиту"
+      },
+      {
+        "value": 1,
+        "id": "manual",
+        "label": "Вписано вручну"
+      },
+      {
+        "value": 2,
+        "id": "ear",
+        "label": "Знайдено на слух"
+      },
+      {
+        "value": 3,
+        "id": "measured",
+        "label": "Виміряно"
+      }
+    ]
+  },
+  "audio.asrc_ppm": {
+    "type": "float",
+    "access": "read",
+    "unit": "ppm"
+  },
+  "audio.balance_db10": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "0.1 dB",
+    "min": -60,
+    "max": 60,
+    "step": 5
+  },
+  "audio.bass_db": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "dB",
+    "min": -6,
+    "max": 6,
+    "step": 1
+  },
+  "audio.bass_gr": {
+    "type": "float",
+    "access": "read",
+    "unit": "dB"
+  },
+  "audio.bass_xo_hz": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "Hz",
+    "min": 0,
+    "max": 250,
+    "step": 10
+  },
+  "audio.bt_clock_follow": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.cal_port_off": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.cal_vol_cap": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 100,
+    "step": 1
+  },
+  "audio.ceiling_dbfs": {
+    "type": "float",
+    "access": "read",
+    "unit": "dBFS"
+  },
+  "audio.cpu_pct": {
+    "type": "float",
+    "access": "read",
+    "unit": "%"
+  },
+  "audio.drive_db": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "dB",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "audio.dsp_faults": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.dsp_max_pct": {
+    "type": "float",
+    "access": "read",
+    "unit": "%"
+  },
+  "audio.dsp_pct": {
+    "type": "float",
+    "access": "read",
+    "unit": "%"
+  },
+  "audio.eq_enabled": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.eq_headroom_db": {
+    "type": "float",
+    "access": "read",
+    "unit": "dB"
+  },
+  "audio.eq_reload": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.eq_rev": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.hp_hz": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "Hz",
+    "min": 0,
+    "max": 80,
+    "step": 5
+  },
+  "audio.in_l": {
+    "type": "float",
+    "access": "read",
+    "unit": "dBFS"
+  },
+  "audio.in_r": {
+    "type": "float",
+    "access": "read",
+    "unit": "dBFS"
+  },
+  "audio.in_rate": {
+    "type": "float",
+    "access": "read",
+    "unit": "Hz"
+  },
+  "audio.lev_db": {
+    "type": "float",
+    "access": "read",
+    "unit": "dB"
+  },
+  "audio.lev_from": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "min",
+    "min": 0,
+    "max": 1435,
+    "step": 5
+  },
+  "audio.lev_sched": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.lev_to": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "min",
+    "min": 0,
+    "max": 1435,
+    "step": 5
+  },
+  "audio.level_l": {
+    "type": "float",
+    "access": "read",
+    "unit": "dBFS"
+  },
+  "audio.level_r": {
+    "type": "float",
+    "access": "read",
+    "unit": "dBFS"
+  },
+  "audio.leveler": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.lim_gr": {
+    "type": "float",
+    "access": "read",
+    "unit": "dB"
+  },
+  "audio.loud_back": {
+    "type": "int",
+    "access": "read",
+    "unit": "%"
+  },
+  "audio.loud_db": {
+    "type": "float",
+    "access": "read",
+    "unit": "dB"
+  },
+  "audio.loud_ref": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 20,
+    "max": 100,
+    "step": 1
+  },
+  "audio.loudness": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 100,
+    "step": 10
+  },
+  "audio.mono_bass_hz": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "Hz",
+    "min": 0,
+    "max": 300,
+    "step": 10
+  },
+  "audio.mute": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.out_caps": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.out_clamps": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.out_mode": {
+    "type": "string",
+    "access": "read"
+  },
+  "audio.port_hz": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "Hz",
+    "min": 0,
+    "max": 80,
+    "step": 1
+  },
+  "audio.port_lift_db": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "dB",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "audio.port_meas": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "audio.port_meas_ch": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 1,
+        "id": "left",
+        "label": "Ліва"
+      },
+      {
+        "value": 2,
+        "id": "right",
+        "label": "Права"
+      }
+    ]
+  },
+  "audio.port_meas_hz": {
+    "type": "float",
+    "access": "read",
+    "unit": "Hz"
+  },
+  "audio.port_meas_status": {
+    "type": "string",
+    "access": "read"
+  },
+  "audio.port_src": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "unset",
+        "label": "Не задано"
+      },
+      {
+        "value": 1,
+        "id": "manual",
+        "label": "Вписано вручну"
+      },
+      {
+        "value": 3,
+        "id": "measured",
+        "label": "Виміряно"
+      }
+    ]
+  },
+  "audio.rms_cap_db10": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "0.1 dB",
+    "min": -120,
+    "max": 0,
+    "step": 5
+  },
+  "audio.source": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "off",
+        "label": "Вимкнено"
+      },
+      {
+        "value": 1,
+        "id": "tone",
+        "label": "Тест-тон"
+      },
+      {
+        "value": 2,
+        "id": "aux",
+        "label": "AUX"
+      },
+      {
+        "value": 3,
+        "id": "bt",
+        "label": "Bluetooth"
+      },
+      {
+        "value": 4,
+        "id": "file",
+        "label": "Файл"
+      },
+      {
+        "value": 5,
+        "id": "radio",
+        "label": "Радіо"
+      },
+      {
+        "value": 6,
+        "id": "airplay",
+        "label": "AirPlay"
+      },
+      {
+        "value": 7,
+        "id": "usb",
+        "label": "USB"
+      }
+    ]
+  },
+  "audio.sources": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.spk_type": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "unset",
+        "label": "Не задано"
+      },
+      {
+        "value": 1,
+        "id": "ported",
+        "label": "З фазоінвертором"
+      },
+      {
+        "value": 2,
+        "id": "closed",
+        "label": "Закриті"
+      }
+    ]
+  },
+  "audio.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "audio.tone_ch": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 1,
+        "id": "left",
+        "label": "Лівий"
+      },
+      {
+        "value": 2,
+        "id": "right",
+        "label": "Правий"
+      },
+      {
+        "value": 3,
+        "id": "both",
+        "label": "Обидва"
+      }
+    ]
+  },
+  "audio.tone_db10": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "0.1 dBFS",
+    "min": -600,
+    "max": 0,
+    "step": 5
+  },
+  "audio.tone_hz": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "Hz",
+    "min": 20,
+    "max": 20000,
+    "step": 1
+  },
+  "audio.tone_mode": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "chain",
+        "label": "Через DSP (−12 dB від стелі)"
+      },
+      {
+        "value": 1,
+        "id": "raw",
+        "label": "Калібрування: точний рівень ЦАП"
+      },
+      {
+        "value": 2,
+        "id": "bursts",
+        "label": "Калібрування: сплески 250/750 мс"
+      }
+    ]
+  },
+  "audio.transport": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "audio.transport_caps": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.treble_db": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "dB",
+    "min": -6,
+    "max": 6,
+    "step": 1
+  },
+  "audio.underruns": {
+    "type": "int",
+    "access": "read"
+  },
+  "audio.vol_eff": {
+    "type": "float",
+    "access": "read",
+    "unit": "%"
+  },
+  "audio.vol_max": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 40,
+    "max": 100,
+    "step": 5
+  },
+  "audio.vol_start": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 100,
+    "step": 5
+  },
+  "audio.volume": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 100,
+    "step": 1
+  },
+  "audio.width": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 200,
+    "step": 5
+  },
+  "bt.album": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.artist": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.bits": {
+    "type": "int",
+    "access": "read",
+    "unit": "bit"
+  },
+  "bt.cfg_rev": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "bt.codec": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.dur_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "bt.link": {
+    "type": "bool",
+    "access": "read"
+  },
+  "bt.link_master": {
+    "type": "bool",
+    "access": "read"
+  },
+  "bt.pair_active": {
+    "type": "bool",
+    "access": "read"
+  },
+  "bt.pair_by": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.pair_kind": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.pair_name": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.pair_result": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.pair_seq": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.peer": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.play_state": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.pos_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "bt.rate_hz": {
+    "type": "int",
+    "access": "read",
+    "unit": "Hz"
+  },
+  "bt.rtt_ms": {
+    "type": "int",
+    "access": "read",
+    "unit": "ms"
+  },
+  "bt.rx_drops": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.sat": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.seq_gaps": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.title": {
+    "type": "string",
+    "access": "read"
+  },
+  "bt.uart_ovf": {
+    "type": "int",
+    "access": "read"
+  },
+  "bt.volume": {
+    "type": "int",
+    "access": "read"
+  },
+  "dlna.album": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.art_uri": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.artist": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.browse_cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 268435455,
+    "step": 1
+  },
+  "dlna.cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 5,
+    "step": 1
+  },
+  "dlna.enabled": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "dlna.name": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.title": {
+    "type": "string",
+    "access": "read"
+  },
+  "dlna.uri": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.album": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.artist": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 6,
+    "step": 1
+  },
+  "player.count": {
+    "type": "int",
+    "access": "read"
+  },
+  "player.dir": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.dur_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "player.format": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.index": {
+    "type": "int",
+    "access": "read"
+  },
+  "player.pos_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "player.repeat": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 2,
+    "step": 1
+  },
+  "player.seek_s": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "s",
+    "min": -1,
+    "max": 86400,
+    "step": 1
+  },
+  "player.shuffle": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "player.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.title": {
+    "type": "string",
+    "access": "read"
+  },
+  "player.track": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.buffer": {
+    "type": "int",
+    "access": "read",
+    "unit": "%"
+  },
+  "radio.cat_count": {
+    "type": "int",
+    "access": "read"
+  },
+  "radio.cat_error": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.cat_fav": {
+    "type": "int",
+    "access": "readwrite",
+    "min": -1,
+    "max": 11,
+    "step": 1
+  },
+  "radio.cat_list": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.cat_more": {
+    "type": "bool",
+    "access": "read"
+  },
+  "radio.cat_next": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "radio.cat_page": {
+    "type": "int",
+    "access": "read"
+  },
+  "radio.cat_play": {
+    "type": "int",
+    "access": "readwrite",
+    "min": -1,
+    "max": 11,
+    "step": 1
+  },
+  "radio.cat_prev": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "radio.cat_quality": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "any",
+        "label": "Усі"
+      },
+      {
+        "value": 1,
+        "id": "k128",
+        "label": "від 128 кбіт/с"
+      },
+      {
+        "value": 2,
+        "id": "k192",
+        "label": "від 192 кбіт/с"
+      },
+      {
+        "value": 3,
+        "id": "k320",
+        "label": "320 кбіт/с"
+      },
+      {
+        "value": 4,
+        "id": "lossless",
+        "label": "Без втрат (FLAC)"
+      }
+    ]
+  },
+  "radio.cat_query": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.cat_sort": {
+    "type": "int",
+    "access": "readwrite",
+    "options": [
+      {
+        "value": 0,
+        "id": "popular",
+        "label": "Популярні"
+      },
+      {
+        "value": 1,
+        "id": "votes",
+        "label": "Голоси"
+      },
+      {
+        "value": 2,
+        "id": "quality",
+        "label": "Якість"
+      },
+      {
+        "value": 3,
+        "id": "name",
+        "label": "А–Я"
+      }
+    ]
+  },
+  "radio.cat_state": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.cmd": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 4,
+    "step": 1
+  },
+  "radio.completed": {
+    "type": "int",
+    "access": "read"
+  },
+  "radio.completed_uri": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.count": {
+    "type": "int",
+    "access": "read"
+  },
+  "radio.covers": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "radio.dur_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "radio.fav_add": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "radio.format": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.list_rev": {
+    "type": "int",
+    "access": "read"
+  },
+  "radio.mode": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.name": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.next_url": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.now_playing": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.play_url": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.pos_s": {
+    "type": "int",
+    "access": "read",
+    "unit": "s"
+  },
+  "radio.promoted_uri": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.report_clicks": {
+    "type": "bool",
+    "access": "readwrite"
+  },
+  "radio.save": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 1,
+    "step": 1
+  },
+  "radio.seek_s": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "s",
+    "min": -1,
+    "max": 86400,
+    "step": 1
+  },
+  "radio.seekable": {
+    "type": "bool",
+    "access": "read"
+  },
+  "radio.state": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.station": {
+    "type": "int",
+    "access": "readwrite",
+    "min": -1,
+    "max": 63,
+    "step": 1
+  },
+  "radio.url": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.uuid": {
+    "type": "string",
+    "access": "read"
+  },
+  "radio.web_act": {
+    "type": "int",
+    "access": "readwrite",
+    "min": -1,
+    "max": 7,
+    "step": 1
+  },
+  "radio.web_name": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.web_url": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "radio.web_uuid": {
+    "type": "string",
+    "access": "readwrite"
+  },
+  "storage.sd_free_mb": {
+    "type": "int",
+    "access": "read",
+    "unit": "MB"
+  },
+  "storage.sd_present": {
+    "type": "bool",
+    "access": "read"
+  },
+  "storage.sd_status": {
+    "type": "string",
+    "access": "read"
+  },
+  "storage.sd_total_mb": {
+    "type": "int",
+    "access": "read",
+    "unit": "MB"
+  },
+  "storage.sd_tracks": {
+    "type": "int",
+    "access": "read"
+  },
+  "ui.backlight": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 0,
+    "max": 100,
+    "step": 5
+  },
+  "ui.cover": {
+    "type": "int",
+    "access": "read"
+  },
+  "ui.cover_rgb": {
+    "type": "int",
+    "access": "read"
+  },
+  "ui.encoder_pos": {
+    "type": "int",
+    "access": "read"
+  },
+  "ui.encoder_sw": {
+    "type": "bool",
+    "access": "read"
+  },
+  "ui.lang": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 3,
+    "step": 1
+  },
+  "ui.screen": {
+    "type": "string",
+    "access": "read"
+  },
+  "ui.standby_bl": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "%",
+    "min": 5,
+    "max": 100,
+    "step": 5
+  },
+  "ui.standby_min": {
+    "type": "int",
+    "access": "readwrite",
+    "unit": "хв",
+    "min": 0,
+    "max": 60,
+    "step": 5
+  },
+  "ui.theme": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 3,
+    "step": 1
+  },
+  "ui.touch_down": {
+    "type": "bool",
+    "access": "read"
+  },
+  "ui.touch_x": {
+    "type": "int",
+    "access": "read",
+    "unit": "px"
+  },
+  "ui.touch_y": {
+    "type": "int",
+    "access": "read",
+    "unit": "px"
+  },
+  "usb_audio.bits": {
+    "type": "int",
+    "access": "read"
+  },
+  "usb_audio.core": {
+    "type": "int",
+    "access": "readwrite",
+    "min": 0,
+    "max": 1,
+    "step": 1
+  },
+  "usb_audio.diag": {
+    "type": "string",
+    "access": "read"
+  },
+  "usb_audio.losses": {
+    "type": "string",
+    "access": "read"
+  },
+  "usb_audio.name": {
+    "type": "string",
+    "access": "read"
+  },
+  "usb_audio.rate": {
+    "type": "int",
+    "access": "read",
+    "unit": "Hz"
+  },
+  "usb_audio.state": {
+    "type": "string",
+    "access": "read"
+  }
+}
