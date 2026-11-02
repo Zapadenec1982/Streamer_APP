@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'device_api.dart';
 import 'models.dart';
@@ -14,12 +15,13 @@ class _Track {
 /// A made-up panel, so the app can be seen without one — by a store's reviewer, and while it is
 /// being built. Every title and name here is invented for the demo.
 class DemoDeviceApi implements DeviceApi {
-  DemoDeviceApi({bool autoTick = true}) {
+  DemoDeviceApi({this.autoTick = true}) {
     _current = _build();
-    if (autoTick) {
-      _timer = Timer.periodic(_second, (_) => tick(_second));
-    }
+    resume();
   }
+
+  /// Time passes by itself (once a second); tests turn that off and call [tick].
+  final bool autoTick;
 
   static const panelName = 'ModESP';
   static const phoneName = 'Phone';
@@ -151,9 +153,26 @@ class DemoDeviceApi implements DeviceApi {
     if (changed) _emit();
   }
 
+  /// The demo draws its own covers (CoverArt).
+  @override
+  Future<Uint8List?> cover(String key) async => null;
+
+  @override
+  void suspend() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
+  void resume() {
+    if (autoTick && _timer == null) {
+      _timer = Timer.periodic(_second, (_) => tick(_second));
+    }
+  }
+
   @override
   void dispose() {
-    _timer?.cancel();
+    suspend();
     _changes.close();
   }
 

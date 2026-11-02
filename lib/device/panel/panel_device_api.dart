@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import '../device_api.dart';
 import '../face.dart';
@@ -57,6 +58,39 @@ class PanelDeviceApi implements DeviceApi {
     if (source == SourceId.radio) Keys.radioCmd.name: 1,
   });
 
+  /// The Player's cover: the panel's 280-pixel tile as a BMP (the firmware's UI.md, "Module HTTP
+  /// routes"), asked again only when `ui.cover` names another picture — and then with the ETag of
+  /// the one kept, which the panel answers 304 to when it has not changed.
+  @override
+  Future<Uint8List?> cover(String key) async {
+    final kept = _cover;
+    if (kept != null && kept.key == key) return kept.bytes;
+    final got = await link.getBytes(
+      '/api/cover',
+      query: const {'px': '280'},
+      etag: kept?.etag,
+    );
+    switch (got.status) {
+      case 200:
+        _cover = (key: key, bytes: got.bytes, etag: got.etag);
+        return got.bytes;
+      case 304 when kept != null:
+        _cover = (key: key, bytes: kept.bytes, etag: kept.etag);
+        return kept.bytes;
+      default:
+        _cover = null;
+        return null;
+    }
+  }
+
+  ({String key, Uint8List bytes, String? etag})? _cover;
+
+  @override
+  void suspend() => link.stop();
+
+  @override
+  void resume() => link.start();
+
   @override
   void dispose() {
     _sub.cancel();
@@ -81,6 +115,10 @@ DeviceSnapshot snapshotOf(
     muted: Keys.audioMute.of(s) ?? false,
     status: status,
     known: known,
+    backdrop: switch (Keys.uiCoverRgb.of(s)) {
+      final rgb? when rgb > 0 => rgb,
+      _ => null,
+    },
   );
 }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,62 +25,103 @@ class PlayerPage extends ConsumerWidget {
     final now = snapshot.now;
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-    return SafeArea(
-      child: LayoutBuilder(
-        builder: (context, box) {
-          final cover = math.min(box.maxWidth - 48, box.maxHeight * 0.42);
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-            child: Column(
-              children: [
-                if (now.kind.hasOrigin) ...[
-                  Text(
-                    l.kindName(now.kind).toUpperCase(),
-                    style: text.labelMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      letterSpacing: 1.4,
+    // the panel's tint of the cover, as the web's Player wears it
+    final backdrop = snapshot.backdrop;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 600),
+      color: backdrop == null ? colors.surface : Color(0xFF000000 | backdrop),
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final cover = math.min(box.maxWidth - 48, box.maxHeight * 0.42);
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+              child: Column(
+                children: [
+                  if (now.kind.hasOrigin) ...[
+                    Text(
+                      l.kindName(now.kind).toUpperCase(),
+                      style: text.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        letterSpacing: 1.4,
+                      ),
                     ),
+                    if (now.device.isNotEmpty)
+                      Text(now.device, style: text.bodyMedium),
+                  ],
+                  const SizedBox(height: 16),
+                  Semantics(
+                    label: l.nowCover,
+                    image: true,
+                    child: _Cover(now: now, size: cover),
                   ),
-                  if (now.device.isNotEmpty)
-                    Text(now.device, style: text.bodyMedium),
+                  const SizedBox(height: 20),
+                  Text(
+                    l.label(now.title),
+                    style: text.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  _SubtitleRow(
+                    subtitle: now.subtitle == null
+                        ? ''
+                        : l.label(now.subtitle!),
+                    format: l.badge(now.format),
+                  ),
+                  const SizedBox(height: 16),
+                  if (now.duration != null && now.duration! > Duration.zero)
+                    _Progress(
+                      position: now.position ?? Duration.zero,
+                      duration: now.duration!,
+                    ),
+                  const SizedBox(height: 8),
+                  _Transport(now: now),
+                  const SizedBox(height: 16),
+                  const _Volume(),
                 ],
-                const SizedBox(height: 16),
-                Semantics(
-                  label: l.nowCover,
-                  image: true,
-                  child: CoverArt(
-                    coverKey: now.coverKey,
-                    source: now.source,
-                    size: cover,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l.label(now.title),
-                  style: text.titleLarge,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                _SubtitleRow(
-                  subtitle: now.subtitle == null ? '' : l.label(now.subtitle!),
-                  format: l.badge(now.format),
-                ),
-                const SizedBox(height: 16),
-                if (now.duration != null && now.duration! > Duration.zero)
-                  _Progress(
-                    position: now.position ?? Duration.zero,
-                    duration: now.duration!,
-                  ),
-                const SizedBox(height: 8),
-                _Transport(now: now),
-                const SizedBox(height: 16),
-                const _Volume(),
-              ],
-            ),
-          );
-        },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// The panel's own picture when it has one; the drawn cover while it loads or when there is none.
+final coverProvider = FutureProvider.autoDispose.family<Uint8List?, String>(
+  (ref, key) => ref.watch(deviceApiProvider).cover(key),
+);
+
+class _Cover extends ConsumerWidget {
+  const _Cover({required this.now, required this.size});
+
+  final NowPlaying now;
+  final double size;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final drawn = CoverArt(
+      coverKey: now.coverKey,
+      source: now.source,
+      size: size,
+    );
+    final key = now.coverKey;
+    if (key == null) return drawn;
+    final bytes = ref.watch(coverProvider(key)).value;
+    if (bytes == null) return drawn;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size / 16),
+      child: Image.memory(
+        bytes,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, _, _) => drawn,
       ),
     );
   }

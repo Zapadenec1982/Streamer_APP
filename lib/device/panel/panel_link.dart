@@ -122,9 +122,9 @@ class PanelLink {
     return jsonDecode(text);
   }
 
-  /// A file of the HTTP API: its bytes and ETag, or null when the panel has none (404) or still
-  /// has the one named by [etag] (304).
-  Future<(Uint8List, String?)?> getBytes(
+  /// A file of the HTTP API. [etag] names the copy the app keeps: the panel answers 304 when
+  /// that is still the one, 404 when it has none; the bytes come only with a 200.
+  Future<({int status, Uint8List bytes, String? etag})> getBytes(
     String path, {
     Map<String, String>? query,
     String? etag,
@@ -133,7 +133,7 @@ class PanelLink {
     if (res.statusCode == HttpStatus.notModified ||
         res.statusCode == HttpStatus.notFound) {
       await res.drain<void>();
-      return null;
+      return (status: res.statusCode, bytes: Uint8List(0), etag: etag);
     }
     if (res.statusCode != HttpStatus.ok) {
       await _drain(res, ok: const [200]);
@@ -142,7 +142,11 @@ class PanelLink {
       BytesBuilder(copy: false),
       (b, d) => b..add(d),
     );
-    return (bytes.takeBytes(), res.headers.value(HttpHeaders.etagHeader));
+    return (
+      status: res.statusCode,
+      bytes: bytes.takeBytes(),
+      etag: res.headers.value(HttpHeaders.etagHeader),
+    );
   }
 
   Future<HttpClientResponse> _send(

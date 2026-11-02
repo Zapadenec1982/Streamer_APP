@@ -7,6 +7,7 @@ import 'state/providers.dart';
 import 'theme/app_theme.dart';
 import 'ui/link_state.dart';
 import 'ui/panels_page.dart';
+import 'ui/phone_keys.dart';
 import 'ui/player_page.dart';
 import 'ui/settings_page.dart';
 import 'ui/shell.dart';
@@ -72,6 +73,7 @@ class StreamerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = ref.watch(snapshotProvider.select((s) => s.scheme));
     return MaterialApp.router(
+      builder: (context, child) => PhoneBinding(child: child!),
       onGenerateTitle: (context) => AppLocalizations.of(context).mobAppName,
       theme: panelTheme(panelColors(scheme)),
       routerConfig: ref.watch(routerProvider),

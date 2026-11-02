@@ -7,12 +7,36 @@ import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/state/providers.dart';
 
+import 'support/phone.dart';
+
+/// The demo, counting how often the app lets go of it and takes it back.
+class CountingDemo extends DemoDeviceApi {
+  CountingDemo() : super(autoTick: false);
+
+  int suspended = 0;
+  int resumed = 0;
+
+  @override
+  void suspend() {
+    suspended++;
+    super.suspend();
+  }
+
+  @override
+  void resume() {
+    resumed++;
+    super.resume();
+  }
+}
+
 void main() {
-  late DemoDeviceApi api;
+  late CountingDemo api;
   late MemorySettingsStore store;
+  late FakePhone phone;
 
   setUp(() {
-    api = DemoDeviceApi(autoTick: false);
+    api = CountingDemo();
+    phone = FakePhone()..install();
     store = MemorySettingsStore();
     store.setString('language', 'uk');
     store.setString('active_panel', 'demo');
@@ -107,6 +131,48 @@ void main() {
       await tester.pumpAndSettle();
     });
   }
+
+  testWidgets(
+    'in the background the app lets go of the panel; back, it takes it again',
+    (tester) async {
+      await pumpApp(tester);
+      final resumedAtStart = api.resumed;
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      expect(api.suspended, 1);
+      expect(phone.intercepting, isFalse);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(api.resumed, resumedAtStart + 1);
+      expect(phone.intercepting, isTrue);
+    },
+  );
+
+  testWidgets('the phone\'s volume buttons step the panel\'s volume', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    expect(phone.intercepting, isTrue);
+    // the presses come over a platform channel, outside the test's clock; the 150 ms the app
+    // gathers them for runs on it
+    Future<void> press(List<int> steps) async {
+      await tester.runAsync(() async {
+        steps.forEach(phone.press);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      });
+      await tester.pump(const Duration(milliseconds: 200));
+    }
+
+    await press([1, 1]);
+    expect(api.current.volume, 36);
+    await press([-1]);
+    expect(api.current.volume, 34);
+    await tester.pump(const Duration(seconds: 2));
+  });
 
   testWidgets('with no panel yet: what to do, and the demo a tap away', (
     tester,

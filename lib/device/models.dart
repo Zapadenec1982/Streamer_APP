@@ -187,6 +187,7 @@ class DeviceSnapshot {
     required this.muted,
     this.status = LinkStatus.ready,
     this.known = true,
+    this.backdrop,
   });
 
   /// The panel's device name — what AirPlay and Bluetooth list it by.
@@ -204,6 +205,10 @@ class DeviceSnapshot {
 
   /// False until the panel has sent its state once: nothing above is the panel's yet.
   final bool known;
+
+  /// The Player's background, 0xRRGGBB: the panel's tint of the cover (`ui.cover_rgb`, a dark,
+  /// muted shade of it), or null without one.
+  final int? backdrop;
 }
 
 enum TransportAction { toggle, previous, next }

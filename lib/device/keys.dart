@@ -41,6 +41,7 @@ abstract final class Keys {
   static const radioCmd = StateKey<int>('radio.cmd', writable: true);
   static const uiTheme = StateKey<int>('ui.theme', writable: true);
   static const uiCover = StateKey<int>('ui.cover');
+  static const uiCoverRgb = StateKey<int>('ui.cover_rgb');
   static const airplayName = StateKey<String>('airplay.name');
   static const airplayState = StateKey<String>('airplay.state');
   static const dlnaName = StateKey<String>('dlna.name');
@@ -64,6 +65,7 @@ abstract final class Keys {
     radioCmd,
     uiTheme,
     uiCover,
+    uiCoverRgb,
     airplayName,
     airplayState,
     dlnaName,

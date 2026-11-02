@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/endpoint.dart';
@@ -172,6 +174,37 @@ void main() {
     await until(() => panel.clients == 0);
     link.start();
     await until(() => panel.clients == 1);
+  });
+
+  test(
+    'suspend lets go of the panel; resume hears it again from the whole state',
+    () async {
+      final api = PanelDeviceApi(link);
+      await until(() => panel.clients == 1 && api.current.known);
+      api.suspend();
+      await until(() => panel.clients == 0);
+      panel.state['audio.volume'] = 70;
+      api.resume();
+      await until(() => panel.clients == 1 && api.current.volume == 70);
+    },
+  );
+
+  test('the cover is fetched once per picture, and a 404 means none', () async {
+    final api = PanelDeviceApi(link);
+    expect(await api.cover('1'), isNull);
+    panel.cover = Uint8List.fromList([1, 2, 3]);
+    expect(await api.cover('2'), [1, 2, 3]);
+    final asked = panel.requests.length;
+    expect(await api.cover('2'), [1, 2, 3]);
+    expect(
+      panel.requests.length,
+      asked,
+      reason: 'the same picture is not asked for again',
+    );
+    // another ui.cover with the same picture: the panel answers 304 to the ETag kept
+    expect(await api.cover('3'), [1, 2, 3]);
+    panel.cover = null;
+    expect(await api.cover('4'), isNull);
   });
 
   test('an address as a person types it', () {

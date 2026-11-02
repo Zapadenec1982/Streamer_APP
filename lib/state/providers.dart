@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -210,6 +211,15 @@ class NoPanelApi implements DeviceApi {
 
   @override
   Future<void> selectSource(SourceId source) async {}
+
+  @override
+  Future<Uint8List?> cover(String key) async => null;
+
+  @override
+  void suspend() {}
+
+  @override
+  void resume() {}
 
   @override
   void dispose() {}
