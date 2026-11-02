@@ -22,10 +22,16 @@ class FakePanel {
 
   Uint8List? cover;
 
-  /// The EQ document (`/api/eq`): its revision, the sound it plays, the sounds it offers.
+  /// The EQ document (`/api/eq`): its revision, the sound it plays, the sounds it offers and the
+  /// bands, as the panel writes them (eq_web.cpp).
   int eqRev = 7;
   String eqPreset = 'rock';
   List<String> eqPresets = const ['custom', 'flat', 'pop', 'rock'];
+  List<Object?> eqBands = const [
+    {'type': 'lowshelf', 'f': 40, 'gain': 4.9, 'q': 0.707, 'on': true},
+    {'type': 'peak', 'f': 62.5, 'gain': 3.6, 'q': 1, 'on': true},
+    {'type': 'peak', 'f': 125, 'gain': 0.0, 'q': 1, 'on': false},
+  ];
 
   /// The next EQ edit finds the document moved on the panel: 409, once.
   bool eqConflict = false;
@@ -162,7 +168,7 @@ class FakePanel {
           'fs': 48000,
           'preset': eqPreset,
           'presets': eqPresets,
-          'bands': const [],
+          'bands': eqBands,
         });
       case ('POST', '/api/eq'):
         final edit = (body! as Map).cast<String, Object?>();
@@ -178,7 +184,14 @@ class FakePanel {
         if (edit['rev'] != eqRev) {
           return _reply(req, 409, {'error': 'changed', 'rev': eqRev});
         }
-        eqPreset = edit['preset']! as String;
+        // a set by hand is «Власний» (eq_hand_edited); "keep" with it writes it at once
+        if (edit['bands'] case final List bands) {
+          eqBands = bands;
+          eqPreset = 'custom';
+          if (edit['keep'] == true) eqKeeps++;
+        } else {
+          eqPreset = edit['preset']! as String;
+        }
         eqRev++;
         change({'audio.eq_rev': eqRev});
         return _reply(req, 200, {'rev': eqRev});

@@ -21,23 +21,34 @@ Future<bool> act(
     await command(api);
     return true;
   } on PanelError catch (e) {
-    if (!context.mounted) return false;
-    final l = AppLocalizations.of(context);
-    if (e.unauthorized && api is PanelDeviceApi) {
-      await askLogin(context, ref, api);
-      return false;
-    }
-    final text = e.locked
-        ? l.authLocked
-        : e.status == 0
-        ? l.appError
-        : l.errCode(e.code ?? '${e.status}');
-    // it takes the place of what is said and of what waits, so a run of failures says it once
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(text)));
+    if (context.mounted) await sayFailed(context, ref, e);
     return false;
   }
+}
+
+/// What went wrong with a request to the panel, in words, as [act] says it — for a page's own
+/// requests too. A panel that wants its login asks for it; the request is not repeated by itself.
+Future<void> sayFailed(
+  BuildContext context,
+  WidgetRef ref,
+  Object error,
+) async {
+  final l = AppLocalizations.of(context);
+  final api = ref.read(deviceApiProvider);
+  final e = error is PanelError ? error : const PanelError(0);
+  if (e.unauthorized && api is PanelDeviceApi) {
+    await askLogin(context, ref, api);
+    return;
+  }
+  final text = e.locked
+      ? l.authLocked
+      : e.status == 0
+      ? l.appError
+      : l.errCode(e.code ?? '${e.status}');
+  // it takes the place of what is said and of what waits, so a run of failures says it once
+  ScaffoldMessenger.of(context)
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(content: Text(text)));
 }
 
 /// The panel's login (the firmware's NETWORK.md, "Authentication"), kept for this panel in the

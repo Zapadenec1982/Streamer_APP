@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:streamer/device/eq.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/endpoint.dart';
 import 'package:streamer/device/panel/panel_device_api.dart';
@@ -212,7 +213,7 @@ void main() {
     'a sound is chosen on the panel\'s version even when it moved meanwhile',
     () async {
       final api = PanelDeviceApi(link);
-      final presets = await api.soundPresets();
+      final presets = await api.eq();
       expect(presets.preset, 'rock');
       expect(presets.presets, ['custom', 'flat', 'pop', 'rock']);
       panel.eqConflict = true;
@@ -222,6 +223,79 @@ void main() {
       expect(panel.eqKeeps, 1);
     },
   );
+
+  test('the EQ document with its bands; an edit of them goes from its '
+      'revision, and the glass\'s change meanwhile is a conflict', () async {
+    final api = PanelDeviceApi(link);
+    final doc = await api.eq();
+    expect(doc.fs, 48000);
+    expect(doc.bands, const [
+      EqBand(type: EqType.lowshelf, f: 40, gain: 4.9, q: 0.707),
+      EqBand(type: EqType.peak, f: 62.5, gain: 3.6),
+      EqBand(type: EqType.peak, f: 125, on: false),
+    ]);
+    final edited = [doc.bands.first.copyWith(gain: -2), ...doc.bands.skip(1)];
+    final rev = await api.setEqBands(doc.rev, edited);
+    expect(rev, doc.rev + 1);
+    final body = (panel.requests.last.body! as Map).cast<String, Object?>();
+    expect(body.keys.first, 'rev', reason: 'the panel reads it off the front');
+    expect((body['bands']! as List).first, {
+      'type': 'lowshelf',
+      'f': 40.0,
+      'gain': -2.0,
+      'q': 0.707,
+      'on': true,
+    });
+    expect(panel.eqPreset, 'custom');
+    // the glass moved it: the old revision is refused
+    await expectLater(
+      api.setEqBands(doc.rev, edited),
+      throwsA(isA<EqChanged>()),
+    );
+  });
+
+  test('the volume\'s two and the leveler\'s schedule go as settings, held '
+      'to the panel\'s ranges', () async {
+    final api = PanelDeviceApi(link);
+    Map<String, Object?> last() =>
+        (panel.requests.last.body! as Map).cast<String, Object?>();
+    await api.setVolMax(105);
+    expect(last(), {'audio.vol_max': 100});
+    await api.setVolStart(30);
+    expect(last(), {'audio.vol_start': 30});
+    await api.setLevelerSchedule(on: true);
+    expect(last(), {'audio.lev_sched': true});
+    await api.setLevelerSchedule(from: 1320, to: 2000);
+    expect(last(), {'audio.lev_from': 1320, 'audio.lev_to': 1435});
+  });
+
+  test('the sound\'s state: the volume\'s two, the schedule, and the port '
+      'that plays — none for closed speakers', () {
+    final s = snapshotOf({
+      'audio.vol_max': 85,
+      'audio.vol_start': 30,
+      'audio.lev_sched': true,
+      'audio.lev_from': 1380,
+      'audio.lev_to': 360,
+      'audio.loud_db': 4.5,
+      'audio.hp_hz': 30,
+      'audio.spk_type': 1,
+      'audio.port_hz': 45,
+      'audio.port_lift_db': 2,
+    }).sound;
+    expect(s.volMax, 85);
+    expect(s.volStart, 30);
+    expect(s.levSchedule, isTrue);
+    expect((s.levFrom, s.levTo), (1380, 360));
+    expect(s.loudDb, 4.5);
+    expect((s.hpHz, s.portHz, s.portLiftDb), (30, 45, 2));
+    expect(
+      snapshotOf({'audio.spk_type': 2, 'audio.port_hz': 45}).sound.portHz,
+      0,
+    );
+    final old = snapshotOf(const {}).sound;
+    expect((old.volMax, old.volStart, old.levSchedule), (null, null, null));
+  });
 
   test('the station list: a preset naming no station is empty', () async {
     final api = PanelDeviceApi(link);

@@ -60,6 +60,22 @@ abstract final class Keys {
   );
   static const audioEqRev = StateKey<int>('audio.eq_rev');
   static const audioLeveler = StateKey<bool>('audio.leveler', writable: true);
+  static const audioLevSched = StateKey<bool>(
+    'audio.lev_sched',
+    writable: true,
+  );
+  static const audioLevFrom = StateKey<int>('audio.lev_from', writable: true);
+  static const audioLevTo = StateKey<int>('audio.lev_to', writable: true);
+  static const audioVolMax = StateKey<int>('audio.vol_max', writable: true);
+  static const audioVolStart = StateKey<int>('audio.vol_start', writable: true);
+  static const audioLoudDb = StateKey<double>('audio.loud_db');
+  static const audioHpHz = StateKey<int>('audio.hp_hz', writable: true);
+  static const audioSpkType = StateKey<int>('audio.spk_type', writable: true);
+  static const audioPortHz = StateKey<int>('audio.port_hz', writable: true);
+  static const audioPortLiftDb = StateKey<int>(
+    'audio.port_lift_db',
+    writable: true,
+  );
   static const radioStation = StateKey<int>('radio.station', writable: true);
   static const radioListRev = StateKey<int>('radio.list_rev');
   static const radioUrl = StateKey<String>('radio.url');
@@ -114,6 +130,16 @@ abstract final class Keys {
     audioEqEnabled,
     audioEqRev,
     audioLeveler,
+    audioLevSched,
+    audioLevFrom,
+    audioLevTo,
+    audioVolMax,
+    audioVolStart,
+    audioLoudDb,
+    audioHpHz,
+    audioSpkType,
+    audioPortHz,
+    audioPortLiftDb,
     radioStation,
     radioListRev,
     radioUrl,

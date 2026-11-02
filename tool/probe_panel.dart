@@ -62,9 +62,10 @@ Future<void> main(List<String> args) async {
     'eq ${s.sound.eqOn}, leveler ${s.sound.leveler}',
   );
   final api = PanelDeviceApi(link);
-  final sounds = await api.soundPresets();
+  final eq = await api.eq();
   stdout.writeln(
-    'sounds: ${sounds.preset} of ${sounds.presets} (rev ${sounds.rev})',
+    'sounds: ${eq.preset} of ${eq.presets} (rev ${eq.rev}), '
+    '${eq.bands.where((b) => b.on).length} of ${eq.bands.length} bands on at ${eq.fs} Hz',
   );
   final list = await api.stations();
   stdout.writeln(

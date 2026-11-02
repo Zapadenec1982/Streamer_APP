@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'eq.dart';
 import 'models.dart';
 
 /// A panel as the app sees it: `DemoDeviceApi`, or `PanelDeviceApi` for a real one. The app sends
@@ -28,14 +29,19 @@ abstract interface class DeviceApi {
 
   Future<void> selectSource(SourceId source);
 
-  /// The sounds the panel offers and the one it plays.
-  Future<SoundPresets> soundPresets();
+  /// The EQ document: the sounds offered, the one that plays and its bands.
+  Future<EqDoc> eq();
 
   /// Plays sound [id]. A panel that changed the EQ meanwhile (409) is read again and the choice
   /// made on its version — a choice is not an edit to merge.
   Future<void> chooseSound(String id);
 
-  /// The sheet closed: the panel writes the chosen sound at once rather than a minute later.
+  /// Section 0's bands, set by hand on the document of revision [rev] — the sound becomes
+  /// «Власний»: the panel's revision after it. Throws [EqChanged] when the document moved
+  /// meanwhile (409): it is read again rather than written over.
+  Future<int> setEqBands(int rev, List<EqBand> bands);
+
+  /// A sound page closed: the panel writes the EQ at once rather than a minute after the last edit.
   Future<void> keepSound();
 
   Future<void> setBass(int db);
@@ -47,6 +53,16 @@ abstract interface class DeviceApi {
   Future<void> setEqOn(bool on);
 
   Future<void> setLeveler(bool on);
+
+  /// The leveler by the clock: the schedule on or off, its window's ends in minutes of the day
+  /// (a step of 5).
+  Future<void> setLevelerSchedule({bool? on, int? from, int? to});
+
+  /// «Максимум», 40…100 % in steps of 5.
+  Future<void> setVolMax(int percent);
+
+  /// The volume after power-on is no higher than this, 0…100 %; 0 leaves it as it was.
+  Future<void> setVolStart(int percent);
 
   Future<StationList> stations();
 

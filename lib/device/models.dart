@@ -252,6 +252,15 @@ class SoundState {
     this.eqOn = true,
     this.leveler,
     this.eqRev = 0,
+    this.volMax,
+    this.volStart,
+    this.levSchedule,
+    this.levFrom = 22 * 60,
+    this.levTo = 7 * 60,
+    this.loudDb = 0,
+    this.hpHz = 40,
+    this.portHz = 0,
+    this.portLiftDb = 3,
   });
 
   /// −6…+6 dB.
@@ -265,19 +274,26 @@ class SoundState {
 
   /// Moves whenever the EQ document changes, wherever it was changed.
   final int eqRev;
-}
 
-/// The sounds a panel offers and the one it plays (the EQ document's, `GET /api/eq`).
-class SoundPresets {
-  const SoundPresets({
-    required this.rev,
-    required this.preset,
-    required this.presets,
-  });
+  /// «Максимум», 40…100 %: what 100 % from any client plays; null where the panel has none.
+  final int? volMax;
 
-  final int rev;
-  final String preset;
-  final List<String> presets;
+  /// After power-on the volume is no higher than this, 0 as it was; null where the panel has none.
+  final int? volStart;
+
+  /// The leveler by the clock (audio.lev_sched), null where the panel has no schedule; its window
+  /// in minutes of the day, [levFrom] up to [levTo], which may cross midnight.
+  final bool? levSchedule;
+  final int levFrom;
+  final int levTo;
+
+  /// What the stages around the EQ do now, for «Показати всю систему»: the loudness's low shelf
+  /// (dB, audio.loud_db), the subsonic asked for (Hz), the port that plays — 0 for closed speakers —
+  /// and its lift (dB).
+  final double loudDb;
+  final int hpHz;
+  final int portHz;
+  final int portLiftDb;
 }
 
 /// The radio as its card needs it.

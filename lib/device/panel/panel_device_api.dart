@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../device_api.dart';
+import '../eq.dart';
 import '../face.dart';
 import '../keys.dart';
 import '../models.dart';
@@ -94,20 +95,33 @@ class PanelDeviceApi implements DeviceApi {
   });
 
   @override
-  Future<SoundPresets> soundPresets() async =>
-      presetsOf(await link.getJson('/api/eq'));
+  Future<EqDoc> eq() async => EqDoc.fromJson(await link.getJson('/api/eq'));
 
   @override
   Future<void> chooseSound(String id) async {
-    var now = await soundPresets();
+    var now = await eq();
     if (now.preset == id) return;
     try {
       await link.postJson('/api/eq', {'rev': now.rev, 'preset': id});
     } on PanelError catch (e) {
       // the panel changed the document meanwhile: the choice is made on its version
       if (e.status != 409) rethrow;
-      now = await soundPresets();
+      now = await eq();
       await link.postJson('/api/eq', {'rev': now.rev, 'preset': id});
+    }
+  }
+
+  @override
+  Future<int> setEqBands(int rev, List<EqBand> bands) async {
+    try {
+      final reply = await link.postJson('/api/eq', {
+        'rev': rev,
+        'bands': [for (final b in bands) b.toJson()],
+      });
+      return reply is Map && reply['rev'] is int ? reply['rev'] as int : rev;
+    } on PanelError catch (e) {
+      if (e.status == 409) throw const EqChanged();
+      rethrow;
     }
   }
 
@@ -137,6 +151,22 @@ class PanelDeviceApi implements DeviceApi {
 
   @override
   Future<void> setLeveler(bool on) => link.write({Keys.audioLeveler.name: on});
+
+  @override
+  Future<void> setLevelerSchedule({bool? on, int? from, int? to}) =>
+      link.write({
+        Keys.audioLevSched.name: ?on,
+        Keys.audioLevFrom.name: ?from?.clamp(0, 1435),
+        Keys.audioLevTo.name: ?to?.clamp(0, 1435),
+      });
+
+  @override
+  Future<void> setVolMax(int percent) =>
+      link.write({Keys.audioVolMax.name: percent.clamp(40, 100)});
+
+  @override
+  Future<void> setVolStart(int percent) =>
+      link.write({Keys.audioVolStart.name: percent.clamp(0, 100)});
 
   @override
   Future<StationList> stations() async =>
@@ -278,6 +308,16 @@ DeviceSnapshot snapshotOf(
       eqOn: Keys.audioEqEnabled.of(s) ?? true,
       leveler: Keys.audioLeveler.of(s),
       eqRev: Keys.audioEqRev.of(s) ?? 0,
+      volMax: Keys.audioVolMax.of(s),
+      volStart: Keys.audioVolStart.of(s),
+      levSchedule: Keys.audioLevSched.of(s),
+      levFrom: Keys.audioLevFrom.of(s) ?? 22 * 60,
+      levTo: Keys.audioLevTo.of(s) ?? 7 * 60,
+      loudDb: Keys.audioLoudDb.of(s) ?? 0,
+      hpHz: Keys.audioHpHz.of(s) ?? 40,
+      // closed speakers have no port, whatever number is kept (the web's speakers.js port())
+      portHz: Keys.audioSpkType.of(s) == 2 ? 0 : Keys.audioPortHz.of(s) ?? 0,
+      portLiftDb: Keys.audioPortLiftDb.of(s) ?? 3,
     ),
     radio: radioOf(s),
   );
@@ -292,19 +332,6 @@ StationState radioOf(Map<String, Object?> s) {
     storable:
         (Keys.radioUrl.of(s) ?? '').isNotEmpty &&
         (current >= 0 || (Keys.radioName.of(s) ?? '').isNotEmpty),
-  );
-}
-
-/// `GET /api/eq` as the app needs it.
-SoundPresets presetsOf(Object? json) {
-  final d = json is Map ? json : const {};
-  return SoundPresets(
-    rev: d['rev'] is int ? d['rev'] as int : 0,
-    preset: d['preset'] is String ? d['preset'] as String : '',
-    presets: [
-      for (final p in d['presets'] is List ? d['presets'] as List : const [])
-        if (p is String) p,
-    ],
   );
 }
 

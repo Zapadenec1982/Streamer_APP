@@ -65,6 +65,7 @@ unit.hz
 unit.khz
 unit.kbps
 unit.bit
+unit.db
 
 # the link to the panel
 conn.lost
@@ -113,6 +114,48 @@ eq.preset.rock
 eq.preset.ska
 eq.preset.soft
 eq.preset.soft_rock
+sound.undo
+undo.action
+sys.timbre_volume
+sys.eq_off
+sound.volume
+sound.vol_max
+sound.vol_start
+sound.vol_start_any
+sound.vol_start_n
+sound.lev_sched
+sound.lev_from
+sound.lev_to
+
+# the equalizer
+eq.enabled
+eq.disabled
+eq.menu
+eq.system
+eq.system_note
+eq.curve
+eq.conflict
+eq.no_bands
+eq.add
+eq.reset_mine
+eq.reset_done
+eq.off
+eq.band_n
+eq.band_on
+eq.type
+eq.type.peak
+eq.type.lowshelf
+eq.type.highshelf
+eq.type.lowpass
+eq.type.highpass
+eq.type.notch
+eq.freq
+eq.gain
+eq.q_width
+eq.slope
+eq.less
+eq.more_step
+eq.done
 
 # the stations
 page.stations

@@ -7,11 +7,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/app.dart';
 import 'package:streamer/device/demo_device_api.dart';
 import 'package:streamer/device/device_api.dart';
+import 'package:streamer/device/eq.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/device/radio_browser.dart';
 import 'package:streamer/state/providers.dart';
+import 'package:streamer/ui/eq_plot.dart';
 import 'package:streamer/ui/player_page.dart';
+import 'package:streamer/ui/sound_sheet.dart';
 import 'package:streamer/ui/station_card.dart';
 
 import 'support/phone.dart';
@@ -166,6 +169,30 @@ void main() {
     store.setString('active_panel', 'demo');
   });
   tearDown(() => api.dispose());
+
+  /// A section by its place in the navigation bar: a page's own title can be the same word.
+  Finder tab(String name) => find.descendant(
+    of: find.byType(NavigationBar),
+    matching: find.text(name),
+  );
+
+  /// Scrolls the page in front — the one a finger reaches — until [target] is on the screen.
+  Future<void> reveal(WidgetTester tester, Finder target) async {
+    await tester.scrollUntilVisible(
+      target,
+      200,
+      scrollable: find.byType(Scrollable).hitTestable().first,
+    );
+    await tester.pumpAndSettle();
+  }
+
+  /// The Player's «Звук» sheet, then its way to the equalizer.
+  Future<void> openEq(WidgetTester tester) async {
+    await tester.tap(find.text('Звук'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Еквалайзер'));
+    await tester.pumpAndSettle();
+  }
 
   Future<void> pumpApp(
     WidgetTester tester, {
@@ -362,6 +389,23 @@ void main() {
       await tester.ensureVisible(find.text('Усі станції · 12'));
       await tester.tap(find.text('Усі станції · 12'));
       await tester.pumpAndSettle();
+      // Тембр і гучність as long as it gets, the equalizer, a band's sheet
+      await api.setLevelerSchedule(on: true);
+      await tester.tap(tab('Налаштування'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Тембр і гучність'));
+      await tester.tap(find.text('Тембр і гучність'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Еквалайзер'));
+      await tester.tap(find.text('Еквалайзер'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Ще'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Показати всю систему'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('High Shelf'));
+      await tester.tap(find.text('High Shelf'));
+      await tester.pumpAndSettle();
     });
   }
 
@@ -486,6 +530,17 @@ void main() {
       await tester.pumpAndSettle();
       await check();
     }
+    await api.setLevelerSchedule(on: true);
+    await tester.tap(find.text('Тембр і гучність'));
+    await tester.pumpAndSettle();
+    await check();
+    await reveal(tester, find.text('Еквалайзер'));
+    await tester.tap(find.text('Еквалайзер'));
+    await tester.pumpAndSettle();
+    await check();
+    await tester.tap(find.text('Low Shelf'));
+    await tester.pumpAndSettle();
+    await check();
     semantics.dispose();
   });
 
@@ -676,7 +731,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Джаз').last);
       await tester.pumpAndSettle();
-      expect((await api.soundPresets()).preset, 'jazz');
+      expect((await api.eq()).preset, 'jazz');
       await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
       expect(api.current.sound.loudness, isFalse);
@@ -915,5 +970,146 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsWidgets);
     expect(store.getString('language'), 'en');
+  });
+
+  testWidgets('the equalizer from the Player\'s sheet: the bands in a list; a '
+      'step in a band\'s sheet is heard, and the sound becomes «Власний»', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await openEq(tester);
+    expect(find.byType(EqPlot), findsOne);
+    expect(find.text('Low Shelf'), findsOne);
+    expect(find.text('+4,9 дБ'), findsOne);
+    await tester.tap(find.text('Low Shelf'));
+    await tester.pumpAndSettle();
+    expect(find.text('Смуга 1'), findsOne);
+    await tester.tap(find.byTooltip('Більше').first);
+    await tester.pumpAndSettle();
+    final doc = await api.eq();
+    expect(doc.preset, 'custom');
+    expect(doc.bands.first.f, 42.4, reason: 'a twelfth of an octave up');
+    expect(find.text('42 Гц'), findsWidgets);
+    await tester.tap(find.text('Готово'));
+    await tester.pumpAndSettle();
+    expect(find.text('Власний'), findsOne);
+    // the whole system, dashed over the curve
+    await tester.tap(find.byTooltip('Ще'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Показати всю систему'));
+    await tester.pumpAndSettle();
+    expect(find.text('Пунктир — уся система'), findsOne);
+  });
+
+  testWidgets('a point on the plot moves its band, and «Скасувати» puts it '
+      'and the sound back; a finger off the points moves nothing', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await openEq(tester);
+    final plot = find.byType(EqPlot);
+    final width = tester.getSize(plot).width;
+    await tester.dragFrom(
+      tester.getTopLeft(plot) + Offset(width - 14, 110),
+      const Offset(0, -60),
+    );
+    await tester.pumpAndSettle();
+    expect((await api.eq()).preset, 'rock');
+    // where the point is now: the page may have scrolled under that finger
+    final point =
+        tester.getTopLeft(plot) +
+        eqPointAt((await api.eq()).bands, 4, 48000, width);
+    final finger = await tester.startGesture(point);
+    for (var i = 0; i < 4; i++) {
+      await finger.moveBy(const Offset(0, -10));
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    await finger.up();
+    await tester.pumpAndSettle();
+    final moved = await api.eq();
+    expect(moved.preset, 'custom');
+    expect(moved.bands[4].f, 500, reason: 'straight up: the same frequency');
+    expect(moved.bands[4].gain, greaterThan(-4.2));
+    expect(find.textContaining('Смуга 5: 500 Гц'), findsOne);
+    await tester.tap(find.text('Скасувати'));
+    await tester.pumpAndSettle();
+    final back = await api.eq();
+    expect(back.preset, 'rock');
+    expect(back.bands[4].gain, -4.2);
+  });
+
+  testWidgets('«Власний»: a band added where no band is; «Скинути» turns every '
+      'band off, «Повернути» puts them back', (tester) async {
+    await api.chooseSound('custom');
+    await pumpApp(tester);
+    await openEq(tester);
+    await reveal(tester, find.text('+ Додати смугу'));
+    await tester.tap(find.text('+ Додати смугу'));
+    await tester.pumpAndSettle();
+    expect(find.text('Смуга 4'), findsOne);
+    var doc = await api.eq();
+    expect(doc.bands, hasLength(4));
+    expect(doc.bands[3], const EqBand(type: EqType.peak, f: 450));
+    await tester.tap(find.text('Увімкнена'));
+    await tester.pumpAndSettle();
+    expect((await api.eq()).bands[3].on, isFalse);
+    await tester.tap(find.text('Готово'));
+    await tester.pumpAndSettle();
+    expect(find.text('Вимк.'), findsOne);
+    await reveal(tester, find.text('Скинути «Власний»'));
+    await tester.tap(find.text('Скинути «Власний»'));
+    await tester.pumpAndSettle();
+    doc = await api.eq();
+    expect(doc.bands.any((b) => b.on), isFalse);
+    await tester.tap(find.text('Повернути'));
+    await tester.pumpAndSettle();
+    doc = await api.eq();
+    expect(doc.bands.where((b) => b.on), hasLength(3));
+  });
+
+  testWidgets('Тембр і гучність: «Максимум» with its «Скасувати», the start '
+      'volume, and the leveler by the clock on a step of 5 minutes', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Тембр і гучність'));
+    await tester.pumpAndSettle();
+    final maximum = find.byType(Slider).at(2);
+    await tester.drag(maximum, const Offset(-120, 0));
+    await tester.pumpAndSettle();
+    final lowered = api.current.sound.volMax!;
+    expect(lowered, lessThan(100));
+    expect(find.text('Максимум: 100 % → $lowered %'), findsOne);
+    await tester.tap(find.text('Скасувати'));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.volMax, 100);
+    await tester.tap(find.text('Після увімкнення'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Не гучніше 30 %'));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.volStart, 30);
+    expect(find.text('Не гучніше 30 %'), findsOne);
+    await reveal(tester, find.text('За розкладом'));
+    await tester.tap(find.text('За розкладом'));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.levSchedule, isTrue);
+    await reveal(tester, find.text('Вимикати о'));
+    expect(find.text('22:00'), findsOne);
+    expect(find.text('07:00'), findsOne);
+    // the phone's own clock face; the same time back writes nothing
+    await tester.tap(find.text('Вмикати о'));
+    await tester.pumpAndSettle();
+    final ok = MaterialLocalizations.of(tester.element(find.byType(Dialog)))
+        .okButtonLabel;
+    await tester.tap(find.text(ok));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.levFrom, 22 * 60);
+    // a time picked goes on the schedule's step of 5 minutes
+    expect(scheduleMinutes(const TimeOfDay(hour: 23, minute: 7)), 1385);
+    expect(scheduleMinutes(const TimeOfDay(hour: 7, minute: 3)), 425);
+    expect(scheduleMinutes(const TimeOfDay(hour: 23, minute: 58)), 1435);
+    expect(scheduleMinutes(const TimeOfDay(hour: 0, minute: 2)), 0);
   });
 }

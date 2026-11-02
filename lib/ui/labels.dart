@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../device/eq.dart';
 import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 
@@ -174,6 +175,52 @@ extension Words on AppLocalizations {
     }
     return out.join(' ');
   }
+
+  /// [x] to [n] decimals with the separator the language writes — a comma but in English — and
+  /// the minus sign (U+2212), as the glass's i18n::num and the web's decimal() print it: «1,25 кГц»
+  /// and «−3,5 дБ» on all three. A value that rounds to zero has no sign.
+  String decimal(double x, int n) {
+    var s = x.toStringAsFixed(n);
+    if (RegExp(r'^-[0.]+$').hasMatch(s)) s = s.substring(1);
+    s = s.replaceFirst('-', '\u2212');
+    return localeName == 'en' ? s : s.replaceFirst('.', ',');
+  }
+
+  /// A band's type by the names REW and Equalizer APO use, as the glass's list has them.
+  String eqTypeName(EqType type) => switch (type) {
+    EqType.peak => eqTypePeak,
+    EqType.lowshelf => eqTypeLowshelf,
+    EqType.highshelf => eqTypeHighshelf,
+    EqType.lowpass => eqTypeLowpass,
+    EqType.highpass => eqTypeHighpass,
+    EqType.notch => eqTypeNotch,
+  };
+
+  /// «125 Гц», «1,25 кГц».
+  String frequency(double f) => f >= 1000
+      ? '${decimal(f / 1000, 2)} $unitKhz'
+      : '${f.toStringAsFixed(0)} $unitHz';
+
+  /// «+3,5 дБ»; «—» for a type a gain means nothing to.
+  String bandGain(EqBand b) => b.type.hasGain
+      ? '${b.gain > 0 ? '+' : ''}${decimal(b.gain, 1)} $unitDb'
+      : '—';
+}
+
+/// The number in [s] as people type it into a field: a decimal comma, "1.2k", the minus the pages
+/// print (U+2212) or a dash — the web's parseNumber(). Null for none.
+double? parseNumber(String s) {
+  final t = s
+      .trim()
+      .replaceAll(RegExp('[\u2212\u2013]'), '-')
+      .replaceFirst(',', '.');
+  final m = RegExp(
+    r'^([+-]?\d*\.?\d+)\s*(k)?',
+    caseSensitive: false,
+  ).firstMatch(t);
+  if (m == null) return null;
+  final v = double.tryParse(m[1]!);
+  return v == null ? null : v * (m[2] != null ? 1000 : 1);
 }
 
 final _message = RegExp(r'^@([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)(?:\u001f|$)');

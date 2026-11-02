@@ -49,6 +49,14 @@ class SettingsPage extends ConsumerWidget {
               trailing: const Icon(Icons.open_in_new),
               onTap: () => openWeb(context, ref, 'system'),
             ),
+          if (ref.watch(activePanelProvider) is! NoPanel) ...[
+            _Header(l.sysSound),
+            ListTile(
+              leading: const Icon(Icons.tune),
+              title: Text(l.sysTimbreVolume),
+              onTap: () => context.go('/settings/sound'),
+            ),
+          ],
           _Header(l.mobApp),
           ListTile(
             leading: const Icon(Icons.language),

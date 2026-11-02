@@ -248,6 +248,10 @@
   "@unitBit": {
     "description": "unit.bit"
   },
+  "unitDb": "dB",
+  "@unitDb": {
+    "description": "unit.db"
+  },
   "connLost": "Lost the connection to the streamer. Reconnecting…",
   "@connLost": {
     "description": "conn.lost"
@@ -428,6 +432,176 @@
   "eqPresetSoftRock": "Soft rock",
   "@eqPresetSoftRock": {
     "description": "eq.preset.soft_rock"
+  },
+  "soundUndo": "Undo",
+  "@soundUndo": {
+    "description": "sound.undo"
+  },
+  "undoAction": "Undo",
+  "@undoAction": {
+    "description": "undo.action"
+  },
+  "sysTimbreVolume": "Tone and volume",
+  "@sysTimbreVolume": {
+    "description": "sys.timbre_volume"
+  },
+  "sysEqOff": "Off",
+  "@sysEqOff": {
+    "description": "sys.eq_off"
+  },
+  "soundVolume": "Volume",
+  "@soundVolume": {
+    "description": "sound.volume"
+  },
+  "soundVolMax": "Maximum",
+  "@soundVolMax": {
+    "description": "sound.vol_max"
+  },
+  "soundVolStart": "After power-on",
+  "@soundVolStart": {
+    "description": "sound.vol_start"
+  },
+  "soundVolStartAny": "As it was",
+  "@soundVolStartAny": {
+    "description": "sound.vol_start_any"
+  },
+  "soundVolStartN": "No louder than {n} %",
+  "@soundVolStartN": {
+    "description": "sound.vol_start_n",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "soundLevSched": "On a schedule",
+  "@soundLevSched": {
+    "description": "sound.lev_sched"
+  },
+  "soundLevFrom": "Turn on at",
+  "@soundLevFrom": {
+    "description": "sound.lev_from"
+  },
+  "soundLevTo": "Turn off at",
+  "@soundLevTo": {
+    "description": "sound.lev_to"
+  },
+  "eqEnabled": "On",
+  "@eqEnabled": {
+    "description": "eq.enabled"
+  },
+  "eqDisabled": "Off",
+  "@eqDisabled": {
+    "description": "eq.disabled"
+  },
+  "eqMenu": "More",
+  "@eqMenu": {
+    "description": "eq.menu"
+  },
+  "eqSystem": "Show the whole system",
+  "@eqSystem": {
+    "description": "eq.system"
+  },
+  "eqSystemNote": "Dashed: the whole system",
+  "@eqSystemNote": {
+    "description": "eq.system_note"
+  },
+  "eqCurve": "Frequency response",
+  "@eqCurve": {
+    "description": "eq.curve"
+  },
+  "eqConflict": "The EQ was changed on the streamer — showing its version",
+  "@eqConflict": {
+    "description": "eq.conflict"
+  },
+  "eqNoBands": "No bands",
+  "@eqNoBands": {
+    "description": "eq.no_bands"
+  },
+  "eqAdd": "+ Add a band",
+  "@eqAdd": {
+    "description": "eq.add"
+  },
+  "eqResetMine": "Reset “Custom”",
+  "@eqResetMine": {
+    "description": "eq.reset_mine"
+  },
+  "eqResetDone": "“Custom” reset",
+  "@eqResetDone": {
+    "description": "eq.reset_done"
+  },
+  "eqOff": "Off",
+  "@eqOff": {
+    "description": "eq.off"
+  },
+  "eqBandN": "Band {n}",
+  "@eqBandN": {
+    "description": "eq.band_n",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "eqBandOn": "On",
+  "@eqBandOn": {
+    "description": "eq.band_on"
+  },
+  "eqType": "Type",
+  "@eqType": {
+    "description": "eq.type"
+  },
+  "eqTypePeak": "Peak",
+  "@eqTypePeak": {
+    "description": "eq.type.peak"
+  },
+  "eqTypeLowshelf": "Low Shelf",
+  "@eqTypeLowshelf": {
+    "description": "eq.type.lowshelf"
+  },
+  "eqTypeHighshelf": "High Shelf",
+  "@eqTypeHighshelf": {
+    "description": "eq.type.highshelf"
+  },
+  "eqTypeLowpass": "Low Pass",
+  "@eqTypeLowpass": {
+    "description": "eq.type.lowpass"
+  },
+  "eqTypeHighpass": "High Pass",
+  "@eqTypeHighpass": {
+    "description": "eq.type.highpass"
+  },
+  "eqTypeNotch": "Notch",
+  "@eqTypeNotch": {
+    "description": "eq.type.notch"
+  },
+  "eqFreq": "Frequency",
+  "@eqFreq": {
+    "description": "eq.freq"
+  },
+  "eqGain": "Gain",
+  "@eqGain": {
+    "description": "eq.gain"
+  },
+  "eqQWidth": "Width (Q)",
+  "@eqQWidth": {
+    "description": "eq.q_width"
+  },
+  "eqSlope": "Slope",
+  "@eqSlope": {
+    "description": "eq.slope"
+  },
+  "eqLess": "Less",
+  "@eqLess": {
+    "description": "eq.less"
+  },
+  "eqMoreStep": "More",
+  "@eqMoreStep": {
+    "description": "eq.more_step"
+  },
+  "eqDone": "Done",
+  "@eqDone": {
+    "description": "eq.done"
   },
   "pageStations": "Stations",
   "@pageStations": {

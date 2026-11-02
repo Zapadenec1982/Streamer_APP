@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../device/demo_device_api.dart';
 import '../device/device_api.dart';
+import '../device/eq.dart';
 import '../device/models.dart';
 import '../device/panel/panel_device_api.dart';
 import '../device/panel/panel_link.dart';
@@ -322,8 +323,10 @@ class NoPanelApi implements DeviceApi {
   Future<void> dlnaCommand(int code) async {}
 
   @override
-  Future<SoundPresets> soundPresets() async =>
-      const SoundPresets(rev: 0, preset: '', presets: []);
+  Future<EqDoc> eq() async => const EqDoc(rev: 0, preset: '', presets: []);
+
+  @override
+  Future<int> setEqBands(int rev, List<EqBand> bands) async => rev;
 
   @override
   Future<void> chooseSound(String id) async {}
@@ -342,6 +345,15 @@ class NoPanelApi implements DeviceApi {
 
   @override
   Future<void> setEqOn(bool on) async {}
+
+  @override
+  Future<void> setLevelerSchedule({bool? on, int? from, int? to}) async {}
+
+  @override
+  Future<void> setVolMax(int percent) async {}
+
+  @override
+  Future<void> setVolStart(int percent) async {}
 
   @override
   Future<void> setLeveler(bool on) async {}

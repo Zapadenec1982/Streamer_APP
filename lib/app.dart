@@ -6,6 +6,7 @@ import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 import 'theme/app_theme.dart';
 import 'ui/dlna_page.dart';
+import 'ui/eq_page.dart';
 import 'ui/library_page.dart';
 import 'ui/link_state.dart';
 import 'ui/panels_page.dart';
@@ -13,6 +14,7 @@ import 'ui/phone_keys.dart';
 import 'ui/player_page.dart';
 import 'ui/settings_page.dart';
 import 'ui/shell.dart';
+import 'ui/sound_page.dart';
 import 'ui/source_page.dart';
 import 'ui/stations_page.dart';
 
@@ -42,6 +44,10 @@ final routerProvider = Provider<GoRouter>(
                     path: 'dlna',
                     builder: (context, state) => const DlnaPage(),
                   ),
+                  GoRoute(
+                    path: 'eq',
+                    builder: (context, state) => const EqPage(),
+                  ),
                 ],
               ),
             ],
@@ -67,6 +73,16 @@ final routerProvider = Provider<GoRouter>(
                 path: '/settings',
                 builder: (context, state) => const SettingsPage(),
                 routes: [
+                  GoRoute(
+                    path: 'sound',
+                    builder: (context, state) => const SoundPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'eq',
+                        builder: (context, state) => const EqPage(),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'panels',
                     builder: (context, state) => const PanelsPage(),

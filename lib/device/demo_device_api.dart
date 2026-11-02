@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'demo_art.dart';
 import 'device_api.dart';
+import 'eq.dart';
 import 'media.dart';
 import 'models.dart';
 
@@ -206,6 +207,45 @@ class DemoDeviceApi implements DeviceApi {
     'hiphop',
   ];
 
+  /// The presets' bands (eq_presets.cpp): a low shelf, eight octave peaks, a high shelf; a 0 dB
+  /// band is off.
+  static const _presetF = [
+    40.0,
+    62.5,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+    12000.0,
+  ];
+  static const _presetGain = {
+    'flat': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    'pop': [-1.4, -1.1, 1.0, 2.7, 3.4, 2.3, 0.2, -1.1, -1.2, -1.0],
+    'rock': [4.9, 3.6, 3.1, -0.8, -4.2, -1.8, 0.7, 2.5, 4.5, 7.0],
+    'jazz': [3.3, 1.9, 0.5, -0.2, -0.2, 0.7, 1.0, 0.4, 1.3, 3.3],
+    'classical': [0.0, 0.0, 0.0, -0.1, -0.2, 0.0, 0.7, -1.0, -3.5, -5.5],
+    'electronic': [4.9, 3.4, 3.0, 1.1, -2.3, -2.4, -1.1, 1.3, 4.3, 6.1],
+    'hiphop': [5.3, 3.3, 1.8, 0.4, -0.6, -0.1, 0.3, 0.6, 1.0, 2.1],
+  };
+
+  static List<EqBand> _presetBands(List<double> gains) => [
+    for (var i = 0; i < gains.length; i++)
+      EqBand(
+        type: i == 0
+            ? EqType.lowshelf
+            : i == gains.length - 1
+            ? EqType.highshelf
+            : EqType.peak,
+        f: _presetF[i],
+        gain: gains[i],
+        q: i == 0 || i == gains.length - 1 ? 0.707 : 1,
+        on: gains[i].abs() >= 0.05,
+      ),
+  ];
+
   final _changes = StreamController<DeviceSnapshot>.broadcast();
   Timer? _timer;
   late DeviceSnapshot _current;
@@ -243,6 +283,20 @@ class DemoDeviceApi implements DeviceApi {
   ({String name, String url, String uuid})? _catalog;
   String _sound = 'rock';
   int _eqRev = 1;
+
+  /// «Власний», kept as it is edited — a set of three, as an import leaves one, so a band can be
+  /// added — and the set that plays.
+  var _custom = const [
+    EqBand(type: EqType.lowshelf, f: 80, gain: 3, q: 0.7),
+    EqBand(type: EqType.peak, f: 2500, gain: -1.5, q: 1.4),
+    EqBand(type: EqType.highshelf, f: 10000, gain: 2, q: 0.7),
+  ];
+  var _bands = _presetBands(_presetGain['rock']!);
+  int _volMax = 100;
+  int _volStart = 0;
+  bool _levSchedule = false;
+  int _levFrom = 22 * 60;
+  int _levTo = 7 * 60;
   int _bass = 2;
   int _treble = 0;
   bool _loudness = true;
@@ -480,15 +534,29 @@ class DemoDeviceApi implements DeviceApi {
   }
 
   @override
-  Future<SoundPresets> soundPresets() async =>
-      SoundPresets(rev: _eqRev, preset: _sound, presets: _sounds);
+  Future<EqDoc> eq() async =>
+      EqDoc(rev: _eqRev, preset: _sound, presets: _sounds, bands: _bands);
 
   @override
   Future<void> chooseSound(String id) async {
     if (id == _sound || !_sounds.contains(id)) return;
     _sound = id;
+    _bands = id == 'custom' ? _custom : _presetBands(_presetGain[id]!);
     _eqRev++;
     _emit();
+  }
+
+  /// A hand edit is «Власний», as the panel's (eq_hand_edited).
+  @override
+  Future<int> setEqBands(int rev, List<EqBand> bands) async {
+    if (rev != _eqRev) throw const EqChanged();
+    _custom = _bands = [
+      for (final b in bands.take(EqLimits.bands)) b.clamped(),
+    ];
+    _sound = 'custom';
+    _eqRev++;
+    _emit();
+    return _eqRev;
   }
 
   @override
@@ -521,6 +589,26 @@ class DemoDeviceApi implements DeviceApi {
   @override
   Future<void> setLeveler(bool on) async {
     _leveler = on;
+    _emit();
+  }
+
+  @override
+  Future<void> setLevelerSchedule({bool? on, int? from, int? to}) async {
+    _levSchedule = on ?? _levSchedule;
+    _levFrom = from?.clamp(0, 1435) ?? _levFrom;
+    _levTo = to?.clamp(0, 1435) ?? _levTo;
+    _emit();
+  }
+
+  @override
+  Future<void> setVolMax(int percent) async {
+    _volMax = percent.clamp(40, 100);
+    _emit();
+  }
+
+  @override
+  Future<void> setVolStart(int percent) async {
+    _volStart = percent.clamp(0, 100);
     _emit();
   }
 
@@ -725,6 +813,13 @@ class DemoDeviceApi implements DeviceApi {
         eqOn: _eqOn,
         leveler: _leveler,
         eqRev: _eqRev,
+        volMax: _volMax,
+        volStart: _volStart,
+        levSchedule: _levSchedule,
+        levFrom: _levFrom,
+        levTo: _levTo,
+        // a quiet evening: the loudness lifts the bass as the panel's would
+        loudDb: _loudness ? 6 : 0,
       ),
       radio: StationState(
         current: _catalog != null ? -1 : _station,
