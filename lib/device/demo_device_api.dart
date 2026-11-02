@@ -1,15 +1,23 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'demo_art.dart';
 import 'device_api.dart';
 import 'models.dart';
 
 class _Track {
-  const _Track(this.title, this.artist, this.duration);
+  const _Track(this.title, this.artist, this.seconds, this.art);
 
   final String title;
   final String artist;
-  final Duration duration;
+  final int seconds;
+
+  /// Its cover: a [DemoArt] palette and pattern.
+  final (int, int) art;
+
+  Duration get duration => Duration(seconds: seconds);
+
+  String get coverKey => DemoArt.key(art.$1, art.$2, title);
 }
 
 /// A made-up panel, so the app can be seen without one — by a store's reviewer, and while it is
@@ -32,27 +40,15 @@ class DemoDeviceApi implements DeviceApi {
   static const _tuning = Duration(milliseconds: 1500);
 
   static const _phoneTracks = [
-    _Track('Amber Hours', 'Lantern Theory', Duration(minutes: 3, seconds: 42)),
-    _Track(
-      'Tidewater Static',
-      'Northbound Echo',
-      Duration(minutes: 4, seconds: 5),
-    ),
-    _Track(
-      'Seven Quiet Rooms',
-      'Lantern Theory',
-      Duration(minutes: 3, seconds: 18),
-    ),
-    _Track(
-      'Copper Lanterns',
-      'Northbound Echo',
-      Duration(minutes: 5, seconds: 1),
-    ),
+    _Track('Amber Hours', 'Lantern Theory', 222, (0, 0)),
+    _Track('Tidewater Static', 'Northbound Echo', 245, (1, 3)),
+    _Track('Seven Quiet Rooms', 'Lantern Theory', 198, (2, 2)),
+    _Track('Copper Lanterns', 'Northbound Echo', 301, (3, 1)),
   ];
   static const _cardTracks = [
-    _Track('Glasshouse', 'Cedar Line', Duration(minutes: 3, seconds: 54)),
-    _Track('Low Tide Lamps', 'Cedar Line', Duration(minutes: 3, seconds: 36)),
-    _Track('Northern Window', 'Cedar Line', Duration(minutes: 4, seconds: 12)),
+    _Track('Glasshouse', 'Cedar Line', 234, (4, 2)),
+    _Track('Low Tide Lamps', 'Cedar Line', 216, (1, 0)),
+    _Track('Northern Window', 'Cedar Line', 252, (5, 3)),
   ];
   static const _stations = [
     ('Radio Lantern', 'Lantern Theory - Amber Hours'),
@@ -261,7 +257,7 @@ class DemoDeviceApi implements DeviceApi {
   @override
   Uri? web(String route) => null;
 
-  /// The demo draws its own covers (CoverArt).
+  /// The demo draws its own covers (DemoArt).
   @override
   Future<Uint8List?> cover(String key) async => null;
 
@@ -294,10 +290,15 @@ class DemoDeviceApi implements DeviceApi {
 
   DeviceSnapshot _build() {
     final now = _now();
+    final cover = now.coverKey;
     return DeviceSnapshot(
       name: panelName,
       scheme: 0,
       now: now,
+      // the Player's background follows the cover, as the panel's does (ui.cover_rgb)
+      backdrop: cover != null && now.kind != NowKind.radio
+          ? DemoArt.of(cover).backdrop
+          : null,
       cards: [
         for (final card in SourceCard.values)
           SourceCardState(
@@ -368,7 +369,7 @@ class DemoDeviceApi implements DeviceApi {
           canNext: true,
           position: _phonePosition,
           duration: t.duration,
-          coverKey: '${t.artist}/${t.title}',
+          coverKey: t.coverKey,
         );
       case SourceId.card:
         final t = _cardTracks[_cardTrack];
@@ -383,7 +384,7 @@ class DemoDeviceApi implements DeviceApi {
           canNext: true,
           position: _cardPosition,
           duration: t.duration,
-          coverKey: '${t.artist}/${t.title}',
+          coverKey: t.coverKey,
         );
       case SourceId.radio:
         final (name, line) = _stations[_station];

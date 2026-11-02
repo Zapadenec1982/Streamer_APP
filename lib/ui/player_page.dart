@@ -5,7 +5,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../device/demo_art.dart';
 import '../device/models.dart';
+import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'cover_art.dart';
@@ -117,6 +119,13 @@ class _Cover extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final title = now.title;
+    final key = now.coverKey;
+    // the demo's tracks wear the app's own artwork
+    if (key != null &&
+        now.kind != NowKind.radio &&
+        ref.watch(activePanelProvider) is DemoPanel) {
+      return DemoCover(art: DemoArt.of(key), size: size);
+    }
     // a station without a picture shows its disc, as the glass and the web do
     final Widget drawn = now.kind == NowKind.radio && title is TextLabel
         ? Container(
@@ -130,7 +139,6 @@ class _Cover extends ConsumerWidget {
             child: StationDisc(name: title.text, size: size * 0.6, label: true),
           )
         : CoverArt(coverKey: now.coverKey, source: now.source, size: size);
-    final key = now.coverKey;
     if (key == null) return drawn;
     final bytes = ref.watch(coverProvider(key)).value;
     if (bytes == null) return drawn;

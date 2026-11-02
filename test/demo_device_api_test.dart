@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:streamer/device/demo_art.dart';
 import 'package:streamer/device/demo_device_api.dart';
 import 'package:streamer/device/models.dart';
 
@@ -90,4 +91,39 @@ void main() {
     );
     expect((cards[SourceCard.servers]! as LineLabel).line, CatalogLine.servers);
   });
+
+  test(
+    'each track wears its own drawn cover, and the Player its dark shade',
+    () async {
+      final covers = <String>{};
+      for (var i = 0; i < 4; i++) {
+        final s = api.current;
+        final key = s.now.coverKey!;
+        covers.add(key);
+        final art = DemoArt.of(key);
+        expect(s.backdrop, art.backdrop);
+        // dark: the Player's light text stays readable on it
+        for (final shift in [16, 8, 0]) {
+          expect((s.backdrop! >> shift) & 0xFF, lessThan(0x40));
+        }
+        await api.transport(TransportAction.next);
+      }
+      expect(covers, hasLength(4));
+      // the same art from the same key, every run
+      expect(DemoArt.of('art:3:1:Copper Lanterns').pattern, 1);
+      expect(
+        DemoArt.of('art:3:1:Copper Lanterns').palette,
+        DemoArt.palettes[3],
+      );
+      expect(DemoArt.of('x').seed, DemoArt.of('x').seed);
+    },
+  );
+
+  test(
+    'a station has no drawn cover and no shade: its disc stands in',
+    () async {
+      await api.selectSource(SourceId.radio);
+      expect(api.current.backdrop, isNull);
+    },
+  );
 }
