@@ -7,5 +7,20 @@
   "mob.lang_phone": "Same as the phone",
   "mob.licenses": "Licences",
   "mob.in_web": "This is in the panel's web interface",
-  "mob.busy": "The panel already serves three clients. Trying again…"
+  "mob.busy": "The panel already serves three clients. Trying again…",
+  "mob.panels": "Panels",
+  "mob.add_panel": "Add a panel",
+  "mob.on_network": "On the network",
+  "mob.searching": "Looking for panels…",
+  "mob.none_found": "No panels on this network",
+  "mob.by_address": "By address",
+  "mob.address": "Panel address",
+  "mob.address_hint": "192.168.1.20 or modesp-xxxx.local",
+  "mob.connect": "Connect",
+  "mob.not_panel": "There is no ModESP panel at this address",
+  "mob.no_panel": "Connect a panel",
+  "mob.no_panel_note": "The phone and the panel need to be on the same Wi-Fi",
+  "mob.find": "Find a panel",
+  "mob.try_demo": "Try the demo",
+  "mob.forget": "Forget"
 }

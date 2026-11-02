@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
@@ -19,11 +21,26 @@ class SettingsPage extends ConsumerWidget {
       body: ListView(
         children: [
           _Header(l.mobPanel),
-          ListTile(
-            leading: const Icon(Icons.speaker),
-            title: Text(l.mobDemoPanel),
-            subtitle: Text(l.mobDemoNote),
-          ),
+          switch (ref.watch(activePanelProvider)) {
+            NoPanel() => ListTile(
+              leading: const Icon(Icons.speaker_outlined),
+              title: Text(l.mobNoPanel),
+              subtitle: Text(l.mobNoPanelNote),
+              onTap: () => context.go('/settings/panels'),
+            ),
+            DemoPanel() => ListTile(
+              leading: const Icon(Icons.speaker_outlined),
+              title: Text(l.mobDemoPanel),
+              subtitle: Text(l.mobDemoNote),
+              onTap: () => context.go('/settings/panels'),
+            ),
+            RealPanel(:final panel) => ListTile(
+              leading: const Icon(Icons.speaker),
+              title: Text(panel.name),
+              subtitle: Text(panel.address),
+              onTap: () => context.go('/settings/panels'),
+            ),
+          },
           _Header(l.mobApp),
           ListTile(
             leading: const Icon(Icons.language),

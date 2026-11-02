@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The panel's HTTP API and WebSocket on the home network, plain HTTP until the panel speaks
+         HTTPS (plan, stage 7). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
+        android:usesCleartextTraffic="true"
         android:label="ModESP Streamer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

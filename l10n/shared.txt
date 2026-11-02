@@ -61,6 +61,18 @@ unit.bit
 
 # the link to the panel
 conn.lost
+app.error
+app.retry
+err.code
+err.bad_request
+auth.title
+auth.user
+auth.pass
+auth.login
+auth.error
+auth.locked
+pass.show
+pass.hide
 
 # settings
 sys.scheme

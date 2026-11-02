@@ -9,6 +9,7 @@ import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'cover_art.dart';
 import 'labels.dart';
+import 'writes.dart';
 
 /// What plays, from where, and the hands on it: transport and volume. The web's Player in one
 /// column (webui PlayerPage), the glass's rules for the buttons: a 72 dp play disc between bare
@@ -164,8 +165,9 @@ class _Transport extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final api = ref.watch(deviceApiProvider);
     final colors = Theme.of(context).colorScheme;
+    void press(TransportAction a) =>
+        act(context, ref, (api) => api.transport(a));
     if (!now.canToggle && !now.canPrevious && !now.canNext) {
       return const SizedBox(height: 72);
     }
@@ -177,7 +179,7 @@ class _Transport extends ConsumerWidget {
           constraints: const BoxConstraints.tightFor(width: 64, height: 64),
           tooltip: l.transportPrev,
           onPressed: now.canPrevious
-              ? () => api.transport(TransportAction.previous)
+              ? () => press(TransportAction.previous)
               : null,
           icon: const Icon(Icons.skip_previous),
         ),
@@ -192,7 +194,7 @@ class _Transport extends ConsumerWidget {
                 backgroundColor: colors.primary,
                 foregroundColor: colors.onPrimary,
               ),
-              onPressed: () => api.transport(TransportAction.toggle),
+              onPressed: () => press(TransportAction.toggle),
               icon: Icon(now.playing ? Icons.pause : Icons.play_arrow),
             ),
           ),
@@ -201,9 +203,7 @@ class _Transport extends ConsumerWidget {
           iconSize: 36,
           constraints: const BoxConstraints.tightFor(width: 64, height: 64),
           tooltip: l.transportNext,
-          onPressed: now.canNext
-              ? () => api.transport(TransportAction.next)
-              : null,
+          onPressed: now.canNext ? () => press(TransportAction.next) : null,
           icon: const Icon(Icons.skip_next),
         ),
       ],
@@ -243,20 +243,22 @@ class _VolumeState extends ConsumerState<_Volume> {
   void _flush() {
     final value = _pending;
     _pending = null;
-    if (value != null) ref.read(deviceApiProvider).setVolume(value);
+    if (value != null && mounted) {
+      act(context, ref, (api) => api.setVolume(value));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final snapshot = ref.watch(snapshotProvider);
-    final api = ref.watch(deviceApiProvider);
     final value = _dragging ?? snapshot.volume.toDouble();
     return Row(
       children: [
         IconButton(
           tooltip: snapshot.muted ? l.volumeUnmute : l.volumeMute,
-          onPressed: () => api.setMuted(!snapshot.muted),
+          onPressed: () =>
+              act(context, ref, (api) => api.setMuted(!snapshot.muted)),
           icon: Icon(snapshot.muted ? Icons.volume_off : Icons.volume_up),
         ),
         Expanded(

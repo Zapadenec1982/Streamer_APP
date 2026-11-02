@@ -7,5 +7,20 @@
   "mob.lang_phone": "Як у телефоні",
   "mob.licenses": "Ліцензії",
   "mob.in_web": "Це — у вебінтерфейсі панелі",
-  "mob.busy": "Панель уже обслуговує трьох клієнтів. Пробую знову…"
+  "mob.busy": "Панель уже обслуговує трьох клієнтів. Пробую знову…",
+  "mob.panels": "Панелі",
+  "mob.add_panel": "Додати панель",
+  "mob.on_network": "У мережі",
+  "mob.searching": "Шукаю панелі…",
+  "mob.none_found": "Панелей у цій мережі не видно",
+  "mob.by_address": "За адресою",
+  "mob.address": "Адреса панелі",
+  "mob.address_hint": "192.168.1.20 або modesp-xxxx.local",
+  "mob.connect": "Підключити",
+  "mob.not_panel": "За цією адресою немає панелі ModESP",
+  "mob.no_panel": "Підключіть панель",
+  "mob.no_panel_note": "Телефон і панель мають бути в одній мережі Wi-Fi",
+  "mob.find": "Знайти панель",
+  "mob.try_demo": "Спробувати демо",
+  "mob.forget": "Забути"
 }

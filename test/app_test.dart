@@ -15,6 +15,7 @@ void main() {
     api = DemoDeviceApi(autoTick: false);
     store = MemorySettingsStore();
     store.setString('language', 'uk');
+    store.setString('active_panel', 'demo');
   });
   tearDown(() => api.dispose());
 
@@ -106,6 +107,27 @@ void main() {
       await tester.pumpAndSettle();
     });
   }
+
+  testWidgets('with no panel yet: what to do, and the demo a tap away', (
+    tester,
+  ) async {
+    store.setString('active_panel', '');
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [settingsStoreProvider.overrideWithValue(store)],
+        child: const StreamerApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Підключіть панель'), findsOneWidget);
+    expect(find.text('Знайти панель'), findsOneWidget);
+    await tester.tap(find.text('Спробувати демо'));
+    await tester.pumpAndSettle();
+    expect(find.text('BLUETOOTH'), findsOneWidget);
+    expect(store.getString('active_panel'), 'demo');
+    // the demo's ticking clock is the app's own here; stop it
+    await tester.pumpWidget(const SizedBox());
+  });
 
   testWidgets('the language is the app\'s own setting and is kept', (
     tester,

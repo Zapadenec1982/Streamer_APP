@@ -224,6 +224,59 @@
   "@connLost": {
     "description": "conn.lost"
   },
+  "appError": "Cannot reach the panel",
+  "@appError": {
+    "description": "app.error"
+  },
+  "appRetry": "Retry",
+  "@appRetry": {
+    "description": "app.retry"
+  },
+  "errCode": "The panel answered: {code}",
+  "@errCode": {
+    "description": "err.code",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errBadRequest": "The panel did not accept the request",
+  "@errBadRequest": {
+    "description": "err.bad_request"
+  },
+  "authTitle": "Sign in",
+  "@authTitle": {
+    "description": "auth.title"
+  },
+  "authUser": "Username",
+  "@authUser": {
+    "description": "auth.user"
+  },
+  "authPass": "Password",
+  "@authPass": {
+    "description": "auth.pass"
+  },
+  "authLogin": "Sign in",
+  "@authLogin": {
+    "description": "auth.login"
+  },
+  "authError": "Wrong username or password",
+  "@authError": {
+    "description": "auth.error"
+  },
+  "authLocked": "Too many failed attempts — try again in half a minute",
+  "@authLocked": {
+    "description": "auth.locked"
+  },
+  "passShow": "Show",
+  "@passShow": {
+    "description": "pass.show"
+  },
+  "passHide": "Hide",
+  "@passHide": {
+    "description": "pass.hide"
+  },
   "sysScheme": "Colour scheme",
   "@sysScheme": {
     "description": "sys.scheme"
@@ -252,6 +305,18 @@
   "@pageLanguage": {
     "description": "page.language"
   },
+  "mobAddPanel": "Add a panel",
+  "@mobAddPanel": {
+    "description": "mob.add_panel"
+  },
+  "mobAddress": "Panel address",
+  "@mobAddress": {
+    "description": "mob.address"
+  },
+  "mobAddressHint": "192.168.1.20 or modesp-xxxx.local",
+  "@mobAddressHint": {
+    "description": "mob.address_hint"
+  },
   "mobApp": "App",
   "@mobApp": {
     "description": "mob.app"
@@ -264,6 +329,14 @@
   "@mobBusy": {
     "description": "mob.busy"
   },
+  "mobByAddress": "By address",
+  "@mobByAddress": {
+    "description": "mob.by_address"
+  },
+  "mobConnect": "Connect",
+  "@mobConnect": {
+    "description": "mob.connect"
+  },
   "mobDemoNote": "A made-up panel, to see the app without the device",
   "@mobDemoNote": {
     "description": "mob.demo_note"
@@ -271,6 +344,14 @@
   "mobDemoPanel": "Demo panel",
   "@mobDemoPanel": {
     "description": "mob.demo_panel"
+  },
+  "mobFind": "Find a panel",
+  "@mobFind": {
+    "description": "mob.find"
+  },
+  "mobForget": "Forget",
+  "@mobForget": {
+    "description": "mob.forget"
   },
   "mobInWeb": "This is in the panel's web interface",
   "@mobInWeb": {
@@ -284,8 +365,40 @@
   "@mobLicenses": {
     "description": "mob.licenses"
   },
+  "mobNoPanel": "Connect a panel",
+  "@mobNoPanel": {
+    "description": "mob.no_panel"
+  },
+  "mobNoPanelNote": "The phone and the panel need to be on the same Wi-Fi",
+  "@mobNoPanelNote": {
+    "description": "mob.no_panel_note"
+  },
+  "mobNoneFound": "No panels on this network",
+  "@mobNoneFound": {
+    "description": "mob.none_found"
+  },
+  "mobNotPanel": "There is no ModESP panel at this address",
+  "@mobNotPanel": {
+    "description": "mob.not_panel"
+  },
+  "mobOnNetwork": "On the network",
+  "@mobOnNetwork": {
+    "description": "mob.on_network"
+  },
   "mobPanel": "Panel",
   "@mobPanel": {
     "description": "mob.panel"
+  },
+  "mobPanels": "Panels",
+  "@mobPanels": {
+    "description": "mob.panels"
+  },
+  "mobSearching": "Looking for panels…",
+  "@mobSearching": {
+    "description": "mob.searching"
+  },
+  "mobTryDemo": "Try the demo",
+  "@mobTryDemo": {
+    "description": "mob.try_demo"
   }
 }

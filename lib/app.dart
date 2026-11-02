@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 import 'theme/app_theme.dart';
+import 'ui/link_state.dart';
+import 'ui/panels_page.dart';
 import 'ui/player_page.dart';
 import 'ui/settings_page.dart';
 import 'ui/shell.dart';
@@ -21,7 +23,8 @@ final routerProvider = Provider<GoRouter>(
             routes: [
               GoRoute(
                 path: '/player',
-                builder: (context, state) => const PlayerPage(),
+                builder: (context, state) =>
+                    const PanelPage(child: PlayerPage()),
               ),
             ],
           ),
@@ -29,7 +32,8 @@ final routerProvider = Provider<GoRouter>(
             routes: [
               GoRoute(
                 path: '/source',
-                builder: (context, state) => const SourcePage(),
+                builder: (context, state) =>
+                    const PanelPage(child: SourcePage()),
               ),
             ],
           ),
@@ -38,6 +42,18 @@ final routerProvider = Provider<GoRouter>(
               GoRoute(
                 path: '/settings',
                 builder: (context, state) => const SettingsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'panels',
+                    builder: (context, state) => const PanelsPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'add',
+                        builder: (context, state) => const AddPanelPage(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

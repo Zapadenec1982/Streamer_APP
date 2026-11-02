@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'writes.dart';
 
 /// The panel's sources as cards, the playing one filled (webui SourcePage, screen_src.cpp).
 class SourcePage extends ConsumerWidget {
@@ -109,6 +111,10 @@ class _Card extends ConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(l.mobInWeb)));
       return;
     }
-    ref.read(deviceApiProvider).selectSource(state.card.source);
+    // a tap is "listen": the source is set and the Player opens, as on the glass and the web
+    if (!state.active) {
+      act(context, ref, (api) => api.selectSource(state.card.source));
+    }
+    context.go('/player');
   }
 }
