@@ -204,14 +204,14 @@ class _CatalogPageState extends ConsumerState<CatalogPage>
       setState(() {
         _genres = genres;
         _loading = false;
-        if (genres.isEmpty) _message = l.mobCatNoGenres;
+        if (genres.isEmpty) _message = l.catNoGenres;
       });
     } on PanelError {
       if (!mounted || mine != _serial) return;
       setState(() {
         _loading = false;
         _error = true;
-        _message = l.mobCatNoGenres;
+        _message = l.catNoGenres;
       });
     }
   }
@@ -250,7 +250,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage>
       ..showSnackBar(
         SnackBar(
           content: Text(switch (action) {
-            0 => l.mobCatPlayed(st.name),
+            0 => l.catPlayed(st.name),
             1 => l.catKept(st.name),
             _ => l.catInPreset('${action - 1}', st.name),
           }),

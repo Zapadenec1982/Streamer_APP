@@ -28,13 +28,5 @@
   "mob.other_panel": "Inny streamer",
   "mob.hint_listen": "słuchać",
   "mob.hint_store": "zapisać tu to, co gra",
-  "mob.added": "Już dodany",
-  "mob.conn_lost": "Utracono połączenie ze streamerem. Ponowne łączenie…",
-  "mob.no_link": "Brak połączenia ze streamerem",
-  "mob.err_code": "Streamer odpowiedział: {code}",
-  "mob.as_streamer": "Jak na streamerze",
-  "mob.cat_play": "Odtwórz na streamerze",
-  "mob.cat_played": "Gra na streamerze: {name}",
-  "mob.cat_no_genres": "Streamer nie ma listy gatunków",
-  "mob.st_conflict": "Lista zmieniła się na streamerze — pokazuję ją, powtórz zmianę"
+  "mob.added": "Już dodany"
 }

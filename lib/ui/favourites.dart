@@ -62,7 +62,7 @@ class _FavouritesTabState extends ConsumerState<FavouritesTab>
     }
     if (!mounted) return false;
     if (result != StationsSave.saved) {
-      if (result == StationsSave.changed) _say(l.mobStConflict);
+      if (result == StationsSave.changed) _say(l.stConflict);
       _settle();
       return false;
     }

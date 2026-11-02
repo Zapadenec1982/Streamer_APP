@@ -67,6 +67,9 @@ unit.kbps
 unit.bit
 
 # the link to the panel
+conn.lost
+app.error
+err.code
 app.retry
 auth.title
 auth.user
@@ -144,6 +147,7 @@ st.err_dup
 st.err_full
 st.saved
 st.save_failed
+st.conflict
 cat.sort_pop
 cat.sort_votes
 cat.sort_quality
@@ -170,6 +174,8 @@ cat.nothing_page
 cat.keep
 cat.to_preset
 cat.kept
+cat.played
+cat.no_genres
 cat.prev
 cat.next
 cat.page
@@ -228,3 +234,6 @@ dlna.queue
 dlna.queued
 common.cancel
 app.loading
+
+# the app's settings
+lang.as_panel

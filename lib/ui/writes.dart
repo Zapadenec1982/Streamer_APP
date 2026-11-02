@@ -30,8 +30,8 @@ Future<bool> act(
     final text = e.locked
         ? l.authLocked
         : e.status == 0
-        ? l.mobNoLink
-        : l.mobErrCode(e.code ?? '${e.status}');
+        ? l.appError
+        : l.errCode(e.code ?? '${e.status}');
     // it takes the place of what is said and of what waits, so a run of failures says it once
     ScaffoldMessenger.of(context)
       ..clearSnackBars()

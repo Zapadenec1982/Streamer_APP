@@ -39,7 +39,7 @@ class PanelPage extends ConsumerWidget {
 String _words(AppLocalizations l, LinkStatus status, {required bool known}) =>
     switch (status) {
       LinkStatus.busy => l.mobBusy,
-      _ => known ? l.mobConnLost : l.nowConnecting,
+      _ => known ? l.connLost : l.nowConnecting,
     };
 
 class _Strip extends StatelessWidget {
@@ -146,7 +146,7 @@ class _WaitingState extends ConsumerState<_Waiting> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        l.mobNoLink,
+                        l.appError,
                         style: text.titleLarge,
                         textAlign: TextAlign.center,
                       ),

@@ -248,6 +248,23 @@
   "@unitBit": {
     "description": "unit.bit"
   },
+  "connLost": "Lost the connection to the streamer. Reconnecting…",
+  "@connLost": {
+    "description": "conn.lost"
+  },
+  "appError": "Cannot reach the streamer",
+  "@appError": {
+    "description": "app.error"
+  },
+  "errCode": "The streamer answered: {code}",
+  "@errCode": {
+    "description": "err.code",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "appRetry": "Retry",
   "@appRetry": {
     "description": "app.retry"
@@ -568,6 +585,10 @@
   "@stSaveFailed": {
     "description": "st.save_failed"
   },
+  "stConflict": "The list changed on the streamer — showing it; repeat your edit",
+  "@stConflict": {
+    "description": "st.conflict"
+  },
   "catSortPop": "Popular",
   "@catSortPop": {
     "description": "cat.sort_pop"
@@ -706,6 +727,19 @@
         "type": "String"
       }
     }
+  },
+  "catPlayed": "Playing on the streamer: {name}",
+  "@catPlayed": {
+    "description": "cat.played",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "catNoGenres": "The streamer has no genre list",
+  "@catNoGenres": {
+    "description": "cat.no_genres"
   },
   "catPrev": "Previous page",
   "@catPrev": {
@@ -974,6 +1008,10 @@
   "@appLoading": {
     "description": "app.loading"
   },
+  "langAsPanel": "Same as the streamer",
+  "@langAsPanel": {
+    "description": "lang.as_panel"
+  },
   "mobAddPanel": "Add a streamer",
   "@mobAddPanel": {
     "description": "mob.add_panel"
@@ -998,10 +1036,6 @@
   "@mobAppName": {
     "description": "mob.app_name"
   },
-  "mobAsStreamer": "Same as the streamer",
-  "@mobAsStreamer": {
-    "description": "mob.as_streamer"
-  },
   "mobBusy": "The streamer already serves three clients. Trying again…",
   "@mobBusy": {
     "description": "mob.busy"
@@ -1009,27 +1043,6 @@
   "mobByAddress": "By address",
   "@mobByAddress": {
     "description": "mob.by_address"
-  },
-  "mobCatNoGenres": "The streamer has no genre list",
-  "@mobCatNoGenres": {
-    "description": "mob.cat_no_genres"
-  },
-  "mobCatPlay": "Play on the streamer",
-  "@mobCatPlay": {
-    "description": "mob.cat_play"
-  },
-  "mobCatPlayed": "Playing on the streamer: {name}",
-  "@mobCatPlayed": {
-    "description": "mob.cat_played",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "mobConnLost": "Lost the connection to the streamer. Reconnecting…",
-  "@mobConnLost": {
-    "description": "mob.conn_lost"
   },
   "mobConnect": "Connect",
   "@mobConnect": {
@@ -1042,15 +1055,6 @@
   "mobDemoPanel": "Demo streamer",
   "@mobDemoPanel": {
     "description": "mob.demo_panel"
-  },
-  "mobErrCode": "The streamer answered: {code}",
-  "@mobErrCode": {
-    "description": "mob.err_code",
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
   },
   "mobFind": "Find a streamer",
   "@mobFind": {
@@ -1079,10 +1083,6 @@
   "mobLicenses": "Licences",
   "@mobLicenses": {
     "description": "mob.licenses"
-  },
-  "mobNoLink": "Cannot reach the streamer",
-  "@mobNoLink": {
-    "description": "mob.no_link"
   },
   "mobNoPanel": "Connect a streamer",
   "@mobNoPanel": {
@@ -1135,10 +1135,6 @@
   "mobSearching": "Looking for streamers…",
   "@mobSearching": {
     "description": "mob.searching"
-  },
-  "mobStConflict": "The list changed on the streamer — showing it; repeat your edit",
-  "@mobStConflict": {
-    "description": "mob.st_conflict"
   },
   "mobTryDemo": "Try the demo",
   "@mobTryDemo": {
