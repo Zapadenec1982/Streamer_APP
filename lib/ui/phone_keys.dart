@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
+import 'sender.dart';
 import 'writes.dart';
 
 /// The app's hold on the phone: in the background it lets go of the panel (its WebSocket slot)
@@ -32,10 +33,11 @@ class _PhoneBindingState extends ConsumerState<PhoneBinding> {
   late final AppLifecycleListener _life;
   StreamSubscription<Object?>? _sub;
   bool _shown = true;
-  int? _target;
-  int? _pending;
-  Timer? _settle;
-  Timer? _send;
+  late final _sender = SettingSender(
+    (value) => mounted
+        ? act(context, ref, (api) => api.setVolume(value))
+        : Future.value(false),
+  );
 
   /// The volume the popup shows; null once it has gone.
   int? _popup;
@@ -71,8 +73,7 @@ class _PhoneBindingState extends ConsumerState<PhoneBinding> {
   void dispose() {
     _life.dispose();
     _sub?.cancel();
-    _settle?.cancel();
-    _send?.cancel();
+    _sender.dispose();
     _hide?.cancel();
     super.dispose();
   }
@@ -89,22 +90,18 @@ class _PhoneBindingState extends ConsumerState<PhoneBinding> {
     }
   }
 
-  /// Presses add up from the volume the panel last reported, so a quick run of them is not lost
-  /// to the 200 ms the panel takes to report back. The first goes out at once and the newest
-  /// after it at most every 150 ms, as the Player's slider sends. The popup follows each press
-  /// and goes 1.5 s after the last — one popup, not one queued behind another per press.
+  /// Presses add up from the volume they asked for until the panel has reported it, so a quick
+  /// run of them is not lost to the time the panel takes to report back; they reach the panel as
+  /// the Player's slider does ([SettingSender]). The popup follows each press and goes 1.5 s after
+  /// the last — one popup, not one queued behind another per press.
   void _press(int dir) {
     if (dir == 0) return;
-    final from = _target ?? ref.read(snapshotProvider).volume;
+    final from = _sender.shows(ref.read(snapshotProvider).volume);
     final to = (from + dir * PhoneBinding.step).clamp(0, 100);
-    _target = to;
-    _settle?.cancel();
-    _settle = Timer(const Duration(seconds: 1), () => _target = null);
-    _pending = to;
-    if (!(_send?.isActive ?? false)) {
-      _flush();
-      _send = Timer(const Duration(milliseconds: 150), _flush);
-    }
+    // each press is a whole gesture
+    _sender
+      ..send(to)
+      ..release();
     _hide?.cancel();
     _hide = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) setState(() => _popup = null);
@@ -112,16 +109,14 @@ class _PhoneBindingState extends ConsumerState<PhoneBinding> {
     setState(() => _popup = to);
   }
 
-  void _flush() {
-    final to = _pending;
-    _pending = null;
-    if (to != null && mounted) act(context, ref, (api) => api.setVolume(to));
-  }
-
   @override
   Widget build(BuildContext context) {
     // a panel chosen or dropped changes whose the buttons are
     ref.listen(activePanelProvider, (_, _) => _intercept());
+    ref.listen(
+      snapshotProvider.select((s) => s.volume),
+      (_, reported) => _sender.heard(reported),
+    );
     final volume = _popup;
     return Stack(
       fit: StackFit.expand,

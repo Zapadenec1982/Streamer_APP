@@ -9,8 +9,9 @@ import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 
 /// Sends a command to the active panel and says in words what went wrong, if anything: a panel
-/// that wants its login asks for it; the command is not repeated by itself.
-Future<void> act(
+/// that wants its login asks for it; the command is not repeated by itself. True when the panel
+/// took it.
+Future<bool> act(
   BuildContext context,
   WidgetRef ref,
   Future<void> Function(DeviceApi api) command,
@@ -18,12 +19,13 @@ Future<void> act(
   final api = ref.read(deviceApiProvider);
   try {
     await command(api);
+    return true;
   } on PanelError catch (e) {
-    if (!context.mounted) return;
+    if (!context.mounted) return false;
     final l = AppLocalizations.of(context);
     if (e.unauthorized && api is PanelDeviceApi) {
       await askLogin(context, ref, api);
-      return;
+      return false;
     }
     final text = e.locked
         ? l.authLocked
@@ -34,6 +36,7 @@ Future<void> act(
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(content: Text(text)));
+    return false;
   }
 }
 

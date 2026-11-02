@@ -8,6 +8,7 @@ import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'sender.dart';
 import 'web_link.dart';
 import 'writes.dart';
 
@@ -147,8 +148,8 @@ class _SoundPick extends ConsumerWidget {
   }
 }
 
-/// A tone control: −6…+6 dB, moving under the finger at once, the newest value to the panel at
-/// most every 150 ms and the last one as the finger lifts — as the volume.
+/// A tone control: −6…+6 dB, moving under the finger at once and written as the volume is
+/// ([SettingSender]).
 class _ToneSlider extends ConsumerStatefulWidget {
   const _ToneSlider({
     required this.label,
@@ -165,20 +166,26 @@ class _ToneSlider extends ConsumerStatefulWidget {
 }
 
 class _ToneSliderState extends ConsumerState<_ToneSlider> {
+  late final _sender = SettingSender(
+    (value) => mounted
+        ? act(context, ref, (api) => widget.send(api, value))
+        : Future.value(false),
+    onSettled: () {
+      if (mounted) setState(() {});
+    },
+  );
   double? _dragging;
-  Timer? _timer;
-  int? _pending;
+
+  @override
+  void didUpdateWidget(_ToneSlider old) {
+    super.didUpdateWidget(old);
+    if (widget.value != old.value) _sender.heard(widget.value);
+  }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _sender.dispose();
     super.dispose();
-  }
-
-  void _flush() {
-    final v = _pending;
-    _pending = null;
-    if (v != null && mounted) act(context, ref, (api) => widget.send(api, v));
   }
 
   static String _signed(double v) {
@@ -188,7 +195,7 @@ class _ToneSliderState extends ConsumerState<_ToneSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final value = _dragging ?? widget.value.toDouble();
+    final value = _dragging ?? _sender.shows(widget.value).toDouble();
     // the name and the value over the slider, so neither wraps at the phone's text size; one node
     // for TalkBack — «Бас, +2» — that it moves a step at a time
     return MergeSemantics(
@@ -213,16 +220,12 @@ class _ToneSliderState extends ConsumerState<_ToneSlider> {
             semanticFormatterCallback: _signed,
             onChanged: (v) {
               setState(() => _dragging = v);
-              _pending = v.round();
-              if (!(_timer?.isActive ?? false)) {
-                _flush();
-                _timer = Timer(const Duration(milliseconds: 150), _flush);
-              }
+              _sender.send(v.round());
             },
             onChangeEnd: (v) {
-              _timer?.cancel();
-              _pending = v.round();
-              _flush();
+              _sender
+                ..send(v.round())
+                ..release();
               setState(() => _dragging = null);
             },
           ),

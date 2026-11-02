@@ -13,6 +13,7 @@ import '../state/providers.dart';
 import 'cover_art.dart';
 import 'fit.dart';
 import 'labels.dart';
+import 'sender.dart';
 import 'sound_sheet.dart';
 import 'station_card.dart';
 import 'writes.dart';
@@ -346,8 +347,9 @@ class _Transport extends ConsumerWidget {
   }
 }
 
-/// The volume moves under the finger at once; the panel gets the newest value at most every
-/// 150 ms and the last one when the finger lifts (plan, §2 «Підключення»).
+/// The volume moves under the finger at once and stays where the finger left it until the panel
+/// says it is there; the panel gets one value at a time, the newest at most every 150 ms (plan,
+/// §2 «Підключення»; [SettingSender]).
 class _Volume extends ConsumerStatefulWidget {
   const _Volume();
 
@@ -356,46 +358,40 @@ class _Volume extends ConsumerStatefulWidget {
 }
 
 class _VolumeState extends ConsumerState<_Volume> {
-  static const _every = Duration(milliseconds: 150);
+  late final _sender = SettingSender(
+    (value) => mounted
+        ? act(context, ref, (api) => api.setVolume(value))
+        : Future.value(false),
+    onSettled: () {
+      if (mounted) setState(() {});
+    },
+  );
 
   double? _dragging;
-  Timer? _timer;
-  int? _pending;
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _sender.dispose();
     super.dispose();
-  }
-
-  void _send(int value) {
-    _pending = value;
-    if (_timer?.isActive ?? false) return;
-    _flush();
-    _timer = Timer(_every, _flush);
-  }
-
-  void _flush() {
-    final value = _pending;
-    _pending = null;
-    if (value != null && mounted) {
-      act(context, ref, (api) => api.setVolume(value));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final snapshot = ref.watch(snapshotProvider);
-    final value = _dragging ?? snapshot.volume.toDouble();
+    final volume = ref.watch(snapshotProvider.select((s) => s.volume));
+    final muted = ref.watch(snapshotProvider.select((s) => s.muted));
+    ref.listen(
+      snapshotProvider.select((s) => s.volume),
+      (_, reported) => _sender.heard(reported),
+    );
+    final value = _dragging ?? _sender.shows(volume).toDouble();
     final style = Theme.of(context).textTheme.labelLarge;
     return Row(
       children: [
         IconButton(
-          tooltip: snapshot.muted ? l.volumeUnmute : l.volumeMute,
-          onPressed: () =>
-              act(context, ref, (api) => api.setMuted(!snapshot.muted)),
-          icon: Icon(snapshot.muted ? Icons.volume_off : Icons.volume_up),
+          tooltip: muted ? l.volumeUnmute : l.volumeMute,
+          onPressed: () => act(context, ref, (api) => api.setMuted(!muted)),
+          icon: Icon(muted ? Icons.volume_off : Icons.volume_up),
         ),
         Expanded(
           // one node: «Гучність, 32 %», which TalkBack moves up and down
@@ -407,12 +403,12 @@ class _VolumeState extends ConsumerState<_Volume> {
                 max: 100,
                 onChanged: (v) {
                   setState(() => _dragging = v);
-                  _send(v.round());
+                  _sender.send(v.round());
                 },
                 onChangeEnd: (v) {
-                  _timer?.cancel();
-                  _pending = v.round();
-                  _flush();
+                  _sender
+                    ..send(v.round())
+                    ..release();
                   setState(() => _dragging = null);
                 },
               ),

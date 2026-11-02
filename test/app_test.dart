@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,6 +52,22 @@ class LongNamesDemo extends CountingDemo {
     ],
     presets: [0, 1, 2, -1, -1, -1],
   );
+}
+
+/// A panel slow to take a volume: each write lands when the test says so, and only then does the
+/// panel report it.
+class SlowVolumeDemo extends CountingDemo {
+  final writes = <int>[];
+  final landing = <Completer<void>>[];
+
+  @override
+  Future<void> setVolume(int percent) async {
+    writes.add(percent);
+    final done = Completer<void>();
+    landing.add(done);
+    await done.future;
+    await super.setVolume(percent);
+  }
 }
 
 /// A panel that never answers: no state, ever, and the link trying all the while.
@@ -315,6 +333,40 @@ void main() {
       await check();
     }
     semantics.dispose();
+  });
+
+  testWidgets('the volume slider stays where the finger left it, and writes '
+      'one value at a time', (tester) async {
+    api.dispose();
+    final slow = SlowVolumeDemo();
+    api = slow;
+    await pumpApp(tester);
+    final slider = find.byType(Slider).first;
+    double shown() => tester.widget<Slider>(slider).value;
+    final gesture = await tester.startGesture(tester.getCenter(slider));
+    for (var i = 0; i < 6; i++) {
+      await gesture.moveBy(const Offset(20, 0));
+      await tester.pump(const Duration(milliseconds: 60));
+    }
+    await gesture.up();
+    await tester.pump();
+    final left = shown();
+    expect(slow.writes, hasLength(1), reason: 'the first is still on its way');
+    expect(slow.current.volume, 32, reason: 'the panel has not moved yet');
+    expect(
+      left,
+      greaterThan(32),
+      reason: 'the finger\'s value, not the panel\'s',
+    );
+    // the first lands: the newest goes next, and the slider does not step back meanwhile
+    slow.landing.last.complete();
+    await tester.pump();
+    expect(shown(), left);
+    expect(slow.writes, [slow.writes.first, left.round()]);
+    slow.landing.last.complete();
+    await tester.pump(const Duration(seconds: 3));
+    expect(slow.current.volume, left.round());
+    expect(shown(), left.round());
   });
 
   testWidgets('a panel that does not answer says so, with a retry and the '
