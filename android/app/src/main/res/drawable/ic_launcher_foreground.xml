@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app's mark: a speaker's driver (the surround, the cone with its ridge, the dust cap) in the
+     panel's amber, inside the adaptive icon's 66 dp safe circle. tool/app_icon.py draws the same
+     for the PNGs. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#653E00"
+        android:pathData="M35,54a19,19 0,1 0,38 0a19,19 0,1 0,-38 0" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFB95F"
+        android:strokeWidth="5"
+        android:pathData="M29,54a25,25 0,1 0,50 0a25,25 0,1 0,-50 0" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#59FFB95F"
+        android:strokeWidth="1.5"
+        android:pathData="M40,54a14,14 0,1 0,28 0a14,14 0,1 0,-28 0" />
+    <path
+        android:fillColor="#FFB95F"
+        android:pathData="M45.5,54a8.5,8.5 0,1 0,17 0a8.5,8.5 0,1 0,-17 0" />
+</vector>

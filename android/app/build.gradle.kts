@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// The upload key: android/key.properties names a keystore kept outside git (storeFile,
+// storePassword, keyAlias, keyPassword). Neither ever goes into git.
+val uploadKey = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
@@ -27,10 +36,23 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (!uploadKey.isEmpty) {
+            create("upload") {
+                storeFile = file(uploadKey.getProperty("storeFile"))
+                storePassword = uploadKey.getProperty("storePassword")
+                keyAlias = uploadKey.getProperty("keyAlias")
+                keyPassword = uploadKey.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // The debug key until the upload key exists; the upload key never goes into git.
-            signingConfig = signingConfigs.getByName("debug")
+            // Without the upload key a release build is signed with the debug key: fine on the
+            // bench, and Google Play refuses it.
+            signingConfig = signingConfigs.findByName("upload")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }

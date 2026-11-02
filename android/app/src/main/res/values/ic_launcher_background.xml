@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The panel's amber scheme, surfaceContainer (ui_m3.cpp). -->
+    <color name="ic_launcher_background">#231F18</color>
+</resources>
