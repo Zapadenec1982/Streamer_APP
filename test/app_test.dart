@@ -192,6 +192,22 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// A row of Налаштування opened: the section, its list from the top — it keeps where it was
+  /// scrolled to — the row brought on the screen and tapped.
+  Future<void> settings(WidgetTester tester, String row) async {
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byType(Scrollable).hitTestable().first,
+      const Offset(0, 2000),
+      3000,
+    );
+    await tester.pumpAndSettle();
+    await reveal(tester, find.text(row));
+    await tester.tap(find.text(row));
+    await tester.pumpAndSettle();
+  }
+
   /// The Player's «Звук» sheet, then its way to the equalizer.
   Future<void> openEq(WidgetTester tester) async {
     await tester.tap(find.text('Звук'));
@@ -418,22 +434,7 @@ void main() {
       // Колонки, its details, the port page both ways, Тонке налаштування, the wizard's two steps
       // with its help open — and a test tone's bar over the navigation all the while
       await api.playTone(hz: 40);
-      Future<void> settings(String row) async {
-        await tester.tap(tab('Налаштування'));
-        await tester.pumpAndSettle();
-        // the list keeps where it was scrolled to: from its top
-        await tester.fling(
-          find.byType(Scrollable).hitTestable().first,
-          const Offset(0, 2000),
-          3000,
-        );
-        await tester.pumpAndSettle();
-        await reveal(tester, find.text(row));
-        await tester.tap(find.text(row));
-        await tester.pumpAndSettle();
-      }
-
-      await settings('Колонки');
+      await settings(tester, 'Колонки');
       await reveal(tester, find.text('Подробиці'));
       await tester.tap(find.text('Подробиці'));
       await tester.pumpAndSettle();
@@ -445,9 +446,9 @@ void main() {
       await tester.tap(find.text('Вручну'));
       await tester.pumpAndSettle();
       await reveal(tester, find.text('Записати 40 Гц'));
-      await settings('Тонке налаштування');
+      await settings(tester, 'Тонке налаштування');
       await reveal(tester, find.text('Підйом басу'));
-      await settings('Колонки');
+      await settings(tester, 'Колонки');
       await reveal(tester, find.text('Налаштувати'));
       await tester.tap(find.text('Налаштувати'));
       await tester.pumpAndSettle();
@@ -468,6 +469,34 @@ void main() {
       api.tick(const Duration(seconds: 30));
       await tester.pumpAndSettle();
       await reveal(tester, find.text('Лишити як було'));
+      // the streamer's pages: the screen, its language, the clock by hand, Wi-Fi with a join's
+      // dialog and the access point open, Bluetooth, a pairing's question
+      for (final row in ['Екран', 'Мова стрімера', 'Час']) {
+        await settings(tester, row);
+      }
+      await tester.tap(find.text('Час з інтернету'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Взяти з цього пристрою'));
+      await settings(tester, 'Wi-Fi');
+      await reveal(tester, find.text('Точка доступу стрімера'));
+      await tester.tap(find.text('Точка доступу стрімера'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Діє після перезапуску'));
+      await reveal(tester, find.text('Cedar Line 5G'), up: true);
+      await tester.tap(find.text('Cedar Line 5G'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Скасувати'));
+      await tester.pumpAndSettle();
+      await settings(tester, 'Bluetooth');
+      await reveal(tester, find.text('Tablet'));
+      api.askToPair('Pixel');
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('Сховати').hitTestable().evaluate().isEmpty
+            ? find.text('Відхилити')
+            : find.text('Сховати'),
+      );
+      await tester.pumpAndSettle();
     });
   }
 
@@ -608,18 +637,10 @@ void main() {
     await tester.pumpAndSettle();
     await api.playTone(hz: 40);
     for (final row in ['Колонки', 'Тонке налаштування']) {
-      await tester.tap(tab('Налаштування'));
-      await tester.pumpAndSettle();
-      await reveal(tester, find.text(row));
-      await tester.tap(find.text(row));
-      await tester.pumpAndSettle();
+      await settings(tester, row);
       await check();
     }
-    await tester.tap(tab('Налаштування'));
-    await tester.pumpAndSettle();
-    await reveal(tester, find.text('Колонки'));
-    await tester.tap(find.text('Колонки'));
-    await tester.pumpAndSettle();
+    await settings(tester, 'Колонки');
     await tester.tap(find.text('Налаштувати'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('З фазоінвертором'));
@@ -631,6 +652,12 @@ void main() {
     await tester.tap(find.text('Знайти вручну'));
     await tester.pumpAndSettle();
     await check();
+    // the tone's bar off: a row the list has scrolled to its edge would be measured against it
+    await api.stopTone(then: SourceId.bt);
+    for (final row in ['Екран', 'Мова стрімера', 'Час', 'Wi-Fi', 'Bluetooth']) {
+      await settings(tester, row);
+      await check();
+    }
     semantics.dispose();
   });
 
@@ -1052,10 +1079,8 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
-    await tester.tap(find.text('Налаштування'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Мова'));
-    await tester.pumpAndSettle();
+    // the app's own: under the streamer's groups
+    await settings(tester, 'Мова');
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsWidgets);
@@ -1366,5 +1391,150 @@ void main() {
     await tester.pumpAndSettle();
     expect(api.current.speakers.balanceDb10, greaterThan(0));
     expect(find.textContaining('Правіше · '), findsWidgets);
+  });
+
+  testWidgets('Налаштування: the streamer\'s groups say what each page holds, '
+      'and the services switch from here', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await reveal(tester, find.text('80 % · Бурштин'));
+    await reveal(tester, find.text('Lantern Home · 192.168.1.47'));
+    await reveal(tester, find.text('DLNA'));
+    await tester.tap(find.text('DLNA'));
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.dlna, isFalse);
+    await reveal(tester, find.text('Режим AirPlay'));
+    await tester.tap(find.text('Режим AirPlay'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('AirPlay 1 · сумісність із Windows'));
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.airplayMode, 1);
+  });
+
+  testWidgets('Екран: the brightness, the auto-sleep and the scheme, which the '
+      'app wears too; Мова стрімера', (tester) async {
+    await pumpApp(tester);
+    await settings(tester, 'Екран');
+    await tester.drag(find.byType(Slider).first, const Offset(-100, 0));
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.backlight, lessThan(80));
+    await tester.tap(find.text('Автосон'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('10 хв'));
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.sleepMinutes, 10);
+    await tester.tap(find.bySemanticsLabel('Синя'));
+    await tester.pumpAndSettle();
+    expect(api.current.scheme, 1);
+    await settings(tester, 'Мова стрімера');
+    await tester.tap(find.text('Deutsch'));
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.language, 2);
+  });
+
+  testWidgets('Час: off the internet, the phone\'s time goes to the streamer', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await settings(tester, 'Час');
+    await tester.tap(find.text('Час з інтернету'));
+    await tester.pumpAndSettle();
+    expect((await api.panelTime()).ntp, isFalse);
+    await reveal(tester, find.text('Взяти з цього пристрою'));
+    await tester.tap(find.text('Взяти з цього пристрою'));
+    await tester.pumpAndSettle();
+    expect(find.text('Збережено'), findsOne);
+    // the page reads the clock again as the streamer has set it
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('Wi-Fi: the networks nearby, one joined with its password, and '
+      'the network forgotten', (tester) async {
+    await pumpApp(tester);
+    await settings(tester, 'Wi-Fi');
+    expect(find.text('WEP — застарілий захист, не підтримується'), findsOne);
+    await tester.tap(find.text('Cedar Line 5G'));
+    await tester.pumpAndSettle();
+    expect(find.text('Пароль до «Cedar Line 5G»'), findsOne);
+    final join = find.widgetWithText(FilledButton, 'Підключити');
+    await tester.enterText(find.byType(TextField), 'short');
+    await tester.pump();
+    expect(tester.widget<FilledButton>(join).onPressed, isNull);
+    await tester.enterText(find.byType(TextField), 'long-enough-pass');
+    await tester.pump();
+    await tester.tap(join);
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.wifi.trying, isTrue);
+    api.tick(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(find.text('Підключено до «Cedar Line 5G»'), findsOne);
+    expect(api.current.streamer.wifi.network, 'Cedar Line 5G');
+    await tester.tap(find.text('Забути'));
+    await tester.pumpAndSettle();
+    expect(find.text('Забути «Cedar Line 5G»?'), findsOne);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(FilledButton, 'Забути'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(api.current.streamer.wifi.mode, 'ap');
+  });
+
+  testWidgets('Bluetooth: visibility, the name, a codec, a phone forgotten', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await settings(tester, 'Bluetooth');
+    await tester.tap(find.text('Видимість'));
+    await tester.pumpAndSettle();
+    expect((await api.bt()).discoverable, isTrue);
+    await tester.tap(find.text('Ім\'я'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Kitchen');
+    await tester.tap(find.text('Зберегти'));
+    await tester.pumpAndSettle();
+    expect((await api.bt()).name, 'Kitchen');
+    await reveal(tester, find.text('aptX'));
+    await tester.tap(find.text('aptX'));
+    await tester.pumpAndSettle();
+    expect((await api.bt()).codecsEnabled & 4, 4);
+    await reveal(tester, find.text('Tablet'));
+    await tester.tap(find.text('Забути').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Забути'));
+    await tester.pumpAndSettle();
+    expect((await api.bt()).bonds.map((b) => b.name), ['Phone']);
+  });
+
+  testWidgets('a phone asking to pair is asked about over any page, with its '
+      'code, and the answer goes to the streamer', (tester) async {
+    await pumpApp(tester);
+    api.askToPair('Pixel');
+    await tester.pumpAndSettle();
+    expect(find.text('Спарювання Bluetooth'), findsOne);
+    expect(find.text('482 916'), findsOne);
+    await tester.tap(find.text('Підключити'));
+    await tester.pumpAndSettle();
+    expect(find.text('Спарено з «Pixel»'), findsOne);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(find.text('Спарено з «Pixel»'), findsNothing);
+  });
+
+  testWidgets('a restart is asked about first, then said until the streamer '
+      'is back', (tester) async {
+    await pumpApp(tester);
+    await settings(tester, 'Перезапустити');
+    expect(find.text('Перезапустити стрімер?'), findsOne);
+    await tester.tap(find.widgetWithText(FilledButton, 'Перезапустити'));
+    await tester.pumpAndSettle();
+    expect(find.text('Перезапуск…'), findsOne);
+    await tester.pump(const Duration(minutes: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Перезапуск…'), findsNothing);
   });
 }

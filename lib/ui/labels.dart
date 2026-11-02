@@ -125,6 +125,13 @@ extension Words on AppLocalizations {
       'dlna.st_not_searched' => dlnaStNotSearched,
       'dlna.unsupported' => dlnaUnsupported,
       'dlna.queued' => dlnaQueued(a('title')),
+      // switching AirPlay's mode (airplay.mode_status, mode_error)
+      'airplay.st_starting' => airplayStStarting,
+      'airplay.st_stopped' => airplayStStopped,
+      'airplay.st_not_applied' => airplayStNotApplied,
+      'airplay.st_switching' => airplayStSwitching,
+      'airplay.st_applied' => airplayStApplied,
+      'airplay.st_wifi' => airplayStWifi,
       // the port meter (audio.port_meas_status)
       'cal.m_no_memory' => calMNoMemory,
       'cal.m_mic_open' => calMMicOpen,

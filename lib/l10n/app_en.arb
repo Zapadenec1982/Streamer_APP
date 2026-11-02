@@ -1753,6 +1753,622 @@
   "@langAsPanel": {
     "description": "lang.as_panel"
   },
+  "sysWifiAp": "The streamer's access point",
+  "@sysWifiAp": {
+    "description": "sys.wifi_ap"
+  },
+  "sysWifiOff": "Not connected",
+  "@sysWifiOff": {
+    "description": "sys.wifi_off"
+  },
+  "sysBtNone": "No Bluetooth module",
+  "@sysBtNone": {
+    "description": "sys.bt_none"
+  },
+  "sysBtReady": "No phone connected",
+  "@sysBtReady": {
+    "description": "sys.bt_ready"
+  },
+  "sysDevice": "Device",
+  "@sysDevice": {
+    "description": "sys.device"
+  },
+  "sysScreen": "Screen",
+  "@sysScreen": {
+    "description": "sys.screen"
+  },
+  "pageTime": "Time",
+  "@pageTime": {
+    "description": "page.time"
+  },
+  "pageAccess": "Access",
+  "@pageAccess": {
+    "description": "page.access"
+  },
+  "pageFirmware": "Firmware update",
+  "@pageFirmware": {
+    "description": "page.firmware"
+  },
+  "pageBackup": "Backup",
+  "@pageBackup": {
+    "description": "page.backup"
+  },
+  "sysRestart": "Restart",
+  "@sysRestart": {
+    "description": "sys.restart"
+  },
+  "sysRestarting": "Restarting…",
+  "@sysRestarting": {
+    "description": "sys.restarting"
+  },
+  "sysLinks": "Connections",
+  "@sysLinks": {
+    "description": "sys.links"
+  },
+  "sysServices": "Services",
+  "@sysServices": {
+    "description": "sys.services"
+  },
+  "sysAirplayMode": "AirPlay mode",
+  "@sysAirplayMode": {
+    "description": "sys.airplay_mode"
+  },
+  "sysAirplay1": "AirPlay 1 · Windows compatible",
+  "@sysAirplay1": {
+    "description": "sys.airplay_1"
+  },
+  "sysCovers": "Covers for the radio",
+  "@sysCovers": {
+    "description": "sys.covers"
+  },
+  "sysRestartQ": "Restart the streamer?",
+  "@sysRestartQ": {
+    "description": "sys.restart_q"
+  },
+  "sysRestartBody": "The music stops for about half a minute.",
+  "@sysRestartBody": {
+    "description": "sys.restart_body"
+  },
+  "sysCancel": "Cancel",
+  "@sysCancel": {
+    "description": "sys.cancel"
+  },
+  "sysBrightness": "Brightness",
+  "@sysBrightness": {
+    "description": "sys.brightness"
+  },
+  "sysStandbyBl": "Screensaver while playing",
+  "@sysStandbyBl": {
+    "description": "sys.standby_bl"
+  },
+  "sysSleep": "Auto sleep",
+  "@sysSleep": {
+    "description": "sys.sleep"
+  },
+  "sysMinutes": "{n} min",
+  "@sysMinutes": {
+    "description": "sys.minutes",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "sysNever": "Never",
+  "@sysNever": {
+    "description": "sys.never"
+  },
+  "langPanel": "Streamer language",
+  "@langPanel": {
+    "description": "lang.panel"
+  },
+  "timeSaved": "Saved",
+  "@timeSaved": {
+    "description": "time.saved"
+  },
+  "timeNotSet": "The clock is not set yet",
+  "@timeNotSet": {
+    "description": "time.not_set"
+  },
+  "timeNtp": "Time from the internet",
+  "@timeNtp": {
+    "description": "time.ntp"
+  },
+  "timeZone": "Time zone",
+  "@timeZone": {
+    "description": "time.zone"
+  },
+  "timeManual": "By hand",
+  "@timeManual": {
+    "description": "time.manual"
+  },
+  "timeSet": "Set",
+  "@timeSet": {
+    "description": "time.set"
+  },
+  "timeFromDevice": "Take it from this device",
+  "@timeFromDevice": {
+    "description": "time.from_device"
+  },
+  "wifiOk": "Connected to “{name}”",
+  "@wifiOk": {
+    "description": "wifi.ok",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiFail": "“{name}”: {why}",
+  "@wifiFail": {
+    "description": "wifi.fail",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiConnecting": "Connecting…",
+  "@wifiConnecting": {
+    "description": "wifi.connecting"
+  },
+  "wifiConnected": "Connected",
+  "@wifiConnected": {
+    "description": "wifi.connected"
+  },
+  "wifiNoIp": "no address yet",
+  "@wifiNoIp": {
+    "description": "wifi.no_ip"
+  },
+  "wifiApTitle": "Access point “{name}”",
+  "@wifiApTitle": {
+    "description": "wifi.ap_title",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiApSub": "no network connected",
+  "@wifiApSub": {
+    "description": "wifi.ap_sub"
+  },
+  "wifiNotConnected": "Not connected",
+  "@wifiNotConnected": {
+    "description": "wifi.not_connected"
+  },
+  "wifiRetrying": "No connection — retrying",
+  "@wifiRetrying": {
+    "description": "wifi.retrying"
+  },
+  "wifiJoining": "Connecting to “{name}”…",
+  "@wifiJoining": {
+    "description": "wifi.joining",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiBusy": "Please wait, the previous attempt is still running",
+  "@wifiBusy": {
+    "description": "wifi.busy"
+  },
+  "wifiForgetting": "The streamer is switching to its own access point",
+  "@wifiForgetting": {
+    "description": "wifi.forgetting"
+  },
+  "wifiApSaved": "Saved — applies after a restart",
+  "@wifiApSaved": {
+    "description": "wifi.ap_saved"
+  },
+  "wifiApSum": "“{name}” · channel {ch}",
+  "@wifiApSum": {
+    "description": "wifi.ap_sum",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "ch": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiApLocked": "with password",
+  "@wifiApLocked": {
+    "description": "wifi.ap_locked"
+  },
+  "wifiApOpen": "no password",
+  "@wifiApOpen": {
+    "description": "wifi.ap_open"
+  },
+  "wifiSignal": "Signal {rssi} dBm",
+  "@wifiSignal": {
+    "description": "wifi.signal",
+    "placeholders": {
+      "rssi": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiForget": "Forget",
+  "@wifiForget": {
+    "description": "wifi.forget"
+  },
+  "wifiNearby": "Networks nearby",
+  "@wifiNearby": {
+    "description": "wifi.nearby"
+  },
+  "wifiScanning": "Searching…",
+  "@wifiScanning": {
+    "description": "wifi.scanning"
+  },
+  "wifiScanFailed": "Search failed",
+  "@wifiScanFailed": {
+    "description": "wifi.scan_failed"
+  },
+  "wifiScan": "Find networks",
+  "@wifiScan": {
+    "description": "wifi.scan"
+  },
+  "wifiNone": "No networks found",
+  "@wifiNone": {
+    "description": "wifi.none"
+  },
+  "wifiApName": "Network name",
+  "@wifiApName": {
+    "description": "wifi.ap_name"
+  },
+  "wifiApLock": "Password protection",
+  "@wifiApLock": {
+    "description": "wifi.ap_lock"
+  },
+  "wifiPassRule": "At least 8 characters.",
+  "@wifiPassRule": {
+    "description": "wifi.pass_rule"
+  },
+  "wifiApLockOff": "Anyone nearby can join",
+  "@wifiApLockOff": {
+    "description": "wifi.ap_lock_off"
+  },
+  "wifiPassword": "Password",
+  "@wifiPassword": {
+    "description": "wifi.password"
+  },
+  "wifiHide": "Hide password",
+  "@wifiHide": {
+    "description": "wifi.hide"
+  },
+  "wifiShow": "Show password",
+  "@wifiShow": {
+    "description": "wifi.show"
+  },
+  "wifiApPassAgain": "The saved password is not shown — enter it again or a new one.",
+  "@wifiApPassAgain": {
+    "description": "wifi.ap_pass_again"
+  },
+  "wifiApChannel": "Channel",
+  "@wifiApChannel": {
+    "description": "wifi.ap_channel"
+  },
+  "wifiApNote": "Takes effect after a restart",
+  "@wifiApNote": {
+    "description": "wifi.ap_note"
+  },
+  "wifiSave": "Save",
+  "@wifiSave": {
+    "description": "wifi.save"
+  },
+  "wifiPassQ": "Password for “{name}”",
+  "@wifiPassQ": {
+    "description": "wifi.pass_q",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiJoinQ": "Join “{name}”?",
+  "@wifiJoinQ": {
+    "description": "wifi.join_q",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiJoin": "Connect",
+  "@wifiJoin": {
+    "description": "wifi.join"
+  },
+  "wifiForgetQ": "Forget “{name}”?",
+  "@wifiForgetQ": {
+    "description": "wifi.forget_q",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiOpen": "Open",
+  "@wifiOpen": {
+    "description": "wifi.open"
+  },
+  "wifiOld": "{auth} — outdated security, not supported",
+  "@wifiOld": {
+    "description": "wifi.old",
+    "placeholders": {
+      "auth": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiUnsupported": "{auth} — not supported by the streamer",
+  "@wifiUnsupported": {
+    "description": "wifi.unsupported",
+    "placeholders": {
+      "auth": {
+        "type": "String"
+      }
+    }
+  },
+  "wifiOther": "Unknown security",
+  "@wifiOther": {
+    "description": "wifi.other"
+  },
+  "wifiWhyPass": "wrong password",
+  "@wifiWhyPass": {
+    "description": "wifi.why_pass"
+  },
+  "wifiWhyNone": "network not found",
+  "@wifiWhyNone": {
+    "description": "wifi.why_none"
+  },
+  "wifiWhySecurity": "unsupported security",
+  "@wifiWhySecurity": {
+    "description": "wifi.why_security"
+  },
+  "wifiWhySilent": "no answer",
+  "@wifiWhySilent": {
+    "description": "wifi.why_silent"
+  },
+  "wifiWhyRefused": "the network refused",
+  "@wifiWhyRefused": {
+    "description": "wifi.why_refused"
+  },
+  "btNoSatellite": "The Bluetooth module does not answer.",
+  "@btNoSatellite": {
+    "description": "bt.no_satellite"
+  },
+  "btNoPhone": "No phone connected",
+  "@btNoPhone": {
+    "description": "bt.no_phone"
+  },
+  "btConnected": "Connected",
+  "@btConnected": {
+    "description": "bt.connected"
+  },
+  "btDisconnect": "Disconnect",
+  "@btDisconnect": {
+    "description": "bt.disconnect"
+  },
+  "btOldSatellite": "The Bluetooth module's firmware is older than protocol 1.8: only disconnecting a phone is available here.",
+  "@btOldSatellite": {
+    "description": "bt.old_satellite"
+  },
+  "btSettings": "Settings",
+  "@btSettings": {
+    "description": "bt.settings"
+  },
+  "btOn": "On",
+  "@btOn": {
+    "description": "bt.on"
+  },
+  "btOff": "Off",
+  "@btOff": {
+    "description": "bt.off"
+  },
+  "btVisible": "Visibility",
+  "@btVisible": {
+    "description": "bt.visible"
+  },
+  "btVisibleOn": "To new phones",
+  "@btVisibleOn": {
+    "description": "bt.visible_on"
+  },
+  "btVisibleOff": "Paired phones only",
+  "@btVisibleOff": {
+    "description": "bt.visible_off"
+  },
+  "btAuto": "Auto-reconnect",
+  "@btAuto": {
+    "description": "bt.auto"
+  },
+  "btName": "Name",
+  "@btName": {
+    "description": "bt.name"
+  },
+  "btCodecs": "Codecs",
+  "@btCodecs": {
+    "description": "bt.codecs"
+  },
+  "btPhones": "Paired phones · {n}",
+  "@btPhones": {
+    "description": "bt.phones",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "btLast": "Connected last",
+  "@btLast": {
+    "description": "bt.last"
+  },
+  "btForget": "Forget",
+  "@btForget": {
+    "description": "bt.forget"
+  },
+  "btNoPhones": "No paired phones.",
+  "@btNoPhones": {
+    "description": "bt.no_phones"
+  },
+  "btForgetAll": "Forget all",
+  "@btForgetAll": {
+    "description": "bt.forget_all"
+  },
+  "btNameTitle": "The name phones see",
+  "@btNameTitle": {
+    "description": "bt.name_title"
+  },
+  "btSave": "Save",
+  "@btSave": {
+    "description": "bt.save"
+  },
+  "btForgetAllQ": "Forget every phone?",
+  "@btForgetAllQ": {
+    "description": "bt.forget_all_q"
+  },
+  "btForgetQ": "Forget “{name}”?",
+  "@btForgetQ": {
+    "description": "bt.forget_q",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "btForgetBody": "To connect again, the phone will have to pair again.",
+  "@btForgetBody": {
+    "description": "bt.forget_body"
+  },
+  "btErrNoSatellite": "The Bluetooth module does not answer",
+  "@btErrNoSatellite": {
+    "description": "bt.err_no_satellite"
+  },
+  "btErrOld": "The Bluetooth module cannot do this (protocol older than 1.8)",
+  "@btErrOld": {
+    "description": "bt.err_old"
+  },
+  "btErrWait": "The Bluetooth module has not sent its settings yet — try again in a moment",
+  "@btErrWait": {
+    "description": "bt.err_wait"
+  },
+  "btErrName": "The name must be 1 to 32 bytes",
+  "@btErrName": {
+    "description": "bt.err_name"
+  },
+  "pairPhone": "Phone",
+  "@pairPhone": {
+    "description": "pair.phone"
+  },
+  "pairAnsweredPanel": "Answered on the streamer.",
+  "@pairAnsweredPanel": {
+    "description": "pair.answered_panel"
+  },
+  "pairOk": "Paired with “{name}”",
+  "@pairOk": {
+    "description": "pair.ok",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pairRejected": "Pairing rejected",
+  "@pairRejected": {
+    "description": "pair.rejected"
+  },
+  "pairTimeout": "Time to answer ran out",
+  "@pairTimeout": {
+    "description": "pair.timeout"
+  },
+  "pairFailed": "Pairing failed",
+  "@pairFailed": {
+    "description": "pair.failed"
+  },
+  "pairConfirmPhone": "Confirm on the phone too.",
+  "@pairConfirmPhone": {
+    "description": "pair.confirm_phone"
+  },
+  "pairRejecting": "Rejecting…",
+  "@pairRejecting": {
+    "description": "pair.rejecting"
+  },
+  "pairPasskey": "Enter this code on “{name}”:",
+  "@pairPasskey": {
+    "description": "pair.passkey",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pairConsent": "“{name}” wants to connect to the streamer.",
+  "@pairConsent": {
+    "description": "pair.consent",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pairNumeric": "“{name}” wants to connect. Check that the phone shows the same code:",
+  "@pairNumeric": {
+    "description": "pair.numeric",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pairTitle": "Bluetooth pairing",
+  "@pairTitle": {
+    "description": "pair.title"
+  },
+  "pairOnPanel": "Sign in to answer here, or answer on the streamer.",
+  "@pairOnPanel": {
+    "description": "pair.on_panel"
+  },
+  "pairReject": "Reject",
+  "@pairReject": {
+    "description": "pair.reject"
+  },
+  "pairConnect": "Connect",
+  "@pairConnect": {
+    "description": "pair.connect"
+  },
+  "pairHide": "Hide",
+  "@pairHide": {
+    "description": "pair.hide"
+  },
+  "airplayStStarting": "Waiting to start",
+  "@airplayStStarting": {
+    "description": "airplay.st_starting"
+  },
+  "airplayStStopped": "Receiver stopped",
+  "@airplayStStopped": {
+    "description": "airplay.st_stopped"
+  },
+  "airplayStNotApplied": "Change not applied",
+  "@airplayStNotApplied": {
+    "description": "airplay.st_not_applied"
+  },
+  "airplayStSwitching": "Switching AirPlay…",
+  "@airplayStSwitching": {
+    "description": "airplay.st_switching"
+  },
+  "airplayStApplied": "Mode applied",
+  "@airplayStApplied": {
+    "description": "airplay.st_applied"
+  },
+  "airplayStWifi": "Waiting for Wi-Fi",
+  "@airplayStWifi": {
+    "description": "airplay.st_wifi"
+  },
   "mobAddPanel": "Add a streamer",
   "@mobAddPanel": {
     "description": "mob.add_panel"
@@ -1861,6 +2477,10 @@
   "@mobOtherPanel": {
     "description": "mob.other_panel"
   },
+  "mobPairElsewhere": "Answered on another device.",
+  "@mobPairElsewhere": {
+    "description": "mob.pair_elsewhere"
+  },
   "mobPanel": "Streamer",
   "@mobPanel": {
     "description": "mob.panel"
@@ -1880,5 +2500,39 @@
   "mobTryDemo": "Try the demo",
   "@mobTryDemo": {
     "description": "mob.try_demo"
+  },
+  "mobWifiForgetBack": "To come back, join “{name}” with the phone and add the streamer at {ip}.",
+  "@mobWifiForgetBack": {
+    "description": "mob.wifi_forget_back",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
+  "mobWifiForgetBody": "The streamer will leave the network and turn on its own access point. The app will lose the connection to it.",
+  "@mobWifiForgetBody": {
+    "description": "mob.wifi_forget_body"
+  },
+  "mobWifiJoinNote": "The streamer will leave its current network for a few seconds. If “{name}” does not answer, it comes back and this shows why. If “{name}” is a different network, join it with the phone too.",
+  "@mobWifiJoinNote": {
+    "description": "mob.wifi_join_note",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mobWifiJoinNoteAp": "The streamer will turn off its access point and the app will lose the connection to it. Join “{name}” with this phone — the app will find the streamer there. If it fails, the access point comes back.",
+  "@mobWifiJoinNoteAp": {
+    "description": "mob.wifi_join_note_ap",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

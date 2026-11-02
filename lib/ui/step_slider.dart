@@ -33,6 +33,7 @@ class StepSlider extends ConsumerStatefulWidget {
     this.enabled = true,
     this.disabledText,
     this.ends,
+    this.undo = true,
   });
 
   final String label;
@@ -49,6 +50,9 @@ class StepSlider extends ConsumerStatefulWidget {
 
   /// Words under the two ends of the track: «Л» and «П» for the balance.
   final (String, String)? ends;
+
+  /// A snackbar offers to put a move back: a sound setting's, not the screen's brightness.
+  final bool undo;
 
   @override
   ConsumerState<StepSlider> createState() => _StepSliderState();
@@ -154,7 +158,9 @@ class _StepSliderState extends ConsumerState<StepSlider> {
               setState(() => _dragging = null);
               final from = _from;
               _from = null;
-              if (from != null && from != to) _released(from, to);
+              if (widget.undo && from != null && from != to) {
+                _released(from, to);
+              }
             },
           ),
           if (ends != null)

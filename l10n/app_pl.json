@@ -28,5 +28,10 @@
   "mob.other_panel": "Inny streamer",
   "mob.hint_listen": "słuchać",
   "mob.hint_store": "zapisać tu to, co gra",
-  "mob.added": "Już dodany"
+  "mob.added": "Już dodany",
+  "mob.wifi_join_note_ap": "Streamer wyłączy swój punkt dostępu, a aplikacja straci z nim połączenie. Połącz ten telefon z „{name}” — aplikacja znajdzie tam streamer. Jeśli się nie uda, punkt dostępu wróci.",
+  "mob.wifi_join_note": "Streamer na kilka sekund rozłączy się z bieżącą siecią. Jeśli „{name}” nie odpowie, wróci, a tutaj będzie widać dlaczego. Jeśli „{name}” to inna sieć, połącz z nią też telefon.",
+  "mob.wifi_forget_body": "Streamer rozłączy się z siecią i włączy własny punkt dostępu. Aplikacja straci z nim połączenie.",
+  "mob.wifi_forget_back": "Aby wrócić, połącz telefon z „{name}” i dodaj streamer pod adresem {ip}.",
+  "mob.pair_elsewhere": "Odpowiedziano na innym urządzeniu."
 }

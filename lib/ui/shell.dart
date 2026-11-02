@@ -6,6 +6,7 @@ import '../device/models.dart';
 import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
+import 'bt_page.dart';
 import 'labels.dart';
 import 'tone.dart';
 import 'writes.dart';
@@ -31,7 +32,8 @@ class Shell extends ConsumerWidget {
         ref.watch(activePanelProvider) is! NoPanel &&
         (now.playing || (now.canToggle && now.live));
     return Scaffold(
-      body: navigationShell,
+      // a phone asking to pair is asked about over every page
+      body: PairingWatcher(child: navigationShell),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

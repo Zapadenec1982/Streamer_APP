@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 import 'theme/app_theme.dart';
+import 'ui/bt_page.dart';
+import 'ui/display_page.dart';
 import 'ui/dlna_page.dart';
 import 'ui/eq_page.dart';
 import 'ui/library_page.dart';
@@ -20,7 +22,9 @@ import 'ui/source_page.dart';
 import 'ui/speaker_wizard.dart';
 import 'ui/speakers_page.dart';
 import 'ui/stations_page.dart';
+import 'ui/time_page.dart';
 import 'ui/tuning_page.dart';
+import 'ui/wifi_page.dart';
 
 final routerProvider = Provider<GoRouter>(
   (ref) => GoRouter(
@@ -108,6 +112,26 @@ final routerProvider = Provider<GoRouter>(
                   GoRoute(
                     path: 'tuning',
                     builder: (context, state) => const TuningPage(),
+                  ),
+                  GoRoute(
+                    path: 'display',
+                    builder: (context, state) => const DisplayPage(),
+                  ),
+                  GoRoute(
+                    path: 'language',
+                    builder: (context, state) => const PanelLanguagePage(),
+                  ),
+                  GoRoute(
+                    path: 'time',
+                    builder: (context, state) => const TimePage(),
+                  ),
+                  GoRoute(
+                    path: 'wifi',
+                    builder: (context, state) => const WifiPage(),
+                  ),
+                  GoRoute(
+                    path: 'bt',
+                    builder: (context, state) => const BtPage(),
                   ),
                   GoRoute(
                     path: 'panels',

@@ -28,5 +28,10 @@
   "mob.other_panel": "Another streamer",
   "mob.hint_listen": "listen",
   "mob.hint_store": "store what is playing here",
-  "mob.added": "Already added"
+  "mob.added": "Already added",
+  "mob.wifi_join_note_ap": "The streamer will turn off its access point and the app will lose the connection to it. Join “{name}” with this phone — the app will find the streamer there. If it fails, the access point comes back.",
+  "mob.wifi_join_note": "The streamer will leave its current network for a few seconds. If “{name}” does not answer, it comes back and this shows why. If “{name}” is a different network, join it with the phone too.",
+  "mob.wifi_forget_body": "The streamer will leave the network and turn on its own access point. The app will lose the connection to it.",
+  "mob.wifi_forget_back": "To come back, join “{name}” with the phone and add the streamer at {ip}.",
+  "mob.pair_elsewhere": "Answered on another device."
 }
