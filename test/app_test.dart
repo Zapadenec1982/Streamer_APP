@@ -5,6 +5,7 @@ import 'package:streamer/app.dart';
 import 'package:streamer/device/demo_device_api.dart';
 import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
+import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/state/providers.dart';
 
 import 'support/phone.dart';
@@ -27,6 +28,12 @@ class CountingDemo extends DemoDeviceApi {
     resumed++;
     super.resume();
   }
+}
+
+/// A panel that has gone: the mute never reaches it.
+class FailingDemo extends CountingDemo {
+  @override
+  Future<void> setMuted(bool muted) => Future.error(const PanelError(0));
 }
 
 void main() {
@@ -200,6 +207,29 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
     expect(popup, findsNothing);
+  });
+
+  testWidgets('writes that fail in a run say so once, not once each', (
+    tester,
+  ) async {
+    api.dispose();
+    api = FailingDemo();
+    await pumpApp(tester);
+    final said = find.text("Немає зв'язку з панеллю");
+    await tester.tap(find.byTooltip('Вимкнути звук'));
+    await tester.pumpAndSettle();
+    expect(said, findsOneWidget);
+    // two more while the first is still up
+    for (var i = 0; i < 2; i++) {
+      await tester.tap(find.byTooltip('Вимкнути звук'));
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    expect(said, findsOneWidget);
+    // its 4 s, and none waiting behind it
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+    expect(said, findsNothing);
   });
 
   testWidgets(

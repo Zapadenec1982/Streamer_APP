@@ -13,7 +13,7 @@ Future<void> openWeb(BuildContext context, WidgetRef ref, String route) async {
       uri != null && await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (opened || !context.mounted) return;
   ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
+    ..clearSnackBars()
     ..showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).mobInWeb)),
     );

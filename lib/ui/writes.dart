@@ -30,8 +30,9 @@ Future<void> act(
         : e.status == 0
         ? l.appError
         : l.errCode(e.code ?? '${e.status}');
+    // it takes the place of what is said and of what waits, so a run of failures says it once
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
+      ..clearSnackBars()
       ..showSnackBar(SnackBar(content: Text(text)));
   }
 }

@@ -274,5 +274,5 @@ class StationDisc extends StatelessWidget {
 }
 
 void _say(BuildContext context, String text) => ScaffoldMessenger.of(context)
-  ..hideCurrentSnackBar()
+  ..clearSnackBars()
   ..showSnackBar(SnackBar(content: Text(text)));
