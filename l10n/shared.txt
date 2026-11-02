@@ -52,10 +52,12 @@ transport.play
 transport.pause
 transport.prev
 transport.next
+transport.stop
 transport.repeat_off
 transport.repeat_one
 transport.repeat_all
 transport.shuffle
+mini.open
 volume.label
 volume.mute
 volume.unmute

@@ -196,6 +196,10 @@
   "@transportNext": {
     "description": "transport.next"
   },
+  "transportStop": "Stop",
+  "@transportStop": {
+    "description": "transport.stop"
+  },
   "transportRepeatOff": "Repeat off",
   "@transportRepeatOff": {
     "description": "transport.repeat_off"
@@ -211,6 +215,10 @@
   "transportShuffle": "Shuffle",
   "@transportShuffle": {
     "description": "transport.shuffle"
+  },
+  "miniOpen": "Open the player",
+  "@miniOpen": {
+    "description": "mini.open"
   },
   "volumeLabel": "Volume",
   "@volumeLabel": {

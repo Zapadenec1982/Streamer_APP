@@ -178,6 +178,17 @@ extension Words on AppLocalizations {
 
 final _message = RegExp(r'^@([a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+)(?:\u001f|$)');
 
+/// Where the sound comes from, as an icon: the mini-player's picture.
+IconData nowIcon(NowKind kind) => switch (kind) {
+  NowKind.bt => Icons.bluetooth,
+  NowKind.airplay => Icons.airplay,
+  NowKind.radio => Icons.radio,
+  NowKind.card => Icons.sd_card,
+  NowKind.dlna => Icons.hub,
+  NowKind.usb => Icons.usb,
+  NowKind.off || NowKind.tone || NowKind.aux => Icons.power_settings_new,
+};
+
 IconData cardIcon(SourceCard card) => switch (card) {
   SourceCard.bt => Icons.bluetooth,
   SourceCard.airplay => Icons.airplay,

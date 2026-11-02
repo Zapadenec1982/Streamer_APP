@@ -250,6 +250,30 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the mini-player: what plays, on the other pages; its button; a tap '
+    'opens the Player',
+    (tester) async {
+      await pumpApp(tester);
+      expect(find.text('Lantern Theory'), findsOne, reason: 'the Player only');
+      await tester.tap(find.text('Джерело'));
+      await tester.pumpAndSettle();
+      // the artist's line is the mini-player's: the card says the title
+      expect(find.text('Lantern Theory'), findsOne);
+      await tester.tap(find.byTooltip('Пауза'));
+      await tester.pumpAndSettle();
+      expect(api.current.now.playing, isFalse);
+      expect(
+        find.byTooltip('Грати'),
+        findsOne,
+        reason: 'it can resume, so it stays',
+      );
+      await tester.tap(find.text('Lantern Theory'));
+      await tester.pumpAndSettle();
+      expect(find.text('BLUETOOTH'), findsOne);
+    },
+  );
+
   // The web's layout was checked at 390×844, 390×664 and 360×740; the app keeps to the same, and
   // to Android's largest text (200 %), here as a plain ×2 — harder than Android's own scaling,
   // which grows large text less.
