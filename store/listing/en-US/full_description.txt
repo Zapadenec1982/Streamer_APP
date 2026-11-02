@@ -4,7 +4,7 @@ The app shows what plays and puts the everyday controls in your hand:
 
 • Player: the cover, the title and the artist, where the sound comes from and in what format. Play, pause and skip as far as the source allows. The volume, with the phone's own volume buttons too.
 • Sources: every source the streamer has, with what it would play now. A tap switches.
-• Radio: the station between ‹ and ›, six preset buttons (a tap listens, a hold stores what plays) and the whole station list.
+• Radio: the station between ‹ and ›, six preset buttons (a tap listens, a hold stores what plays), your station list to arrange, and the Radio Browser catalogue by country, genre or name.
 • Sound: the streamer's sound presets, Bass and Treble, loudness, and the night leveler that keeps quiet and loud passages close together.
 • Several streamers: found on your Wi-Fi by themselves or added by address, and remembered.
 

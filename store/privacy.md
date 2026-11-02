@@ -5,8 +5,15 @@ author of [ModESP_Streamer](https://github.com/Zapadenec1982/ModESP_Streamer).
 
 **What leaves the phone.** The app talks only to ModESP Streamer devices on your local network.
 It reads a streamer's state and sends the streamer your commands (volume, source, station, sound) over HTTP
-and WebSocket. Nothing is sent to the author or to anyone else: the app has no server, no account,
-no analytics, no advertising and no crash reporting.
+and WebSocket. Nothing is sent to the author: the app has no server, no account, no analytics, no
+advertising and no crash reporting.
+
+**The station catalogue.** The catalogue and the stations' logos come from
+[Radio Browser](https://www.radio-browser.info), a public catalogue of internet radio, which the
+app asks directly from the phone, as a web browser would: a search sends the words searched for,
+and a logo is fetched from the address Radio Browser gives for it — usually the station's own site.
+Radio Browser and those sites see the phone's internet address, as with any visit. The app sends
+them nothing else, and asks them only when the catalogue or a list with logos is open.
 
 **Finding streamers.** The app looks for streamers on your Wi-Fi with mDNS (Bonjour). This stays on your
 local network.
@@ -18,8 +25,8 @@ are held only while the app runs.
 
 **Links.** The streamer's own settings open in your browser, at your streamer's address on your network.
 
-**Permissions.** Network access, to reach your streamer, and Wi-Fi multicast, to find streamers on
-your network. The app does not use the microphone, the camera, location, contacts or your files.
+**Permissions.** Network access, to reach your streamer and the catalogue, and Wi-Fi multicast,
+to find streamers on your network. The app does not use the microphone, the camera, location, contacts or your files.
 
 **Removing.** «Forget» removes a streamer and its login from the app. Uninstalling the app removes
 everything it kept.
