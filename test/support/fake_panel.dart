@@ -6,8 +6,9 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 /// A panel on the loopback, as far as the app uses one (the firmware's NETWORK.md): the WebSocket
-/// gives the whole state and then the keys that changed; POST /api/settings takes JSON only (415)
-/// and the login when one is set (401); a busy panel closes a new socket with 1013.
+/// gives the whole state and then the keys that changed; POST /api/settings takes JSON only (415),
+/// the login when one is set (401) and a body with its Content-Length (400); a busy panel closes a
+/// new socket with 1013.
 class FakePanel {
   FakePanel([Map<String, Object?> state = const {}]) : state = {...state};
 
@@ -117,6 +118,14 @@ class FakePanel {
         req.headers.value(HttpHeaders.authorizationHeader) !=
             'Basic ${base64.encode(utf8.encode('admin:$password'))}') {
       return _reply(req, 401, {'error': 'unauthorized'});
+    }
+    // httpd reads a body by its Content-Length alone: one sent in chunks arrives empty
+    // (http_routes::read_small_body)
+    if (req.method == 'POST' && req.contentLength <= 0) {
+      req.response
+        ..statusCode = 400
+        ..write('Empty body');
+      return req.response.close();
     }
     switch ((req.method, path)) {
       case ('GET', '/api/ota'):

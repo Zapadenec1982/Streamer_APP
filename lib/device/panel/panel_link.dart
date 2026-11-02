@@ -162,9 +162,13 @@ class PanelLink {
       if (auth != null) req.headers.set(HttpHeaders.authorizationHeader, auth);
       if (etag != null) req.headers.set(HttpHeaders.ifNoneMatchHeader, etag);
       if (json != null) {
-        // The panel takes a POST only as application/json (415 otherwise).
+        // The panel takes a POST only as application/json (415 otherwise), and reads the body
+        // by its Content-Length: dart:io sends one of unknown length in chunks, which httpd
+        // takes for no body at all (400 «Empty body»).
+        final body = utf8.encode(json);
         req.headers.contentType = ContentType.json;
-        req.write(json);
+        req.contentLength = body.length;
+        req.add(body);
       }
       return await req.close().timeout(timeout);
     } on SocketException {
