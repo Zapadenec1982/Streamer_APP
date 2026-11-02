@@ -125,6 +125,19 @@ extension Words on AppLocalizations {
       'dlna.st_not_searched' => dlnaStNotSearched,
       'dlna.unsupported' => dlnaUnsupported,
       'dlna.queued' => dlnaQueued(a('title')),
+      // the port meter (audio.port_meas_status)
+      'cal.m_no_memory' => calMNoMemory,
+      'cal.m_mic_open' => calMMicOpen,
+      'cal.m_silence' => calMSilence,
+      'cal.m_stopped' => calMStopped,
+      'cal.m_mic_read' => calMMicRead,
+      'cal.m_progress' => calMProgress(a('hz'), a('k'), a('n')),
+      'cal.m_interrupted' => calMInterrupted,
+      'cal.m_found' => calMFound(a('hz')),
+      'cal.m_outside' => calMOutside(a('hz')),
+      'cal.m_doubtful' => calMDoubtful(a('hz')),
+      'cal.m_no_dip' => calMNoDip,
+      'cal.m_no_tone' => calMNoTone,
       _ => raw,
     };
   }

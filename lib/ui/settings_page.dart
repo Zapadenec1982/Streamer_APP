@@ -6,6 +6,7 @@ import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'speakers_page.dart';
 import 'web_link.dart';
 
 /// The app's own settings. The panel's settings stay in its web interface (plan, §1).
@@ -55,6 +56,17 @@ class SettingsPage extends ConsumerWidget {
               leading: const Icon(Icons.tune),
               title: Text(l.sysTimbreVolume),
               onTap: () => context.go('/settings/sound'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.speaker_outlined),
+              title: Text(l.spkTitle),
+              subtitle: Text(l.speakersLine(snapshot.speakers.setup)),
+              onTap: () => context.go('/settings/speakers'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.graphic_eq),
+              title: Text(l.pageTuning),
+              onTap: () => context.go('/settings/tuning'),
             ),
           ],
           _Header(l.mobApp),

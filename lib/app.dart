@@ -14,9 +14,13 @@ import 'ui/phone_keys.dart';
 import 'ui/player_page.dart';
 import 'ui/settings_page.dart';
 import 'ui/shell.dart';
+import 'ui/port_page.dart';
 import 'ui/sound_page.dart';
 import 'ui/source_page.dart';
+import 'ui/speaker_wizard.dart';
+import 'ui/speakers_page.dart';
 import 'ui/stations_page.dart';
+import 'ui/tuning_page.dart';
 
 final routerProvider = Provider<GoRouter>(
   (ref) => GoRouter(
@@ -82,6 +86,28 @@ final routerProvider = Provider<GoRouter>(
                         builder: (context, state) => const EqPage(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'speakers',
+                    builder: (context, state) => const SpeakersPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'setup',
+                        builder: (context, state) => const SpeakerWizard(),
+                      ),
+                      GoRoute(
+                        path: 'details',
+                        builder: (context, state) => const SpeakerDetailsPage(),
+                      ),
+                      GoRoute(
+                        path: 'port',
+                        builder: (context, state) => const PortPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'tuning',
+                    builder: (context, state) => const TuningPage(),
                   ),
                   GoRoute(
                     path: 'panels',

@@ -2,6 +2,10 @@
 /// HTTP API and WebSocket. Widgets read these and never a state key.
 library;
 
+import 'speakers.dart';
+
+export 'speakers.dart' show Speakers, ToneState;
+
 /// The values of `audio.source` (the firmware's CONCEPT.md, "SharedState contract: sources").
 enum SourceId {
   off(0),
@@ -204,6 +208,8 @@ class DeviceSnapshot {
     this.backdrop,
     this.sound = const SoundState(),
     this.radio = const StationState(),
+    this.speakers = const SpeakerState(),
+    this.tone = const ToneState(),
     this.hostname = '',
     this.cardIndex = -1,
     this.cardCount = 0,
@@ -239,6 +245,8 @@ class DeviceSnapshot {
   final int? backdrop;
   final SoundState sound;
   final StationState radio;
+  final SpeakerState speakers;
+  final ToneState tone;
 }
 
 enum TransportAction { toggle, previous, next }
@@ -261,6 +269,11 @@ class SoundState {
     this.hpHz = 40,
     this.portHz = 0,
     this.portLiftDb = 3,
+    this.loudnessLevel = 70,
+    this.loudRef = 100,
+    this.width = 100,
+    this.monoBassHz = 0,
+    this.bassXoHz = 120,
   });
 
   /// −6…+6 dB.
@@ -294,6 +307,43 @@ class SoundState {
   final int hpHz;
   final int portHz;
   final int portLiftDb;
+
+  /// Тонке налаштування: the loudness's strength (0 off), «Звичайна гучність» (% of the effective
+  /// level), the stereo width, the mono bass and the bass limiter's crossover (Hz, 0 off).
+  final int loudnessLevel;
+  final int loudRef;
+  final int width;
+  final int monoBassHz;
+  final int bassXoHz;
+}
+
+/// Колонки: what the speakers are, the balance, and the port meter.
+class SpeakerState {
+  const SpeakerState({
+    this.setup = const Speakers(),
+    this.balanceDb10 = 0,
+    this.measuring,
+    this.meterChannel = 1,
+    this.meterStatus = '',
+    this.meterHz = 0,
+  });
+
+  final Speakers setup;
+
+  /// Tenths of a dB: above 0 the left channel is quieter (the sound goes right), below it the right.
+  final int balanceDb10;
+
+  /// The port meter listens (audio.port_meas); null where the panel has none.
+  final bool? measuring;
+
+  /// The speaker it listens at: 1 left, 2 right.
+  final int meterChannel;
+
+  /// Its last word, a catalog message, and what it found. The panel writes these without
+  /// WebSocket deltas: here as of the last whole state; a page that shows them reads them again
+  /// ([DeviceApi.portMeterReading]).
+  final String meterStatus;
+  final double meterHz;
 }
 
 /// The radio as its card needs it.

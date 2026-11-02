@@ -6,6 +6,7 @@ import '../eq.dart';
 import '../face.dart';
 import '../keys.dart';
 import '../models.dart';
+import '../speakers.dart';
 import '../stations.dart';
 import 'panel_link.dart';
 
@@ -169,6 +170,54 @@ class PanelDeviceApi implements DeviceApi {
       link.write({Keys.audioVolStart.name: percent.clamp(0, 100)});
 
   @override
+  Future<void> setAudio(AudioSetting setting, int value) =>
+      link.write({setting.key.name: value.clamp(setting.min, setting.max)});
+
+  @override
+  Future<void> setSpeakers(SpeakerWrite write) => link.write(write.settings);
+
+  @override
+  Future<void> setPortMeter(bool on) =>
+      link.write({Keys.audioPortMeas.name: on});
+
+  @override
+  Future<void> setPortMeterChannel(int channel) =>
+      link.write({Keys.audioPortMeasCh.name: channel == 2 ? 2 : 1});
+
+  @override
+  Future<({String status, double hz})> portMeterReading() async {
+    final raw = await link.getJson('/api/state');
+    final s = raw is Map
+        ? raw.cast<String, Object?>()
+        : const <String, Object?>{};
+    return (
+      status: Keys.audioPortMeasStatus.of(s) ?? '',
+      hz: Keys.audioPortMeasHz.of(s) ?? 0,
+    );
+  }
+
+  @override
+  Future<void> playTone({
+    required int hz,
+    ToneMode mode = ToneMode.chain,
+    bool portOff = false,
+    int? volCap,
+  }) => link.write({
+    if (portOff) Keys.audioCalPortOff.name: true,
+    Keys.audioCalVolCap.name: ?volCap,
+    Keys.audioToneMode.name: mode.value,
+    Keys.audioToneHz.name: hz.clamp(20, 20000),
+    Keys.audioSource.name: SourceId.tone.value,
+  });
+
+  @override
+  Future<void> stopTone({SourceId? then, SpeakerWrite? write}) => link.write({
+    Keys.audioSource.name: ?then?.value,
+    Keys.audioToneMode.name: ToneMode.chain.value,
+    ...?write?.settings,
+  });
+
+  @override
   Future<StationList> stations() async =>
       stationsOf(await link.getJson('/api/stations'));
 
@@ -316,12 +365,39 @@ DeviceSnapshot snapshotOf(
       loudDb: Keys.audioLoudDb.of(s) ?? 0,
       hpHz: Keys.audioHpHz.of(s) ?? 40,
       // closed speakers have no port, whatever number is kept (the web's speakers.js port())
-      portHz: Keys.audioSpkType.of(s) == 2 ? 0 : Keys.audioPortHz.of(s) ?? 0,
+      portHz: speakersOf(s).port.hz,
       portLiftDb: Keys.audioPortLiftDb.of(s) ?? 3,
+      loudnessLevel: Keys.audioLoudness.of(s) ?? 70,
+      loudRef: Keys.audioLoudRef.of(s) ?? 100,
+      width: Keys.audioWidth.of(s) ?? 100,
+      monoBassHz: Keys.audioMonoBassHz.of(s) ?? 0,
+      bassXoHz: Keys.audioBassXoHz.of(s) ?? 120,
+    ),
+    speakers: SpeakerState(
+      setup: speakersOf(s),
+      balanceDb10: Keys.audioBalanceDb10.of(s) ?? 0,
+      measuring: Keys.audioPortMeas.of(s),
+      meterChannel: Keys.audioPortMeasCh.of(s) ?? 1,
+      meterStatus: Keys.audioPortMeasStatus.of(s) ?? '',
+      meterHz: Keys.audioPortMeasHz.of(s) ?? 0,
+    ),
+    tone: ToneState(
+      on: Keys.audioSource.of(s) == SourceId.tone.value,
+      mode: ToneMode.of(Keys.audioToneMode.of(s)),
+      hz: Keys.audioToneHz.of(s) ?? 1000,
+      db10: Keys.audioToneDb10.of(s) ?? -260,
+      channel: ToneChannel.of(Keys.audioToneCh.of(s)),
     ),
     radio: radioOf(s),
   );
 }
+
+/// The speakers as the panel keeps them.
+Speakers speakersOf(Map<String, Object?> s) => Speakers(
+  type: SpeakerType.of(Keys.audioSpkType.of(s)),
+  portHz: Keys.audioPortHz.of(s) ?? 0,
+  source: PortSource.of(Keys.audioPortSrc.of(s)),
+);
 
 StationState radioOf(Map<String, Object?> s) {
   final current = Keys.radioStation.of(s) ?? -1;

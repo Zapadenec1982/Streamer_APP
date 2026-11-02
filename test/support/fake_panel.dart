@@ -162,6 +162,9 @@ class FakePanel {
       case ('POST', '/api/settings'):
         _apply((body! as Map).cast<String, Object?>());
         return _reply(req, 200, {'ok': true});
+      // the whole state, as the poll of a page that shows diagnostics reads it
+      case ('GET', '/api/state'):
+        return _reply(req, 200, state);
       case ('GET', '/api/eq'):
         return _reply(req, 200, {
           'rev': eqRev,

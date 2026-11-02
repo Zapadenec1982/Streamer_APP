@@ -486,6 +486,573 @@
   "@soundLevTo": {
     "description": "sound.lev_to"
   },
+  "spkTitle": "Speakers",
+  "@spkTitle": {
+    "description": "spk.title"
+  },
+  "spkPorted": "Ported speakers",
+  "@spkPorted": {
+    "description": "spk.ported"
+  },
+  "spkClosed": "Sealed speakers",
+  "@spkClosed": {
+    "description": "spk.closed"
+  },
+  "spkUnset": "Speaker type not chosen",
+  "@spkUnset": {
+    "description": "spk.unset"
+  },
+  "spkPortMeasured": "Port {hz} Hz · measured",
+  "@spkPortMeasured": {
+    "description": "spk.port_measured",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkPortManual": "Port {hz} Hz · by hand",
+  "@spkPortManual": {
+    "description": "spk.port_manual",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkPortNone": "Port frequency not found yet",
+  "@spkPortNone": {
+    "description": "spk.port_none"
+  },
+  "spkSetup": "Set up",
+  "@spkSetup": {
+    "description": "spk.setup"
+  },
+  "spkSetupAgain": "Set up again",
+  "@spkSetupAgain": {
+    "description": "spk.setup_again"
+  },
+  "spkPlacement": "Placement",
+  "@spkPlacement": {
+    "description": "spk.placement"
+  },
+  "spkBalance": "Balance",
+  "@spkBalance": {
+    "description": "spk.balance"
+  },
+  "spkCenter": "Centre",
+  "@spkCenter": {
+    "description": "spk.center"
+  },
+  "spkLeft": "Left · {n}",
+  "@spkLeft": {
+    "description": "spk.left",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "spkRight": "Right · {n}",
+  "@spkRight": {
+    "description": "spk.right",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "spkL": "L",
+  "@spkL": {
+    "description": "spk.l"
+  },
+  "spkR": "R",
+  "@spkR": {
+    "description": "spk.r"
+  },
+  "spkDetails": "Details",
+  "@spkDetails": {
+    "description": "spk.details"
+  },
+  "spkSrcMeasured": "measured",
+  "@spkSrcMeasured": {
+    "description": "spk.src_measured"
+  },
+  "spkSrcManual": "by hand",
+  "@spkSrcManual": {
+    "description": "spk.src_manual"
+  },
+  "spkPortShort": "Port {hz} Hz · {src}",
+  "@spkPortShort": {
+    "description": "spk.port_short",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      },
+      "src": {
+        "type": "String"
+      }
+    }
+  },
+  "spkDType": "Speaker type",
+  "@spkDType": {
+    "description": "spk.d_type"
+  },
+  "spkDPort": "Port frequency",
+  "@spkDPort": {
+    "description": "spk.d_port"
+  },
+  "spkDOff": "Off",
+  "@spkDOff": {
+    "description": "spk.d_off"
+  },
+  "spkDSubPort": "{hz} Hz · from the port",
+  "@spkDSubPort": {
+    "description": "spk.d_sub_port",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkDFind": "Find the frequency by hand",
+  "@spkDFind": {
+    "description": "spk.d_find"
+  },
+  "spkStep": "{i} of {n}",
+  "@spkStep": {
+    "description": "spk.step",
+    "placeholders": {
+      "i": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "spkQType": "What speakers do you have?",
+  "@spkQType": {
+    "description": "spk.q_type"
+  },
+  "spkTPorted": "Ported",
+  "@spkTPorted": {
+    "description": "spk.t_ported"
+  },
+  "spkTPortedX": "A hole or a slot — at the front, the back or underneath",
+  "@spkTPortedX": {
+    "description": "spk.t_ported_x"
+  },
+  "spkTClosed": "Sealed",
+  "@spkTClosed": {
+    "description": "spk.t_closed"
+  },
+  "spkTClosedX": "No openings in the cabinet",
+  "@spkTClosedX": {
+    "description": "spk.t_closed_x"
+  },
+  "spkHow": "Not sure — how to check",
+  "@spkHow": {
+    "description": "spk.how"
+  },
+  "spkHow1": "Look at the cabinet from every side, underneath too: a port is round or a slot.",
+  "@spkHow1": {
+    "description": "spk.how_1"
+  },
+  "spkHow2": "A second “driver” with no wires is a passive radiator. Such a speaker counts as “ported” too.",
+  "@spkHow2": {
+    "description": "spk.how_2"
+  },
+  "spkHow3": "Not sure — skip: everything stays as it is.",
+  "@spkHow3": {
+    "description": "spk.how_3"
+  },
+  "spkNext": "Next",
+  "@spkNext": {
+    "description": "spk.next"
+  },
+  "spkDone": "Done",
+  "@spkDone": {
+    "description": "spk.done"
+  },
+  "spkSkip": "Skip",
+  "@spkSkip": {
+    "description": "spk.skip"
+  },
+  "spkQListen": "Let’s listen to the speaker",
+  "@spkQListen": {
+    "description": "spk.q_listen"
+  },
+  "spkByPanel": "With the streamer’s microphone",
+  "@spkByPanel": {
+    "description": "spk.by_panel"
+  },
+  "spkByPanelX": "The streamer’s top edge 0.5–1 cm from the centre of one speaker’s large driver, not touching. A quiet room. Which speaker:",
+  "@spkByPanelX": {
+    "description": "spk.by_panel_x"
+  },
+  "spkStart": "Start",
+  "@spkStart": {
+    "description": "spk.start"
+  },
+  "spkStartX": "About 45 seconds. The speaker will play quiet low tones.",
+  "@spkStartX": {
+    "description": "spk.start_x"
+  },
+  "spkListening": "Listening…",
+  "@spkListening": {
+    "description": "spk.listening"
+  },
+  "spkStop": "Stop — nothing will be saved",
+  "@spkStop": {
+    "description": "spk.stop"
+  },
+  "spkResult": "Port frequency — {hz} Hz",
+  "@spkResult": {
+    "description": "spk.result",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkNow": "Now",
+  "@spkNow": {
+    "description": "spk.now"
+  },
+  "spkAfter": "After",
+  "@spkAfter": {
+    "description": "spk.after"
+  },
+  "spkAfterV": "{hz} Hz · measured",
+  "@spkAfterV": {
+    "description": "spk.after_v",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkAccept": "Accept",
+  "@spkAccept": {
+    "description": "spk.accept"
+  },
+  "spkKeep": "Keep as it was",
+  "@spkKeep": {
+    "description": "spk.keep"
+  },
+  "spkFailed": "Could not find it",
+  "@spkFailed": {
+    "description": "spk.failed"
+  },
+  "spkFailedX": "Nothing has changed. Usually it is one of these:",
+  "@spkFailedX": {
+    "description": "spk.failed_x"
+  },
+  "spkWhyNoise": "The room is noisy — turn other sounds off",
+  "@spkWhyNoise": {
+    "description": "spk.why_noise"
+  },
+  "spkWhyFar": "The microphone is too far — the streamer’s edge almost at the large driver’s centre",
+  "@spkWhyFar": {
+    "description": "spk.why_far"
+  },
+  "spkWhyClosed": "The speaker is sealed — then no measurement is needed",
+  "@spkWhyClosed": {
+    "description": "spk.why_closed"
+  },
+  "spkDoubtful": "Looks like {hz} Hz, but not for certain",
+  "@spkDoubtful": {
+    "description": "spk.doubtful",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "spkRetry": "Try again",
+  "@spkRetry": {
+    "description": "spk.retry"
+  },
+  "spkByHand": "Find by hand",
+  "@spkByHand": {
+    "description": "spk.by_hand"
+  },
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "common.back"
+  },
+  "calPort": "Speaker port frequency",
+  "@calPort": {
+    "description": "cal.port"
+  },
+  "calPortIs": "Port {hz} Hz",
+  "@calPortIs": {
+    "description": "cal.port_is",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calPortNone": "Not set",
+  "@calPortNone": {
+    "description": "cal.port_none"
+  },
+  "calSet": "Set",
+  "@calSet": {
+    "description": "cal.set"
+  },
+  "calLower": "Lower",
+  "@calLower": {
+    "description": "cal.lower"
+  },
+  "calHigher": "Higher",
+  "@calHigher": {
+    "description": "cal.higher"
+  },
+  "calByMic": "With the streamer's microphone",
+  "@calByMic": {
+    "description": "cal.by_mic"
+  },
+  "calByHand": "By hand",
+  "@calByHand": {
+    "description": "cal.by_hand"
+  },
+  "calSPlace": "Place the streamer",
+  "@calSPlace": {
+    "description": "cal.s_place"
+  },
+  "calSPlaceX": "The microphone is at the streamer's top edge. Hold that edge 0.5–1 cm from the centre of one speaker's large driver without touching it; better with the grille off. Quiet in the room. Which speaker:",
+  "@calSPlaceX": {
+    "description": "cal.s_place_x"
+  },
+  "calSpeakerLeft": "Left",
+  "@calSpeakerLeft": {
+    "description": "cal.speaker_left"
+  },
+  "calSpeakerRight": "Right",
+  "@calSpeakerRight": {
+    "description": "cal.speaker_right"
+  },
+  "calSMeasure": "Measure",
+  "@calSMeasure": {
+    "description": "cal.s_measure"
+  },
+  "calSMeasureX": "About 45 s: the streamer listens to the silence, then the speaker plays quiet tones of 20–100 Hz. Source and tone come back as they were afterwards.",
+  "@calSMeasureX": {
+    "description": "cal.s_measure_x"
+  },
+  "calMeasure": "Measure",
+  "@calMeasure": {
+    "description": "cal.measure"
+  },
+  "calMeasureStop": "Stop",
+  "@calMeasureStop": {
+    "description": "cal.measure_stop"
+  },
+  "calMNoMemory": "Not enough memory to measure",
+  "@calMNoMemory": {
+    "description": "cal.m_no_memory"
+  },
+  "calMMicOpen": "The microphone did not open",
+  "@calMMicOpen": {
+    "description": "cal.m_mic_open"
+  },
+  "calMSilence": "Silence: listening to the room",
+  "@calMSilence": {
+    "description": "cal.m_silence"
+  },
+  "calMStopped": "Stopped",
+  "@calMStopped": {
+    "description": "cal.m_stopped"
+  },
+  "calMMicRead": "The microphone cannot be read",
+  "@calMMicRead": {
+    "description": "cal.m_mic_read"
+  },
+  "calMProgress": "Measuring: {hz} Hz ({k} of {n})",
+  "@calMProgress": {
+    "description": "cal.m_progress",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      },
+      "k": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "calMInterrupted": "Interrupted: the source or the microphone",
+  "@calMInterrupted": {
+    "description": "cal.m_interrupted"
+  },
+  "calMFound": "Found: {hz} Hz",
+  "@calMFound": {
+    "description": "cal.m_found",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calMOutside": "Found {hz} Hz — outside 30…80",
+  "@calMOutside": {
+    "description": "cal.m_outside",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calMDoubtful": "Doubtful, ~{hz} Hz: check with a finger",
+  "@calMDoubtful": {
+    "description": "cal.m_doubtful",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calMNoDip": "No dip: a closed speaker, or too far",
+  "@calMNoDip": {
+    "description": "cal.m_no_dip"
+  },
+  "calMNoTone": "The microphone cannot hear the tone",
+  "@calMNoTone": {
+    "description": "cal.m_no_tone"
+  },
+  "calSSweep": "Start",
+  "@calSSweep": {
+    "description": "cal.s_sweep"
+  },
+  "calSSweepX": "The port frequency goes to 0 while searching, the tone through the DSP, the volume to at most 20 %. Take the grille off one speaker.",
+  "@calSSweepX": {
+    "description": "cal.s_sweep_x"
+  },
+  "calSFind": "Find the dip",
+  "@calSFind": {
+    "description": "cal.s_find"
+  },
+  "calSFindX": "From 30 to 80 Hz in steps of 2–5 Hz. Watch the large driver's cone (or touch it lightly) with a palm at the port: where the cone nearly stops and the port blows hardest, that is it.",
+  "@calSFindX": {
+    "description": "cal.s_find_x"
+  },
+  "calFreq": "Frequency",
+  "@calFreq": {
+    "description": "cal.freq"
+  },
+  "calSPortWrite": "Save",
+  "@calSPortWrite": {
+    "description": "cal.s_port_write"
+  },
+  "calSPortWriteX": "The final check is a finger: a tone from the phone over Bluetooth, the DSP neutral, a finger on the dust cap; where it vibrates least is the port. The number can be typed above.",
+  "@calSPortWriteX": {
+    "description": "cal.s_port_write_x"
+  },
+  "calPortWrite": "Save {hz} Hz",
+  "@calPortWrite": {
+    "description": "cal.port_write",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calApply": "Apply {hz} Hz",
+  "@calApply": {
+    "description": "cal.apply",
+    "placeholders": {
+      "hz": {
+        "type": "String"
+      }
+    }
+  },
+  "calToneOn": "Test tone",
+  "@calToneOn": {
+    "description": "cal.tone_on"
+  },
+  "calToneLeft": "{s} s left",
+  "@calToneLeft": {
+    "description": "cal.tone_left",
+    "placeholders": {
+      "s": {
+        "type": "String"
+      }
+    }
+  },
+  "calToneMax": "up to {s} s",
+  "@calToneMax": {
+    "description": "cal.tone_max",
+    "placeholders": {
+      "s": {
+        "type": "String"
+      }
+    }
+  },
+  "calToneChain": "through the DSP",
+  "@calToneChain": {
+    "description": "cal.tone_chain"
+  },
+  "calToneStop": "Stop",
+  "@calToneStop": {
+    "description": "cal.tone_stop"
+  },
+  "calChLeft": "left",
+  "@calChLeft": {
+    "description": "cal.ch_left"
+  },
+  "calChRight": "right",
+  "@calChRight": {
+    "description": "cal.ch_right"
+  },
+  "calChBoth": "both",
+  "@calChBoth": {
+    "description": "cal.ch_both"
+  },
+  "unitDbfs": "dBFS",
+  "@unitDbfs": {
+    "description": "unit.dbfs"
+  },
+  "pageTuning": "Fine tuning",
+  "@pageTuning": {
+    "description": "page.tuning"
+  },
+  "usualTitle": "Usual volume",
+  "@usualTitle": {
+    "description": "usual.title"
+  },
+  "usualUnset": "Not set",
+  "@usualUnset": {
+    "description": "usual.unset"
+  },
+  "calOff": "Off",
+  "@calOff": {
+    "description": "cal.off"
+  },
+  "eqWidth": "Stereo width",
+  "@eqWidth": {
+    "description": "eq.width"
+  },
+  "eqMonoBass": "Mono bass",
+  "@eqMonoBass": {
+    "description": "eq.mono_bass"
+  },
+  "calHp": "Subsonic filter",
+  "@calHp": {
+    "description": "cal.hp"
+  },
+  "calXo": "Bass limiter",
+  "@calXo": {
+    "description": "cal.xo"
+  },
+  "calLift": "Bass lift",
+  "@calLift": {
+    "description": "cal.lift"
+  },
   "eqEnabled": "On",
   "@eqEnabled": {
     "description": "eq.enabled"

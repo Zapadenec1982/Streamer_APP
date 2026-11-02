@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import 'eq.dart';
+import 'keys.dart';
 import 'models.dart';
+import 'speakers.dart';
 
 /// A panel as the app sees it: `DemoDeviceApi`, or `PanelDeviceApi` for a real one. The app sends
 /// a command and shows what the panel then reports — it never assumes a command took effect, and
@@ -63,6 +65,37 @@ abstract interface class DeviceApi {
 
   /// The volume after power-on is no higher than this, 0…100 %; 0 leaves it as it was.
   Future<void> setVolStart(int percent);
+
+  /// A sound setting a slider moves, held to the panel's range.
+  Future<void> setAudio(AudioSetting setting, int value);
+
+  /// What the speakers' wizard or the port page found: the type, the port and where it came from.
+  Future<void> setSpeakers(SpeakerWrite write);
+
+  /// The port meter on or off (~45 s; the panel's microphone at the speaker [setPortMeterChannel]
+  /// names).
+  Future<void> setPortMeter(bool on);
+
+  /// The speaker the port meter listens at: 1 left, 2 right.
+  Future<void> setPortMeterChannel(int channel);
+
+  /// The port meter's last word and what it found, which the panel writes without WebSocket
+  /// deltas: read from its whole state, while a page shows them.
+  Future<({String status, double hz})> portMeterReading();
+
+  /// The test tone at [hz], through the DSP and the volume unless [mode] says otherwise; [portOff]
+  /// and [volCap] go with it and last only while it plays. Its keys go in one body, the source
+  /// last, so the panel never starts it with what a step before asked.
+  Future<void> playTone({
+    required int hz,
+    ToneMode mode = ToneMode.chain,
+    bool portOff = false,
+    int? volCap,
+  });
+
+  /// The tone off and its mode back through the DSP: the source [then] first (null leaves it as
+  /// it is), and [write] in the same body — what a search by hand found.
+  Future<void> stopTone({SourceId? then, SpeakerWrite? write});
 
   Future<StationList> stations();
 

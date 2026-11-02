@@ -7,11 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../device/demo_device_api.dart';
 import '../device/device_api.dart';
 import '../device/eq.dart';
+import '../device/keys.dart';
 import '../device/models.dart';
 import '../device/panel/panel_device_api.dart';
 import '../device/panel/panel_link.dart';
 import '../device/panels.dart';
 import '../device/radio_browser.dart';
+import '../device/speakers.dart';
 
 /// Every setting the app keeps. The phone's store is opened with this list and refuses any other
 /// key (SharedPreferencesWithCache's allowList, main.dart) — and so does the tests' store, so a key
@@ -354,6 +356,33 @@ class NoPanelApi implements DeviceApi {
 
   @override
   Future<void> setVolStart(int percent) async {}
+
+  @override
+  Future<void> setAudio(AudioSetting setting, int value) async {}
+
+  @override
+  Future<void> setSpeakers(SpeakerWrite write) async {}
+
+  @override
+  Future<void> setPortMeter(bool on) async {}
+
+  @override
+  Future<void> setPortMeterChannel(int channel) async {}
+
+  @override
+  Future<({String status, double hz})> portMeterReading() async =>
+      (status: '', hz: 0.0);
+
+  @override
+  Future<void> playTone({
+    required int hz,
+    ToneMode mode = ToneMode.chain,
+    bool portOff = false,
+    int? volCap,
+  }) async {}
+
+  @override
+  Future<void> stopTone({SourceId? then, SpeakerWrite? write}) async {}
 
   @override
   Future<void> setLeveler(bool on) async {}

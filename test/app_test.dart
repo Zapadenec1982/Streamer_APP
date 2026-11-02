@@ -11,6 +11,7 @@ import 'package:streamer/device/eq.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/device/radio_browser.dart';
+import 'package:streamer/device/speakers.dart';
 import 'package:streamer/state/providers.dart';
 import 'package:streamer/ui/eq_plot.dart';
 import 'package:streamer/ui/player_page.dart';
@@ -176,11 +177,16 @@ void main() {
     matching: find.text(name),
   );
 
-  /// Scrolls the page in front — the one a finger reaches — until [target] is on the screen.
-  Future<void> reveal(WidgetTester tester, Finder target) async {
+  /// Scrolls the page in front — the one a finger reaches — until [target] is on the screen;
+  /// [up] for one above.
+  Future<void> reveal(
+    WidgetTester tester,
+    Finder target, {
+    bool up = false,
+  }) async {
     await tester.scrollUntilVisible(
       target,
-      200,
+      up ? -200 : 200,
       scrollable: find.byType(Scrollable).hitTestable().first,
     );
     await tester.pumpAndSettle();
@@ -406,6 +412,62 @@ void main() {
       await reveal(tester, find.text('High Shelf'));
       await tester.tap(find.text('High Shelf'));
       await tester.pumpAndSettle();
+      await reveal(tester, find.text('Готово'));
+      await tester.tap(find.text('Готово'));
+      await tester.pumpAndSettle();
+      // Колонки, its details, the port page both ways, Тонке налаштування, the wizard's two steps
+      // with its help open — and a test tone's bar over the navigation all the while
+      await api.playTone(hz: 40);
+      Future<void> settings(String row) async {
+        await tester.tap(tab('Налаштування'));
+        await tester.pumpAndSettle();
+        // the list keeps where it was scrolled to: from its top
+        await tester.fling(
+          find.byType(Scrollable).hitTestable().first,
+          const Offset(0, 2000),
+          3000,
+        );
+        await tester.pumpAndSettle();
+        await reveal(tester, find.text(row));
+        await tester.tap(find.text(row));
+        await tester.pumpAndSettle();
+      }
+
+      await settings('Колонки');
+      await reveal(tester, find.text('Подробиці'));
+      await tester.tap(find.text('Подробиці'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Знайти частоту вручну'));
+      await tester.tap(find.text('Знайти частоту вручну'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.textContaining('~45 с'));
+      await reveal(tester, find.text('Вручну'), up: true);
+      await tester.tap(find.text('Вручну'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Записати 40 Гц'));
+      await settings('Тонке налаштування');
+      await reveal(tester, find.text('Підйом басу'));
+      await settings('Колонки');
+      await reveal(tester, find.text('Налаштувати'));
+      await tester.tap(find.text('Налаштувати'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('З фазоінвертором'));
+      await tester.tap(find.text('З фазоінвертором'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Не знаю — як перевірити'));
+      await tester.tap(find.text('Не знаю — як перевірити'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Далі'));
+      await tester.tap(find.text('Далі'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Пропустити'));
+      // what the meter found, with its table
+      await reveal(tester, find.text('Почати'), up: true);
+      await tester.tap(find.text('Почати'));
+      await tester.pumpAndSettle();
+      api.tick(const Duration(seconds: 30));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Лишити як було'));
     });
   }
 
@@ -539,6 +601,34 @@ void main() {
     await tester.pumpAndSettle();
     await check();
     await tester.tap(find.text('Low Shelf'));
+    await tester.pumpAndSettle();
+    await check();
+    // Колонки, the wizard, the port page, Тонке налаштування — the tone's bar over them
+    await tester.tap(find.text('Готово'));
+    await tester.pumpAndSettle();
+    await api.playTone(hz: 40);
+    for (final row in ['Колонки', 'Тонке налаштування']) {
+      await tester.tap(tab('Налаштування'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text(row));
+      await tester.tap(find.text(row));
+      await tester.pumpAndSettle();
+      await check();
+    }
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await reveal(tester, find.text('Колонки'));
+    await tester.tap(find.text('Колонки'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Налаштувати'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('З фазоінвертором'));
+    await tester.pumpAndSettle();
+    await check();
+    await tester.tap(find.text('Далі'));
+    await tester.pumpAndSettle();
+    await check();
+    await tester.tap(find.text('Знайти вручну'));
     await tester.pumpAndSettle();
     await check();
     semantics.dispose();
@@ -1111,5 +1201,170 @@ void main() {
     expect(scheduleMinutes(const TimeOfDay(hour: 7, minute: 3)), 425);
     expect(scheduleMinutes(const TimeOfDay(hour: 23, minute: 58)), 1435);
     expect(scheduleMinutes(const TimeOfDay(hour: 0, minute: 2)), 0);
+  });
+
+  testWidgets('Колонки: closed speakers are set in one step, and the page '
+      'says so', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    expect(find.text('Тип колонок не обрано'), findsOne);
+    await tester.tap(find.text('Колонки'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Налаштувати'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 з 2'), findsOne);
+    await tester.tap(find.text('Закриті'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Готово'));
+    await tester.pumpAndSettle();
+    expect(api.current.speakers.setup.type, SpeakerType.closed);
+    // the title, and the details' line under it
+    expect(find.text('Закриті колонки'), findsNWidgets(2));
+    expect(find.text('Налаштувати знову'), findsOne);
+  });
+
+  testWidgets('Колонки: the port measured by the streamer\'s microphone is '
+      'written only on «Прийняти»', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Колонки'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Налаштувати'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('З фазоінвертором'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Далі'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 з 2'), findsOne);
+    await tester.tap(find.text('Права'));
+    await tester.pumpAndSettle();
+    expect(api.current.speakers.meterChannel, 2);
+    await tester.tap(find.text('Почати'));
+    await tester.pumpAndSettle();
+    expect(api.current.speakers.measuring, isTrue);
+    // the sweep, half way, read as the page reads it: every 2 s
+    api.tick(const Duration(seconds: 14));
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('50 %'), findsOne);
+    api.tick(const Duration(seconds: 14));
+    await tester.pumpAndSettle();
+    expect(find.text('Частота фазоінвертора — 47 Гц'), findsOne);
+    expect(
+      api.current.speakers.setup.type,
+      SpeakerType.unset,
+      reason: 'not yet',
+    );
+    await tester.tap(find.text('Прийняти'));
+    await tester.pumpAndSettle();
+    final setup = api.current.speakers.setup;
+    expect(
+      (setup.type, setup.portHz, setup.source),
+      (SpeakerType.ported, 47, PortSource.measured),
+    );
+    expect(find.text('Фазоінвертор 47 Гц · виміряно'), findsOne);
+  });
+
+  testWidgets('the port by hand: a tone with the port off and the volume '
+      'capped, stepped up, written — and the source that played is back', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Колонки'));
+    await tester.pumpAndSettle();
+    await reveal(tester, find.text('Подробиці'));
+    await tester.tap(find.text('Подробиці'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Знайти частоту вручну'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Вручну'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Встановити'));
+    await tester.pumpAndSettle();
+    expect(api.current.tone.on, isTrue);
+    expect(api.current.tone.hz, 40);
+    expect(
+      find.text('Тест-тон'),
+      findsOne,
+      reason: 'the bar over the navigation',
+    );
+    await reveal(tester, find.byTooltip('Вище'));
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.byTooltip('Вище'));
+      await tester.pumpAndSettle();
+    }
+    expect(api.current.tone.hz, 43, reason: 'heard as it steps');
+    await reveal(tester, find.text('Записати 43 Гц'));
+    await tester.tap(find.text('Записати 43 Гц'));
+    await tester.pumpAndSettle();
+    expect(api.current.tone.on, isFalse);
+    expect(api.current.now.source, SourceId.bt);
+    final setup = api.current.speakers.setup;
+    expect(
+      (setup.type, setup.portHz, setup.source),
+      (SpeakerType.ported, 43, PortSource.manual),
+    );
+    expect(find.text('Фазоінвертор 43 Гц'), findsOne);
+  });
+
+  testWidgets('a test tone shows on every page, and its bar stops it', (
+    tester,
+  ) async {
+    await api.playTone(hz: 1000);
+    await pumpApp(tester);
+    await tester.tap(tab('Джерело'));
+    await tester.pumpAndSettle();
+    expect(find.text('1000 Гц · через DSP'), findsOne);
+    await tester.tap(find.byTooltip('Зупинити'));
+    await tester.pumpAndSettle();
+    expect(api.current.tone.on, isFalse);
+    expect(api.current.now.source, SourceId.off);
+    expect(find.text('Тест-тон'), findsNothing);
+  });
+
+  testWidgets('Тонке налаштування: the sliders that follow the port, and the '
+      'balance on Колонки', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(tab('Налаштування'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Тонке налаштування'));
+    await tester.pumpAndSettle();
+    // no port: the subsonic is the person's, the lift has nothing to lift
+    expect(find.text('40 Гц'), findsOne);
+    final lift = tester.widget<Slider>(find.byType(Slider).last);
+    expect(lift.onChanged, isNull);
+    await tester.drag(find.byType(Slider).at(2), const Offset(-200, 0));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.width, lessThan(100));
+    await api.setSpeakers(
+      const SpeakerWrite(
+        SpeakerType.ported,
+        portHz: 45,
+        source: PortSource.manual,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('36 Гц · від фазоінвертора'), findsOne);
+    expect(
+      tester.widget<Slider>(find.byType(Slider).last).onChanged,
+      isNotNull,
+    );
+    await tester.tap(
+      find.byTooltip(
+        MaterialLocalizations.of(tester.element(find.byType(Scaffold).last))
+            .backButtonTooltip,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Колонки'));
+    await tester.pumpAndSettle();
+    await reveal(tester, find.text('Баланс'));
+    await tester.drag(find.byType(Slider).first, const Offset(80, 0));
+    await tester.pumpAndSettle();
+    expect(api.current.speakers.balanceDb10, greaterThan(0));
+    expect(find.textContaining('Правіше · '), findsWidgets);
   });
 }

@@ -7,6 +7,7 @@ import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'tone.dart';
 import 'writes.dart';
 
 /// The three sections, in the order and with the icons of the panel's drawer and the web's bar,
@@ -21,6 +22,7 @@ class Shell extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final now = ref.watch(snapshotProvider.select((s) => s.now));
     final known = ref.watch(snapshotProvider.select((s) => s.known));
+    final tone = ref.watch(snapshotProvider.select((s) => s.tone));
     // The web's rule (Shell.svelte): what plays, or what a tap could resume; never on the Player,
     // which is the player itself.
     final mini =
@@ -33,6 +35,8 @@ class Shell extends ConsumerWidget {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // a test tone shows on every page, wherever it was started
+          if (known && tone.on) ToneBar(tone: tone),
           if (mini) _MiniPlayer(now: now),
           NavigationBar(
             selectedIndex: navigationShell.currentIndex,

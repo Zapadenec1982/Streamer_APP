@@ -5,8 +5,10 @@ import 'dart:typed_data';
 import 'demo_art.dart';
 import 'device_api.dart';
 import 'eq.dart';
+import 'keys.dart';
 import 'media.dart';
 import 'models.dart';
+import 'speakers.dart';
 
 class _Track {
   const _Track(
@@ -299,7 +301,27 @@ class DemoDeviceApi implements DeviceApi {
   int _levTo = 7 * 60;
   int _bass = 2;
   int _treble = 0;
-  bool _loudness = true;
+
+  /// The loudness's strength, and what switching it on puts back (audio.loud_back).
+  int _loudnessLevel = 70;
+  int _loudBack = 70;
+  int _loudRef = 100;
+  int _width = 100;
+  int _monoBass = 0;
+  int _hp = 40;
+  int _bassXo = 120;
+  int _lift = 3;
+  int _balance = 0;
+  var _speakers = const Speakers();
+
+  /// The port meter: on, at which speaker, how far its sweep is, its last word and what it found.
+  bool _measuring = false;
+  int _meterChannel = 1;
+  Duration _meterAt = Duration.zero;
+  String _meterStatus = '';
+  double _meterHz = 0;
+  int _toneHz = 1000;
+  ToneMode _toneMode = ToneMode.chain;
   bool _eqOn = true;
   bool _leveler = false;
   Duration _tuningLeft = Duration.zero;
@@ -393,6 +415,10 @@ class DemoDeviceApi implements DeviceApi {
     }
     if (_source == SourceId.radio && _tuningLeft > Duration.zero) {
       _tuningLeft -= elapsed;
+      changed = true;
+    }
+    if (_measuring) {
+      _measure(elapsed);
       changed = true;
     }
     if (changed) _emit();
@@ -576,7 +602,7 @@ class DemoDeviceApi implements DeviceApi {
 
   @override
   Future<void> setLoudness(bool on) async {
-    _loudness = on;
+    _loudnessLevel = on ? _loudBack : 0;
     _emit();
   }
 
@@ -609,6 +635,103 @@ class DemoDeviceApi implements DeviceApi {
   @override
   Future<void> setVolStart(int percent) async {
     _volStart = percent.clamp(0, 100);
+    _emit();
+  }
+
+  @override
+  Future<void> setAudio(AudioSetting setting, int value) async {
+    final v = value.clamp(setting.min, setting.max);
+    switch (setting) {
+      case AudioSetting.loudness:
+        _loudnessLevel = v;
+        if (v > 0) _loudBack = v;
+      case AudioSetting.loudRef:
+        _loudRef = v;
+      case AudioSetting.width:
+        _width = v;
+      case AudioSetting.monoBass:
+        _monoBass = v;
+      case AudioSetting.subsonic:
+        _hp = v;
+      case AudioSetting.bassLimiter:
+        _bassXo = v;
+      case AudioSetting.portLift:
+        _lift = v;
+      case AudioSetting.balance:
+        _balance = v;
+    }
+    _emit();
+  }
+
+  @override
+  Future<void> setSpeakers(SpeakerWrite write) async {
+    _speakers = Speakers(
+      type: write.type,
+      portHz: write.portHz ?? _speakers.portHz,
+      source: write.source ?? _speakers.source,
+    );
+    _emit();
+  }
+
+  /// The demo's port meter: four seconds of the room's silence, then a sweep of 20…100 Hz that
+  /// finds a port at 47 Hz, as a pair of bookshelf speakers might have.
+  @override
+  Future<void> setPortMeter(bool on) async {
+    if (on == _measuring) return;
+    _measuring = on;
+    _meterAt = Duration.zero;
+    _meterStatus = on ? '@cal.m_silence' : '@cal.m_stopped';
+    if (on) _meterHz = 0;
+    _emit();
+  }
+
+  void _measure(Duration elapsed) {
+    _meterAt += elapsed;
+    const silence = Duration(seconds: 4);
+    const sweep = Duration(seconds: 20);
+    const steps = 40;
+    if (_meterAt < silence) return;
+    if (_meterAt < silence + sweep) {
+      final k =
+          (steps * (_meterAt - silence).inMilliseconds / sweep.inMilliseconds)
+              .floor();
+      _meterStatus =
+          '@cal.m_progress\u001fhz=${20 + 2 * k}\u001fk=$k\u001fn=$steps';
+      return;
+    }
+    _measuring = false;
+    _meterHz = 47.3;
+    _meterStatus = '@cal.m_found\u001fhz=47';
+  }
+
+  @override
+  Future<void> setPortMeterChannel(int channel) async {
+    _meterChannel = channel == 2 ? 2 : 1;
+    _emit();
+  }
+
+  @override
+  Future<({String status, double hz})> portMeterReading() async =>
+      (status: _meterStatus, hz: _meterHz);
+
+  @override
+  Future<void> playTone({
+    required int hz,
+    ToneMode mode = ToneMode.chain,
+    bool portOff = false,
+    int? volCap,
+  }) async {
+    _toneHz = hz.clamp(20, 20000);
+    _toneMode = mode;
+    _source = SourceId.tone;
+    _emit();
+  }
+
+  @override
+  Future<void> stopTone({SourceId? then, SpeakerWrite? write}) async {
+    if (then != null) _source = then;
+    _toneMode = ToneMode.chain;
+    if (write != null) return setSpeakers(write);
     _emit();
   }
 
@@ -809,7 +932,7 @@ class DemoDeviceApi implements DeviceApi {
       sound: SoundState(
         bass: _bass,
         treble: _treble,
-        loudness: _loudness,
+        loudness: _loudnessLevel > 0,
         eqOn: _eqOn,
         leveler: _leveler,
         eqRev: _eqRev,
@@ -819,7 +942,28 @@ class DemoDeviceApi implements DeviceApi {
         levFrom: _levFrom,
         levTo: _levTo,
         // a quiet evening: the loudness lifts the bass as the panel's would
-        loudDb: _loudness ? 6 : 0,
+        loudDb: _loudnessLevel > 0 ? 6 : 0,
+        hpHz: _hp,
+        portHz: _speakers.port.hz,
+        portLiftDb: _lift,
+        loudnessLevel: _loudnessLevel,
+        loudRef: _loudRef,
+        width: _width,
+        monoBassHz: _monoBass,
+        bassXoHz: _bassXo,
+      ),
+      speakers: SpeakerState(
+        setup: _speakers,
+        balanceDb10: _balance,
+        measuring: _measuring,
+        meterChannel: _meterChannel,
+        meterStatus: _meterStatus,
+        meterHz: _meterHz,
+      ),
+      tone: ToneState(
+        on: _source == SourceId.tone,
+        mode: _toneMode,
+        hz: _toneHz,
       ),
       radio: StationState(
         current: _catalog != null ? -1 : _station,
@@ -937,7 +1081,13 @@ class DemoDeviceApi implements DeviceApi {
           title: LineLabel(CatalogLine.usbWaiting),
           subtitle: LineLabel(CatalogLine.usbPick, name: panelName),
         );
-      case SourceId.off || SourceId.tone || SourceId.aux:
+      case SourceId.tone:
+        return NowPlaying(
+          kind: NowKind.tone,
+          title: const LineLabel(CatalogLine.tone),
+          subtitle: TextLabel('$_toneHz Hz', technical: true),
+        );
+      case SourceId.off || SourceId.aux:
         return const NowPlaying(
           kind: NowKind.off,
           title: LineLabel(CatalogLine.off),
