@@ -22,5 +22,6 @@
   "mob.no_panel_note": "Telefon und Panel müssen im selben WLAN sein",
   "mob.find": "Panel suchen",
   "mob.try_demo": "Demo ausprobieren",
-  "mob.forget": "Vergessen"
+  "mob.forget": "Vergessen",
+  "mob.panel_settings": "Panel-Einstellungen"
 }

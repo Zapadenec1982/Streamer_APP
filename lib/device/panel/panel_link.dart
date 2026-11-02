@@ -106,13 +106,14 @@ class PanelLink {
   }
 
   /// Writes keys: `POST /api/settings`. The panel's answer comes back as state, over the socket.
-  Future<void> write(Map<String, Object?> values) async {
-    final res = await _send(
-      'POST',
-      endpoint.http('/api/settings'),
-      jsonEncode(values),
-    );
-    await _drain(res, ok: const [200]);
+  Future<void> write(Map<String, Object?> values) =>
+      postJson('/api/settings', values);
+
+  /// A JSON POST of the HTTP API; the panel's JSON answer.
+  Future<Object?> postJson(String path, Map<String, Object?> body) async {
+    final res = await _send('POST', endpoint.http(path), jsonEncode(body));
+    final text = await _drain(res, ok: const [200]);
+    return text.isEmpty ? null : jsonDecode(text);
   }
 
   /// A JSON GET of the HTTP API.

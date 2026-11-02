@@ -188,6 +188,8 @@ class DeviceSnapshot {
     this.status = LinkStatus.ready,
     this.known = true,
     this.backdrop,
+    this.sound = const SoundState(),
+    this.radio = const StationState(),
   });
 
   /// The panel's device name — what AirPlay and Bluetooth list it by.
@@ -209,6 +211,91 @@ class DeviceSnapshot {
   /// The Player's background, 0xRRGGBB: the panel's tint of the cover (`ui.cover_rgb`, a dark,
   /// muted shade of it), or null without one.
   final int? backdrop;
+  final SoundState sound;
+  final StationState radio;
 }
 
 enum TransportAction { toggle, previous, next }
+
+/// The daily sound: what the «Звук» sheet and the moon show.
+class SoundState {
+  const SoundState({
+    this.bass = 0,
+    this.treble = 0,
+    this.loudness = false,
+    this.eqOn = true,
+    this.leveler,
+    this.eqRev = 0,
+  });
+
+  /// −6…+6 dB.
+  final int bass;
+  final int treble;
+  final bool loudness;
+  final bool eqOn;
+
+  /// The night leveler, or null where the panel has none.
+  final bool? leveler;
+
+  /// Moves whenever the EQ document changes, wherever it was changed.
+  final int eqRev;
+}
+
+/// The sounds a panel offers and the one it plays (the EQ document's, `GET /api/eq`).
+class SoundPresets {
+  const SoundPresets({
+    required this.rev,
+    required this.preset,
+    required this.presets,
+  });
+
+  final int rev;
+  final String preset;
+  final List<String> presets;
+}
+
+/// The radio as its card needs it.
+class StationState {
+  const StationState({
+    this.current = -1,
+    this.count = 0,
+    this.listRev = 0,
+    this.storable = false,
+  });
+
+  /// The station tuned, by its place in the list; −1 for one from the catalog.
+  final int current;
+  final int count;
+
+  /// Moves whenever the list or its presets change.
+  final int listRev;
+
+  /// What plays can go on a preset: a station of the list, or a named one from the catalog.
+  final bool storable;
+
+  /// A catalog station not in the list, which can be kept in it.
+  bool get keepable => current < 0 && storable;
+}
+
+class Station {
+  const Station({required this.name, required this.url, this.uuid = ''});
+
+  final String name;
+  final String url;
+  final String uuid;
+}
+
+/// The station list and its six presets (indices into the list, −1 empty).
+class StationList {
+  const StationList({
+    required this.rev,
+    required this.stations,
+    required this.presets,
+  });
+
+  final int rev;
+  final List<Station> stations;
+  final List<int> presets;
+
+  static const presetCount = 6;
+}

@@ -22,5 +22,6 @@
   "mob.no_panel_note": "Телефон і панель мають бути в одній мережі Wi-Fi",
   "mob.find": "Знайти панель",
   "mob.try_demo": "Спробувати демо",
-  "mob.forget": "Забути"
+  "mob.forget": "Забути",
+  "mob.panel_settings": "Налаштування панелі"
 }

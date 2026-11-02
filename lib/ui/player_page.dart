@@ -10,6 +10,8 @@ import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'cover_art.dart';
 import 'labels.dart';
+import 'sound_sheet.dart';
+import 'station_card.dart';
 import 'writes.dart';
 
 /// What plays, from where, and the hands on it: transport and volume. The web's Player in one
@@ -27,6 +29,7 @@ class PlayerPage extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     // the panel's tint of the cover, as the web's Player wears it
     final backdrop = snapshot.backdrop;
+    final station = now.kind == NowKind.radio && now.title is TextLabel;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 600),
       color: backdrop == null ? colors.surface : Color(0xFF000000 | backdrop),
@@ -56,13 +59,17 @@ class PlayerPage extends ConsumerWidget {
                     child: _Cover(now: now, size: cover),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    l.label(now.title),
-                    style: text.titleLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
+                  // a station's face: its name between ‹ and ›, no transport, no progress
+                  if (station)
+                    StationTitle(name: l.label(now.title), now: now)
+                  else
+                    Text(
+                      l.label(now.title),
+                      style: text.titleLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
                   const SizedBox(height: 4),
                   _SubtitleRow(
                     subtitle: now.subtitle == null
@@ -71,15 +78,21 @@ class PlayerPage extends ConsumerWidget {
                     format: l.badge(now.format),
                   ),
                   const SizedBox(height: 16),
-                  if (now.duration != null && now.duration! > Duration.zero)
-                    _Progress(
-                      position: now.position ?? Duration.zero,
-                      duration: now.duration!,
-                    ),
-                  const SizedBox(height: 8),
-                  _Transport(now: now),
+                  if (station)
+                    const StationPresets()
+                  else ...[
+                    if (now.duration != null && now.duration! > Duration.zero)
+                      _Progress(
+                        position: now.position ?? Duration.zero,
+                        duration: now.duration!,
+                      ),
+                    const SizedBox(height: 8),
+                    _Transport(now: now),
+                  ],
                   const SizedBox(height: 16),
                   const _Volume(),
+                  const SizedBox(height: 8),
+                  const _SoundRow(),
                 ],
               ),
             );
@@ -103,11 +116,20 @@ class _Cover extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final drawn = CoverArt(
-      coverKey: now.coverKey,
-      source: now.source,
-      size: size,
-    );
+    final title = now.title;
+    // a station without a picture shows its disc, as the glass and the web do
+    final Widget drawn = now.kind == NowKind.radio && title is TextLabel
+        ? Container(
+            width: size,
+            height: size,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(size / 16),
+            ),
+            child: StationDisc(name: title.text, size: size * 0.6, label: true),
+          )
+        : CoverArt(coverKey: now.coverKey, source: now.source, size: size);
     final key = now.coverKey;
     if (key == null) return drawn;
     final bytes = ref.watch(coverProvider(key)).value;
@@ -123,6 +145,38 @@ class _Cover extends ConsumerWidget {
         filterQuality: FilterQuality.medium,
         errorBuilder: (_, _, _) => drawn,
       ),
+    );
+  }
+}
+
+/// «Звук» and, where the panel has the night leveler, the moon — the web's Player foot.
+class _SoundRow extends ConsumerWidget {
+  const _SoundRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final leveler = ref.watch(snapshotProvider.select((s) => s.sound.leveler));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        FilledButton.tonalIcon(
+          onPressed: () => showSoundSheet(context, ref),
+          icon: const Icon(Icons.tune),
+          label: Text(l.sysSound),
+        ),
+        if (leveler != null) ...[
+          const SizedBox(width: 12),
+          IconButton(
+            tooltip: l.soundLeveler,
+            isSelected: leveler,
+            onPressed: () =>
+                act(context, ref, (api) => api.setLeveler(!leveler)),
+            icon: const Icon(Icons.bedtime_outlined),
+            selectedIcon: const Icon(Icons.bedtime),
+          ),
+        ],
+      ],
     );
   }
 }

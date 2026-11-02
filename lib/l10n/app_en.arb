@@ -277,6 +277,200 @@
   "@passHide": {
     "description": "pass.hide"
   },
+  "sysSound": "Sound",
+  "@sysSound": {
+    "description": "sys.sound"
+  },
+  "soundStyles": "Preset",
+  "@soundStyles": {
+    "description": "sound.styles"
+  },
+  "soundBass": "Bass",
+  "@soundBass": {
+    "description": "sound.bass"
+  },
+  "soundTreble": "Treble",
+  "@soundTreble": {
+    "description": "sound.treble"
+  },
+  "soundEqOff": "The equalizer is off",
+  "@soundEqOff": {
+    "description": "sound.eq_off"
+  },
+  "soundEqOn": "Turn the equalizer on",
+  "@soundEqOn": {
+    "description": "sound.eq_on"
+  },
+  "soundLeveler": "Volume leveling",
+  "@soundLeveler": {
+    "description": "sound.leveler"
+  },
+  "eqLoudness": "Loudness",
+  "@eqLoudness": {
+    "description": "eq.loudness"
+  },
+  "pageEq": "Equalizer",
+  "@pageEq": {
+    "description": "page.eq"
+  },
+  "eqPresetBassTreble": "Bass and treble",
+  "@eqPresetBassTreble": {
+    "description": "eq.preset.bass_treble"
+  },
+  "eqPresetClassical": "Classical",
+  "@eqPresetClassical": {
+    "description": "eq.preset.classical"
+  },
+  "eqPresetClub": "Club",
+  "@eqPresetClub": {
+    "description": "eq.preset.club"
+  },
+  "eqPresetCustom": "Custom",
+  "@eqPresetCustom": {
+    "description": "eq.preset.custom"
+  },
+  "eqPresetDance": "Dance",
+  "@eqPresetDance": {
+    "description": "eq.preset.dance"
+  },
+  "eqPresetElectronic": "Electronic",
+  "@eqPresetElectronic": {
+    "description": "eq.preset.electronic"
+  },
+  "eqPresetFlat": "Flat",
+  "@eqPresetFlat": {
+    "description": "eq.preset.flat"
+  },
+  "eqPresetHeadphones": "Headphones",
+  "@eqPresetHeadphones": {
+    "description": "eq.preset.headphones"
+  },
+  "eqPresetHiphop": "Hip-hop",
+  "@eqPresetHiphop": {
+    "description": "eq.preset.hiphop"
+  },
+  "eqPresetJazz": "Jazz",
+  "@eqPresetJazz": {
+    "description": "eq.preset.jazz"
+  },
+  "eqPresetLargeHall": "Large hall",
+  "@eqPresetLargeHall": {
+    "description": "eq.preset.large_hall"
+  },
+  "eqPresetLive": "Live",
+  "@eqPresetLive": {
+    "description": "eq.preset.live"
+  },
+  "eqPresetLoudness": "Loudness",
+  "@eqPresetLoudness": {
+    "description": "eq.preset.loudness"
+  },
+  "eqPresetMoreBass": "More bass",
+  "@eqPresetMoreBass": {
+    "description": "eq.preset.more_bass"
+  },
+  "eqPresetMoreTreble": "More treble",
+  "@eqPresetMoreTreble": {
+    "description": "eq.preset.more_treble"
+  },
+  "eqPresetNight": "Night",
+  "@eqPresetNight": {
+    "description": "eq.preset.night"
+  },
+  "eqPresetParty": "Party",
+  "@eqPresetParty": {
+    "description": "eq.preset.party"
+  },
+  "eqPresetPop": "Pop",
+  "@eqPresetPop": {
+    "description": "eq.preset.pop"
+  },
+  "eqPresetReggae": "Reggae",
+  "@eqPresetReggae": {
+    "description": "eq.preset.reggae"
+  },
+  "eqPresetRock": "Rock",
+  "@eqPresetRock": {
+    "description": "eq.preset.rock"
+  },
+  "eqPresetSka": "Ska",
+  "@eqPresetSka": {
+    "description": "eq.preset.ska"
+  },
+  "eqPresetSoft": "Soft",
+  "@eqPresetSoft": {
+    "description": "eq.preset.soft"
+  },
+  "eqPresetSoftRock": "Soft rock",
+  "@eqPresetSoftRock": {
+    "description": "eq.preset.soft_rock"
+  },
+  "pageStations": "Stations",
+  "@pageStations": {
+    "description": "page.stations"
+  },
+  "stPresets": "Buttons",
+  "@stPresets": {
+    "description": "st.presets"
+  },
+  "stPresetEmpty": "Empty",
+  "@stPresetEmpty": {
+    "description": "st.preset_empty"
+  },
+  "stPresetStore": "Store here",
+  "@stPresetStore": {
+    "description": "st.preset_store"
+  },
+  "stPresetN": "button {n}",
+  "@stPresetN": {
+    "description": "st.preset_n",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "stAll": "All stations · {n}",
+  "@stAll": {
+    "description": "st.all",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "stNone": "No stations",
+  "@stNone": {
+    "description": "st.none"
+  },
+  "stLoadFailed": "The station list is unavailable",
+  "@stLoadFailed": {
+    "description": "st.load_failed"
+  },
+  "catInPreset": "On button {n}: {name}",
+  "@catInPreset": {
+    "description": "cat.in_preset",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "manageKeep": "Keep this station in favourites",
+  "@manageKeep": {
+    "description": "manage.keep"
+  },
+  "manageKept": "Station added to the list",
+  "@manageKept": {
+    "description": "manage.kept"
+  },
+  "appLoadFailed": "Could not load",
+  "@appLoadFailed": {
+    "description": "app.load_failed"
+  },
   "sysScheme": "Colour scheme",
   "@sysScheme": {
     "description": "sys.scheme"
@@ -388,6 +582,10 @@
   "mobPanel": "Panel",
   "@mobPanel": {
     "description": "mob.panel"
+  },
+  "mobPanelSettings": "Panel settings",
+  "@mobPanelSettings": {
+    "description": "mob.panel_settings"
   },
   "mobPanels": "Panels",
   "@mobPanels": {

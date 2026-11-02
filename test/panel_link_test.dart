@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -205,6 +206,82 @@ void main() {
     expect(await api.cover('3'), [1, 2, 3]);
     panel.cover = null;
     expect(await api.cover('4'), isNull);
+  });
+
+  test(
+    'a sound is chosen on the panel\'s version even when it moved meanwhile',
+    () async {
+      final api = PanelDeviceApi(link);
+      final presets = await api.soundPresets();
+      expect(presets.preset, 'rock');
+      expect(presets.presets, ['custom', 'flat', 'pop', 'rock']);
+      panel.eqConflict = true;
+      await api.chooseSound('pop');
+      expect(panel.eqPreset, 'pop');
+      await api.keepSound();
+      expect(panel.eqKeeps, 1);
+    },
+  );
+
+  test('the station list: a preset naming no station is empty', () async {
+    final api = PanelDeviceApi(link);
+    final list = await api.stations();
+    expect(list.stations.map((s) => s.name), [
+      'Radio Lantern',
+      'Northbound FM',
+    ]);
+    expect(list.presets, [1, 0, -1, -1, -1, -1]);
+  });
+
+  test('what plays goes onto a preset by the catalog\'s keys, its name cut to 63 bytes', () async {
+    final long = 'Радіо ${'Ж' * 40}';
+    panel.state
+      ..['audio.source'] = 5
+      ..['radio.station'] = -1
+      ..['radio.name'] = long
+      ..['radio.url'] = 'http://a.invalid/x'
+      ..['radio.uuid'] = 'u9';
+    final api = PanelDeviceApi(link);
+    await until(() => api.current.known);
+    expect(api.current.radio.keepable, isTrue);
+    await api.storePreset(2);
+    final body = (panel.requests.last.body! as Map).cast<String, Object?>();
+    final name = body['radio.web_name']! as String;
+    expect(utf8.encode(name).length, lessThanOrEqualTo(63));
+    expect(long.startsWith(name), isTrue);
+    expect(body['radio.web_url'], 'http://a.invalid/x');
+    expect(body['radio.web_uuid'], 'u9');
+    expect(body['radio.web_act'], 4);
+    expect(body['radio.fav_add'], true);
+  });
+
+  test(
+    'listen tunes another station, or plays the tuned one when it is off',
+    () async {
+      panel.state
+        ..['audio.source'] = 5
+        ..['radio.station'] = 0
+        ..['radio.state'] = 'idle'
+        ..['radio.name'] = 'Radio Lantern';
+      final api = PanelDeviceApi(link);
+      await until(() => api.current.known);
+      await api.listen(1);
+      expect(panel.requests.last.body, {'radio.station': 1});
+      panel.change({'radio.station': 0});
+      await until(() => api.current.radio.current == 0);
+      await api.listen(0);
+      expect(panel.requests.last.body, {'radio.cmd': 1});
+    },
+  );
+
+  test('the loudness comes back at the strength the panel kept', () async {
+    panel.state['audio.loud_back'] = 60;
+    final api = PanelDeviceApi(link);
+    await until(() => api.current.known);
+    await api.setLoudness(true);
+    expect(panel.requests.last.body, {'audio.loudness': 60});
+    await api.setLoudness(false);
+    expect(panel.requests.last.body, {'audio.loudness': 0});
   });
 
   test('an address as a person types it', () {

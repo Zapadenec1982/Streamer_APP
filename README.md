@@ -31,7 +31,9 @@ Nothing the firmware already defines is written a second time:
 | `lib/l10n/app_<lang>.arb` | `tool/gen_l10n.py` | the web's catalogs `webui/src/i18n/<lang>.json`, the keys in `l10n/shared.txt`; app-only strings are in `l10n/app_<lang>.json` |
 | `protocol/state_meta.json` | `tool/sync_state_meta.py` | the state keys, from the modules' manifests (`modules/<name>/manifest.json`) as `tools/generate_ui.py` projects them |
 | `protocol/now_faces.json` | `tool/now_faces.mjs` (Node, local) | what the web shows for a state: the firmware's `webui/src/stores/now.js` run on the cases written there; the Dart port `lib/device/face.dart` is tested on it |
+| `protocol/station_badges.json` | `tool/station_badges.mjs` (Node, local) | a station's stand-in disc: the firmware's `webui/src/lib/stationbadge.js` on the glass's pinned names and more; the Dart port `lib/ui/station_badge.dart` is tested on it |
 
-The scripts read a firmware checkout named by `MODESP_PLAYER_ROOT` (default `../modesp-player`)
-and take `--check`. `now_faces.mjs` also needs the firmware's `webui/node_modules`, so CI tests
-only the Dart side of it. `tool/firmware_ref` is the firmware commit CI checks them against.
+The scripts read a firmware checkout named by `MODESP_PLAYER_ROOT` (default `../modesp-player`) and
+take `--check`. `now_faces.mjs` also needs the firmware's `webui/node_modules`; CI tests only the
+Dart side of it and of `station_badges.mjs`. `tool/firmware_ref` is the firmware commit CI checks
+them against.

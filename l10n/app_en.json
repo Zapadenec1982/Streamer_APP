@@ -22,5 +22,6 @@
   "mob.no_panel_note": "The phone and the panel need to be on the same Wi-Fi",
   "mob.find": "Find a panel",
   "mob.try_demo": "Try the demo",
-  "mob.forget": "Forget"
+  "mob.forget": "Forget",
+  "mob.panel_settings": "Panel settings"
 }

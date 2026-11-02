@@ -31,8 +31,9 @@ flutter build apk --debug
 | `lib/l10n/app_<lang>.arb` | `tool/gen_l10n.py` | каталоги вебу `webui/src/i18n/<lang>.json`, ключі зі `l10n/shared.txt`; рядки лише застосунку — у `l10n/app_<lang>.json` |
 | `protocol/state_meta.json` | `tool/sync_state_meta.py` | ключі стану з маніфестів модулів (`modules/<name>/manifest.json`), як їх проєктує `tools/generate_ui.py` |
 | `protocol/now_faces.json` | `tool/now_faces.mjs` (Node, локально) | що показує веб для стану: `webui/src/stores/now.js` прошивки на записаних там випадках; на ньому тестується Dart-порт `lib/device/face.dart` |
+| `protocol/station_badges.json` | `tool/station_badges.mjs` (Node, локально) | «диск» станції замість логотипа: `webui/src/lib/stationbadge.js` прошивки на закріплених іменах скла і ще кількох; на ньому тестується Dart-порт `lib/ui/station_badge.dart` |
 
-Скрипти читають репозиторій прошивки, шлях до якого — `MODESP_PLAYER_ROOT` (за
-замовчуванням `../modesp-player`), і приймають `--check`. `now_faces.mjs` потребує ще
-`webui/node_modules` прошивки, тож CI перевіряє лише його бік Dart. `tool/firmware_ref` — коміт
+Скрипти читають репозиторій прошивки, шлях до якого — `MODESP_PLAYER_ROOT` (за замовчуванням
+`../modesp-player`), і приймають `--check`. `now_faces.mjs` потребує ще `webui/node_modules`
+прошивки; CI перевіряє лише бік Dart — його і `station_badges.mjs`. `tool/firmware_ref` — коміт
 прошивки, з яким їх звіряє CI.

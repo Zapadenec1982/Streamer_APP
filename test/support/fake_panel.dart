@@ -20,6 +20,27 @@ class FakePanel {
   bool busy = false;
 
   Uint8List? cover;
+
+  /// The EQ document (`/api/eq`): its revision, the sound it plays, the sounds it offers.
+  int eqRev = 7;
+  String eqPreset = 'rock';
+  List<String> eqPresets = const ['custom', 'flat', 'pop', 'rock'];
+
+  /// The next EQ edit finds the document moved on the panel: 409, once.
+  bool eqConflict = false;
+  int eqKeeps = 0;
+
+  /// `/api/stations`: its generation, the list and the six presets.
+  Map<String, Object?> stations = const {
+    'rev': 3,
+    'list': {
+      'stations': [
+        {'name': 'Radio Lantern', 'url': 'http://a.invalid/1', 'uuid': 'u1'},
+        {'name': 'Northbound FM', 'url': 'http://a.invalid/2'},
+      ],
+      'presets': [1, 0, 9, -1, -1, -1],
+    },
+  };
   final requests =
       <({String method, String path, String? contentType, Object? body})>[];
   int connections = 0;
@@ -106,6 +127,34 @@ class FakePanel {
       case ('POST', '/api/settings'):
         _apply((body! as Map).cast<String, Object?>());
         return _reply(req, 200, {'ok': true});
+      case ('GET', '/api/eq'):
+        return _reply(req, 200, {
+          'rev': eqRev,
+          'fs': 48000,
+          'preset': eqPreset,
+          'presets': eqPresets,
+          'bands': const [],
+        });
+      case ('POST', '/api/eq'):
+        final edit = (body! as Map).cast<String, Object?>();
+        if (edit['keep'] == true) {
+          eqKeeps++;
+          return _reply(req, 200, {'rev': eqRev});
+        }
+        if (eqConflict) {
+          eqConflict = false;
+          eqRev++;
+          return _reply(req, 409, {'error': 'changed', 'rev': eqRev});
+        }
+        if (edit['rev'] != eqRev) {
+          return _reply(req, 409, {'error': 'changed', 'rev': eqRev});
+        }
+        eqPreset = edit['preset']! as String;
+        eqRev++;
+        change({'audio.eq_rev': eqRev});
+        return _reply(req, 200, {'rev': eqRev});
+      case ('GET', '/api/stations'):
+        return _reply(req, 200, stations);
       case ('GET', '/api/cover'):
         final bytes = cover;
         if (bytes == null) return _reply(req, 404, {'error': 'not_found'});

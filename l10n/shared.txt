@@ -74,6 +74,54 @@ auth.locked
 pass.show
 pass.hide
 
+# the sound
+sys.sound
+sound.styles
+sound.bass
+sound.treble
+sound.eq_off
+sound.eq_on
+sound.leveler
+eq.loudness
+page.eq
+eq.preset.bass_treble
+eq.preset.classical
+eq.preset.club
+eq.preset.custom
+eq.preset.dance
+eq.preset.electronic
+eq.preset.flat
+eq.preset.headphones
+eq.preset.hiphop
+eq.preset.jazz
+eq.preset.large_hall
+eq.preset.live
+eq.preset.loudness
+eq.preset.more_bass
+eq.preset.more_treble
+eq.preset.night
+eq.preset.party
+eq.preset.pop
+eq.preset.reggae
+eq.preset.rock
+eq.preset.ska
+eq.preset.soft
+eq.preset.soft_rock
+
+# the stations
+page.stations
+st.presets
+st.preset_empty
+st.preset_store
+st.preset_n
+st.all
+st.none
+st.load_failed
+cat.in_preset
+manage.keep
+manage.kept
+app.load_failed
+
 # settings
 sys.scheme
 sys.scheme_amber

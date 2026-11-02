@@ -6,6 +6,7 @@ import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'web_link.dart';
 
 /// The app's own settings. The panel's settings stay in its web interface (plan, §1).
 class SettingsPage extends ConsumerWidget {
@@ -41,6 +42,13 @@ class SettingsPage extends ConsumerWidget {
               onTap: () => context.go('/settings/panels'),
             ),
           },
+          if (ref.watch(activePanelProvider) is RealPanel)
+            ListTile(
+              leading: const Icon(Icons.settings_applications_outlined),
+              title: Text(l.mobPanelSettings),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => openWeb(context, ref, 'system'),
+            ),
           _Header(l.mobApp),
           ListTile(
             leading: const Icon(Icons.language),

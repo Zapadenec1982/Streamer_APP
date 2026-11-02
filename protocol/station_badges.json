@@ -1,0 +1,322 @@
+[
+  {
+    "name": "106.5 Kiss FM",
+    "badge": {
+      "label": "KISS",
+      "first": "K",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "Kiss FM",
+    "badge": {
+      "label": "KISS",
+      "first": "K",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "BBC Radio 1",
+    "badge": {
+      "label": "BBC",
+      "first": "B",
+      "color": "#74682e"
+    }
+  },
+  {
+    "name": "Radio Swiss Jazz",
+    "badge": {
+      "label": "SWISS",
+      "first": "S",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "Radio ROKS",
+    "badge": {
+      "label": "ROKS",
+      "first": "R",
+      "color": "#006f9e"
+    }
+  },
+  {
+    "name": "Хіт FM",
+    "badge": {
+      "label": "ХІТ",
+      "first": "Х",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "Люкс FM",
+    "badge": {
+      "label": "ЛЮКС",
+      "first": "Л",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "Радіо НВ",
+    "badge": {
+      "label": "НВ",
+      "first": "Н",
+      "color": "#006f9e"
+    }
+  },
+  {
+    "name": "Radio Złote Przeboje",
+    "badge": {
+      "label": "ZŁOTE",
+      "first": "Z",
+      "color": "#63629b"
+    }
+  },
+  {
+    "name": "ö1 Klassik",
+    "badge": {
+      "label": "Ö1",
+      "first": "Ö",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "101.ru: Relax",
+    "badge": {
+      "label": "RU",
+      "first": "R",
+      "color": "#63629b"
+    }
+  },
+  {
+    "name": "Deutschlandfunk Kultur",
+    "badge": {
+      "label": "DK",
+      "first": "D",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "Deutschlandfunk",
+    "badge": {
+      "label": "D",
+      "first": "D",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "SomaFM Groove Salad",
+    "badge": {
+      "label": "SGS",
+      "first": "S",
+      "color": "#92537c"
+    }
+  },
+  {
+    "name": "Radio Paradise Main",
+    "badge": {
+      "label": "RPM",
+      "first": "R",
+      "color": "#74682e"
+    }
+  },
+  {
+    "name": "Радіо Релакс",
+    "badge": {
+      "label": "РР",
+      "first": "Р",
+      "color": "#74682e"
+    }
+  },
+  {
+    "name": "Радио Рекорд",
+    "badge": {
+      "label": "РР",
+      "first": "Р",
+      "color": "#92537c"
+    }
+  },
+  {
+    "name": "Rádio Comercial",
+    "badge": {
+      "label": "RC",
+      "first": "R",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "Nightride FM",
+    "badge": {
+      "label": "NF",
+      "first": "N",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "Paradise Radio Main Mix EU",
+    "badge": {
+      "label": "PRM",
+      "first": "P",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "шансон",
+    "badge": {
+      "label": "Ш",
+      "first": "Ш",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "Radio 1",
+    "badge": {
+      "label": "RADIO",
+      "first": "R",
+      "color": "#92537c"
+    }
+  },
+  {
+    "name": "радіо",
+    "badge": {
+      "label": "РАДІО",
+      "first": "Р",
+      "color": "#8f5c38"
+    }
+  },
+  {
+    "name": "538",
+    "badge": {
+      "label": "538",
+      "first": "5",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "",
+    "badge": {
+      "label": "",
+      "first": "",
+      "color": "#006f9e"
+    }
+  },
+  {
+    "name": "— · —",
+    "badge": {
+      "label": "",
+      "first": "",
+      "color": "#63629b"
+    }
+  },
+  {
+    "name": "🎵 Chill",
+    "badge": {
+      "label": "CHILL",
+      "first": "C",
+      "color": "#92537c"
+    }
+  },
+  {
+    "name": "SomaFM Drone Zone",
+    "badge": {
+      "label": "SDZ",
+      "first": "S",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "Radio Paradise Mellow",
+    "badge": {
+      "label": "RPM",
+      "first": "R",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "Radio Lantern",
+    "badge": {
+      "label": "RL",
+      "first": "R",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "Northbound FM",
+    "badge": {
+      "label": "NF",
+      "first": "N",
+      "color": "#8f5c38"
+    }
+  },
+  {
+    "name": "Ελληνικό Ράδιο",
+    "badge": {
+      "label": "ΕΡ",
+      "first": "Ε",
+      "color": "#467342"
+    }
+  },
+  {
+    "name": "Ąžuolas",
+    "badge": {
+      "label": "Ą",
+      "first": "Ą",
+      "color": "#74682e"
+    }
+  },
+  {
+    "name": "Ÿ",
+    "badge": {
+      "label": "Ÿ",
+      "first": "Ÿ",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "ıstanbul",
+    "badge": {
+      "label": "I",
+      "first": "I",
+      "color": "#8f5c38"
+    }
+  },
+  {
+    "name": "Ґанок ФМ",
+    "badge": {
+      "label": "ҐАНОК",
+      "first": "Ґ",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "ǅungla",
+    "badge": {
+      "label": "ǅ",
+      "first": "ǅ",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "a b c d e",
+    "badge": {
+      "label": "A",
+      "first": "A",
+      "color": "#18746b"
+    }
+  },
+  {
+    "name": "123 456",
+    "badge": {
+      "label": "123",
+      "first": "1",
+      "color": "#9d5252"
+    }
+  },
+  {
+    "name": "Radio",
+    "badge": {
+      "label": "RADIO",
+      "first": "R",
+      "color": "#18746b"
+    }
+  }
+]

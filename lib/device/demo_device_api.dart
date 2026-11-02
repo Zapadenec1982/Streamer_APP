@@ -25,7 +25,7 @@ class DemoDeviceApi implements DeviceApi {
 
   static const panelName = 'ModESP';
   static const phoneName = 'Phone';
-  static const stationCount = 12;
+  static int get stationCount => _stations.length;
   static const cardTrackCount = 248;
 
   static const _second = Duration(seconds: 1);
@@ -58,6 +58,27 @@ class DemoDeviceApi implements DeviceApi {
     ('Radio Lantern', 'Lantern Theory - Amber Hours'),
     ('Northbound FM', 'Northbound Echo - Tidewater Static'),
     ('Cedar Jazz', 'Cedar Line - Glasshouse'),
+    ('Harbour Lights FM', 'Lantern Theory - Seven Quiet Rooms'),
+    ('Amber Wave', 'Northbound Echo - Copper Lanterns'),
+    ('Low Tide Radio', 'Cedar Line - Low Tide Lamps'),
+    ('Copper Street', 'Lantern Theory - Amber Hours'),
+    ('Glasshouse Radio', 'Cedar Line - Northern Window'),
+    ('Quiet Engines FM', 'Northbound Echo - Tidewater Static'),
+    ('Night Shift Radio', 'Lantern Theory - Seven Quiet Rooms'),
+    ('Salt and Cedar', 'Cedar Line - Glasshouse'),
+    ('Eastern Window', 'Northbound Echo - Copper Lanterns'),
+  ];
+
+  /// The sounds the panel offers (eq_presets.cpp's eight).
+  static const _sounds = [
+    'custom',
+    'flat',
+    'pop',
+    'rock',
+    'jazz',
+    'classical',
+    'electronic',
+    'hiphop',
   ];
 
   final _changes = StreamController<DeviceSnapshot>.broadcast();
@@ -74,6 +95,15 @@ class DemoDeviceApi implements DeviceApi {
   bool _cardPlaying = true;
   Duration _cardPosition = Duration.zero;
   int _station = 0;
+  final _presets = [0, 1, 2, -1, -1, -1];
+  int _listRev = 1;
+  String _sound = 'rock';
+  int _eqRev = 1;
+  int _bass = 2;
+  int _treble = 0;
+  bool _loudness = true;
+  bool _eqOn = true;
+  bool _leveler = false;
   Duration _tuningLeft = Duration.zero;
 
   @override
@@ -153,6 +183,84 @@ class DemoDeviceApi implements DeviceApi {
     if (changed) _emit();
   }
 
+  @override
+  Future<SoundPresets> soundPresets() async =>
+      SoundPresets(rev: _eqRev, preset: _sound, presets: _sounds);
+
+  @override
+  Future<void> chooseSound(String id) async {
+    if (id == _sound || !_sounds.contains(id)) return;
+    _sound = id;
+    _eqRev++;
+    _emit();
+  }
+
+  @override
+  Future<void> keepSound() async {}
+
+  @override
+  Future<void> setBass(int db) async {
+    _bass = db.clamp(-6, 6);
+    _emit();
+  }
+
+  @override
+  Future<void> setTreble(int db) async {
+    _treble = db.clamp(-6, 6);
+    _emit();
+  }
+
+  @override
+  Future<void> setLoudness(bool on) async {
+    _loudness = on;
+    _emit();
+  }
+
+  @override
+  Future<void> setEqOn(bool on) async {
+    _eqOn = on;
+    _emit();
+  }
+
+  @override
+  Future<void> setLeveler(bool on) async {
+    _leveler = on;
+    _emit();
+  }
+
+  @override
+  Future<StationList> stations() async => StationList(
+    rev: _listRev,
+    stations: [
+      for (final (name, _) in _stations)
+        Station(name: name, url: 'http://demo.invalid/$name'),
+    ],
+    presets: List.of(_presets),
+  );
+
+  @override
+  Future<void> listen(int index) async {
+    if (index < 0 || index >= _stations.length || index == _station) return;
+    _station = index;
+    _tuningLeft = _tuning;
+    _emit();
+  }
+
+  @override
+  Future<void> storePreset(int slot) async {
+    if (slot < 0 || slot >= _presets.length) return;
+    _presets[slot] = _station;
+    _listRev++;
+    _emit();
+  }
+
+  @override
+  Future<void> keepStation() async {}
+
+  /// The demo has no web interface.
+  @override
+  Uri? web(String route) => null;
+
   /// The demo draws its own covers (CoverArt).
   @override
   Future<Uint8List?> cover(String key) async => null;
@@ -200,6 +308,20 @@ class DemoDeviceApi implements DeviceApi {
       ],
       volume: _volume,
       muted: _muted,
+      sound: SoundState(
+        bass: _bass,
+        treble: _treble,
+        loudness: _loudness,
+        eqOn: _eqOn,
+        leveler: _leveler,
+        eqRev: _eqRev,
+      ),
+      radio: StationState(
+        current: _station,
+        count: _stations.length,
+        listRev: _listRev,
+        storable: true,
+      ),
     );
   }
 
@@ -212,8 +334,7 @@ class DemoDeviceApi implements DeviceApi {
       SourceCard.bt => playingTitle ?? const LineLabel(CatalogLine.phoneOn),
       SourceCard.airplay => const LineLabel(CatalogLine.airplayWait),
       SourceCard.radio =>
-        playingTitle ??
-            const LineLabel(CatalogLine.stations, count: stationCount),
+        playingTitle ?? LineLabel(CatalogLine.stations, count: stationCount),
       SourceCard.card =>
         playingTitle ??
             const LineLabel(CatalogLine.tracks, count: cardTrackCount),

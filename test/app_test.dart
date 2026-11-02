@@ -174,6 +174,64 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
   });
 
+  testWidgets(
+    'the Sound sheet: a sound, Bass, Treble, loudness, the way to the equalizer',
+    (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.text('Звук'));
+      await tester.pumpAndSettle();
+      expect(find.text('Бас'), findsOneWidget);
+      expect(find.text('Високі'), findsOneWidget);
+      expect(find.text('Тонкомпенсація'), findsOneWidget);
+      expect(find.text('Еквалайзер'), findsOneWidget);
+      await tester.tap(find.byType(DropdownMenu<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Джаз').last);
+      await tester.pumpAndSettle();
+      expect((await api.soundPresets()).preset, 'jazz');
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      expect(api.current.sound.loudness, isFalse);
+    },
+  );
+
+  testWidgets('the moon turns the night leveler on and off', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(find.byTooltip('Вирівнювання гучності'));
+    await tester.pumpAndSettle();
+    expect(api.current.sound.leveler, isTrue);
+  });
+
+  testWidgets('a station: its name between ‹ ›, the presets, every station', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await api.selectSource(SourceId.radio);
+    api.tick(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.text('Radio Lantern'), findsWidgets);
+    expect(
+      find.byTooltip('Пауза'),
+      findsNothing,
+      reason: 'a station has no transport row',
+    );
+    // a tap on a preset tunes it
+    await tester.tap(find.text('Northbound FM'));
+    await tester.pumpAndSettle();
+    expect(api.current.radio.current, 1);
+    // a hold on an empty one stores what plays
+    await tester.longPress(find.text('Зберегти сюди').first);
+    await tester.pumpAndSettle();
+    expect((await api.stations()).presets[3], 1);
+    await tester.tap(find.text('Усі станції · 12'));
+    await tester.pumpAndSettle();
+    expect(find.text('Станції'), findsOneWidget);
+    await tester.tap(find.text('Cedar Jazz'));
+    await tester.pumpAndSettle();
+    expect(api.current.radio.current, 2);
+    expect(find.text('Станції'), findsNothing);
+  });
+
   testWidgets('with no panel yet: what to do, and the demo a tap away', (
     tester,
   ) async {

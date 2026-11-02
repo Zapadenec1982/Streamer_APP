@@ -62,6 +62,35 @@ extension Words on AppLocalizations {
     CatalogLine.usbWait => srcsubUsbWait,
   };
 
+  /// A sound by its id (the firmware's eq_presets.cpp), as the web's lib/sounds.js names it; its id
+  /// for one this build does not know.
+  String soundName(String id) => switch (id) {
+    'bass_treble' => eqPresetBassTreble,
+    'classical' => eqPresetClassical,
+    'club' => eqPresetClub,
+    'custom' => eqPresetCustom,
+    'dance' => eqPresetDance,
+    'electronic' => eqPresetElectronic,
+    'flat' => eqPresetFlat,
+    'headphones' => eqPresetHeadphones,
+    'hiphop' => eqPresetHiphop,
+    'jazz' => eqPresetJazz,
+    'large_hall' => eqPresetLargeHall,
+    'live' => eqPresetLive,
+    'loudness' => eqPresetLoudness,
+    'more_bass' => eqPresetMoreBass,
+    'more_treble' => eqPresetMoreTreble,
+    'night' => eqPresetNight,
+    'party' => eqPresetParty,
+    'pop' => eqPresetPop,
+    'reggae' => eqPresetReggae,
+    'rock' => eqPresetRock,
+    'ska' => eqPresetSka,
+    'soft' => eqPresetSoft,
+    'soft_rock' => eqPresetSoftRock,
+    _ => id,
+  };
+
   /// The panel's colour scheme `ui.theme` by name.
   String schemeName(int scheme) => switch (scheme) {
     1 => sysSchemeBlue,

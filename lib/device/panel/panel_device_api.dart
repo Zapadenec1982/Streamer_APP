@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import '../device_api.dart';
@@ -57,6 +58,86 @@ class PanelDeviceApi implements DeviceApi {
     // the radio plays as it is chosen, as the glass and the web do (screen_src.cpp)
     if (source == SourceId.radio) Keys.radioCmd.name: 1,
   });
+
+  @override
+  Future<SoundPresets> soundPresets() async =>
+      presetsOf(await link.getJson('/api/eq'));
+
+  @override
+  Future<void> chooseSound(String id) async {
+    var now = await soundPresets();
+    if (now.preset == id) return;
+    try {
+      await link.postJson('/api/eq', {'rev': now.rev, 'preset': id});
+    } on PanelError catch (e) {
+      // the panel changed the document meanwhile: the choice is made on its version
+      if (e.status != 409) rethrow;
+      now = await soundPresets();
+      await link.postJson('/api/eq', {'rev': now.rev, 'preset': id});
+    }
+  }
+
+  @override
+  Future<void> keepSound() => link.postJson('/api/eq', {'keep': true});
+
+  @override
+  Future<void> setBass(int db) =>
+      link.write({Keys.audioBassDb.name: db.clamp(-6, 6)});
+
+  @override
+  Future<void> setTreble(int db) =>
+      link.write({Keys.audioTrebleDb.name: db.clamp(-6, 6)});
+
+  /// On puts back the strength it had, which the panel keeps (audio.loud_back), so the glass, the
+  /// web and the app put back the same one.
+  @override
+  Future<void> setLoudness(bool on) {
+    final back = Keys.audioLoudBack.of(link.state) ?? 0;
+    return link.write({
+      Keys.audioLoudness.name: on ? (back > 0 ? back : 70) : 0,
+    });
+  }
+
+  @override
+  Future<void> setEqOn(bool on) => link.write({Keys.audioEqEnabled.name: on});
+
+  @override
+  Future<void> setLeveler(bool on) => link.write({Keys.audioLeveler.name: on});
+
+  @override
+  Future<StationList> stations() async =>
+      stationsOf(await link.getJson('/api/stations'));
+
+  @override
+  Future<void> listen(int index) {
+    final s = link.state;
+    if (index != (Keys.radioStation.of(s) ?? -1)) {
+      return link.write({Keys.radioStation.name: index});
+    }
+    if (_current.now.playing) return Future.value();
+    return link.write({Keys.radioCmd.name: 1});
+  }
+
+  /// Through the catalog's route, as the web does: radio.web_* names the station as the panel says
+  /// it plays, radio.web_act 2…7 the button; a catalog station also goes into the list.
+  @override
+  Future<void> storePreset(int slot) {
+    final s = link.state;
+    return link.write({
+      Keys.radioWebName.name: fitName(Keys.radioName.of(s) ?? ''),
+      Keys.radioWebUrl.name: Keys.radioUrl.of(s) ?? '',
+      Keys.radioWebUuid.name: Keys.radioUuid.of(s) ?? '',
+      Keys.radioWebAct.name: slot + 2,
+      if ((Keys.radioStation.of(s) ?? -1) < 0) Keys.radioFavAdd.name: true,
+    });
+  }
+
+  @override
+  Future<void> keepStation() => link.write({Keys.radioFavAdd.name: true});
+
+  @override
+  Uri? web(String route) =>
+      link.endpoint.http('/').replace(fragment: '/$route');
 
   /// The Player's cover: the panel's 280-pixel tile as a BMP (the firmware's UI.md, "Module HTTP
   /// routes"), asked again only when `ui.cover` names another picture — and then with the ETag of
@@ -119,7 +200,78 @@ DeviceSnapshot snapshotOf(
       final rgb? when rgb > 0 => rgb,
       _ => null,
     },
+    sound: SoundState(
+      bass: Keys.audioBassDb.of(s) ?? 0,
+      treble: Keys.audioTrebleDb.of(s) ?? 0,
+      loudness: (Keys.audioLoudness.of(s) ?? 0) > 0,
+      eqOn: Keys.audioEqEnabled.of(s) ?? true,
+      leveler: Keys.audioLeveler.of(s),
+      eqRev: Keys.audioEqRev.of(s) ?? 0,
+    ),
+    radio: radioOf(s),
   );
+}
+
+StationState radioOf(Map<String, Object?> s) {
+  final current = Keys.radioStation.of(s) ?? -1;
+  return StationState(
+    current: current,
+    count: Keys.radioCount.of(s) ?? 0,
+    listRev: Keys.radioListRev.of(s) ?? 0,
+    storable:
+        (Keys.radioUrl.of(s) ?? '').isNotEmpty &&
+        (current >= 0 || (Keys.radioName.of(s) ?? '').isNotEmpty),
+  );
+}
+
+/// `GET /api/eq` as the app needs it.
+SoundPresets presetsOf(Object? json) {
+  final d = json is Map ? json : const {};
+  return SoundPresets(
+    rev: d['rev'] is int ? d['rev'] as int : 0,
+    preset: d['preset'] is String ? d['preset'] as String : '',
+    presets: [
+      for (final p in d['presets'] is List ? d['presets'] as List : const [])
+        if (p is String) p,
+    ],
+  );
+}
+
+/// `GET /api/stations`: a preset that names no station of the list is empty.
+StationList stationsOf(Object? json) {
+  final d = json is Map ? json : const {};
+  final list = d['list'] is Map ? d['list'] as Map : const {};
+  final stations = [
+    for (final st
+        in list['stations'] is List ? list['stations'] as List : const [])
+      if (st is Map && st['name'] is String && st['url'] is String)
+        Station(
+          name: st['name'] as String,
+          url: st['url'] as String,
+          uuid: st['uuid'] is String ? st['uuid'] as String : '',
+        ),
+  ];
+  final raw = list['presets'] is List ? list['presets'] as List : const [];
+  return StationList(
+    rev: d['rev'] is int ? d['rev'] as int : 0,
+    stations: stations,
+    presets: [
+      for (var i = 0; i < StationList.presetCount; i++)
+        switch (i < raw.length ? raw[i] : null) {
+          final int p when p >= 0 && p < stations.length => p,
+          _ => -1,
+        },
+    ],
+  );
+}
+
+/// The name cut to the panel's 63 bytes of UTF-8, at a character, never inside one.
+String fitName(String name) {
+  var runes = name.trim().runes.toList();
+  while (utf8.encode(String.fromCharCodes(runes)).length > 63) {
+    runes = runes.sublist(0, runes.length - 1);
+  }
+  return String.fromCharCodes(runes);
 }
 
 /// What the Player shows: the face, with the buttons the panel says the source takes.

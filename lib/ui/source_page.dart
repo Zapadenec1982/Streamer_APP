@@ -6,6 +6,7 @@ import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'labels.dart';
+import 'web_link.dart';
 import 'writes.dart';
 
 /// The panel's sources as cards, the playing one filled (webui SourcePage, screen_src.cpp).
@@ -105,10 +106,8 @@ class _Card extends ConsumerWidget {
 
   void _open(BuildContext context, WidgetRef ref, AppLocalizations l) {
     if (state.card == SourceCard.servers) {
-      // The media server browser stays in the panel's web interface (plan, §1).
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(l.mobInWeb)));
+      // the media server browser stays in the panel's web interface (plan, §1)
+      openWeb(context, ref, 'dlna');
       return;
     }
     // a tap is "listen": the source is set and the Player opens, as on the glass and the web

@@ -50,6 +50,31 @@ abstract final class Keys {
   static const radioCount = StateKey<int>('radio.count');
   static const radioName = StateKey<String>('radio.name');
   static const usbAudioState = StateKey<String>('usb_audio.state');
+  static const audioBassDb = StateKey<int>('audio.bass_db', writable: true);
+  static const audioTrebleDb = StateKey<int>('audio.treble_db', writable: true);
+  static const audioLoudness = StateKey<int>('audio.loudness', writable: true);
+  static const audioLoudBack = StateKey<int>('audio.loud_back');
+  static const audioEqEnabled = StateKey<bool>(
+    'audio.eq_enabled',
+    writable: true,
+  );
+  static const audioEqRev = StateKey<int>('audio.eq_rev');
+  static const audioLeveler = StateKey<bool>('audio.leveler', writable: true);
+  static const radioStation = StateKey<int>('radio.station', writable: true);
+  static const radioListRev = StateKey<int>('radio.list_rev');
+  static const radioUrl = StateKey<String>('radio.url');
+  static const radioUuid = StateKey<String>('radio.uuid');
+  static const radioWebName = StateKey<String>(
+    'radio.web_name',
+    writable: true,
+  );
+  static const radioWebUrl = StateKey<String>('radio.web_url', writable: true);
+  static const radioWebUuid = StateKey<String>(
+    'radio.web_uuid',
+    writable: true,
+  );
+  static const radioWebAct = StateKey<int>('radio.web_act', writable: true);
+  static const radioFavAdd = StateKey<bool>('radio.fav_add', writable: true);
   static const mdnsHostname = StateKey<String>(
     'system.mdns_hostname',
     framework: true,
@@ -74,6 +99,22 @@ abstract final class Keys {
     radioCount,
     radioName,
     usbAudioState,
+    audioBassDb,
+    audioTrebleDb,
+    audioLoudness,
+    audioLoudBack,
+    audioEqEnabled,
+    audioEqRev,
+    audioLeveler,
+    radioStation,
+    radioListRev,
+    radioUrl,
+    radioUuid,
+    radioWebName,
+    radioWebUrl,
+    radioWebUuid,
+    radioWebAct,
+    radioFavAdd,
     mdnsHostname,
   ];
 }

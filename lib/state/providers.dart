@@ -213,6 +213,50 @@ class NoPanelApi implements DeviceApi {
   Future<void> selectSource(SourceId source) async {}
 
   @override
+  Future<SoundPresets> soundPresets() async =>
+      const SoundPresets(rev: 0, preset: '', presets: []);
+
+  @override
+  Future<void> chooseSound(String id) async {}
+
+  @override
+  Future<void> keepSound() async {}
+
+  @override
+  Future<void> setBass(int db) async {}
+
+  @override
+  Future<void> setTreble(int db) async {}
+
+  @override
+  Future<void> setLoudness(bool on) async {}
+
+  @override
+  Future<void> setEqOn(bool on) async {}
+
+  @override
+  Future<void> setLeveler(bool on) async {}
+
+  @override
+  Future<StationList> stations() async => const StationList(
+    rev: 0,
+    stations: [],
+    presets: [-1, -1, -1, -1, -1, -1],
+  );
+
+  @override
+  Future<void> listen(int index) async {}
+
+  @override
+  Future<void> storePreset(int slot) async {}
+
+  @override
+  Future<void> keepStation() async {}
+
+  @override
+  Uri? web(String route) => null;
+
+  @override
   Future<Uint8List?> cover(String key) async => null;
 
   @override

@@ -12,6 +12,7 @@ import 'ui/player_page.dart';
 import 'ui/settings_page.dart';
 import 'ui/shell.dart';
 import 'ui/source_page.dart';
+import 'ui/stations_page.dart';
 
 final routerProvider = Provider<GoRouter>(
   (ref) => GoRouter(
@@ -26,6 +27,12 @@ final routerProvider = Provider<GoRouter>(
                 path: '/player',
                 builder: (context, state) =>
                     const PanelPage(child: PlayerPage()),
+                routes: [
+                  GoRoute(
+                    path: 'stations',
+                    builder: (context, state) => const StationsPage(),
+                  ),
+                ],
               ),
             ],
           ),
