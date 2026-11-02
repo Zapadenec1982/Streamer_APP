@@ -1,5 +1,5 @@
-/// What the app knows about a panel, whichever [DeviceApi] it came from: the demo now, the
-/// panel's HTTP API and WebSocket later. Widgets read these and never a state key.
+/// What the app knows about a panel, whichever DeviceApi it came from: the demo, or the panel's
+/// HTTP API and WebSocket. Widgets read these and never a state key.
 library;
 
 /// The values of `audio.source` (the firmware's CONCEPT.md, "SharedState contract: sources").
@@ -16,6 +16,27 @@ enum SourceId {
   const SourceId(this.value);
 
   final int value;
+}
+
+/// Which face the Player shows: a source's, or DLNA's for a track a control point pushed, which
+/// rides the radio's source (the web's now.js `kind`).
+enum NowKind {
+  off(SourceId.off),
+  tone(SourceId.tone),
+  aux(SourceId.aux),
+  bt(SourceId.bt),
+  card(SourceId.card),
+  radio(SourceId.radio),
+  dlna(SourceId.radio),
+  airplay(SourceId.airplay),
+  usb(SourceId.usb);
+
+  const NowKind(this.source);
+
+  final SourceId source;
+
+  /// The Player names where the sound comes from, except for what is not played from anywhere.
+  bool get hasOrigin => this != off && this != tone && this != aux;
 }
 
 /// The Source page's cards, in the panel's order (screen_src.cpp CARDS). The media servers ride
@@ -36,13 +57,21 @@ enum SourceCard {
 /// A line the app's catalog words, rather than the panel: a state, a hint, a count.
 enum CatalogLine {
   noDevice,
+  dlnaTrack,
+  connecting,
+  buffering,
+  reconnecting,
+  stopped,
   airplayWaiting,
   airplayPick,
+  usb,
   usbWaiting,
   usbPick,
+  tone,
+  aux,
   off,
   pick,
-  connecting,
+  radio,
   phoneOn,
   phoneOff,
   servers,
@@ -61,9 +90,12 @@ sealed class Label {
 }
 
 final class TextLabel extends Label {
-  const TextLabel(this.text);
+  const TextLabel(this.text, {this.technical = false});
 
   final String text;
+
+  /// A rate or a frequency ("48.0 kHz 24 bit"), which a page writes in its language's units.
+  final bool technical;
 }
 
 final class LineLabel extends Label {
@@ -81,7 +113,7 @@ final class LineLabel extends Label {
 /// What the Player shows for the source that plays, and which buttons that source has.
 class NowPlaying {
   const NowPlaying({
-    required this.source,
+    required this.kind,
     required this.title,
     this.subtitle,
     this.device = '',
@@ -95,7 +127,7 @@ class NowPlaying {
     this.coverKey,
   });
 
-  final SourceId source;
+  final NowKind kind;
   final Label title;
   final Label? subtitle;
 
@@ -115,6 +147,8 @@ class NowPlaying {
 
   /// What the cover is of; null when there is none.
   final String? coverKey;
+
+  SourceId get source => kind.source;
 }
 
 /// One card on the Source page.
@@ -130,6 +164,18 @@ class SourceCardState {
   final Label status;
 }
 
+/// How the app hears the panel.
+enum LinkStatus {
+  /// The state is the panel's, as of now.
+  ready,
+
+  /// Connecting, or connecting again after the panel went quiet: the state shown is the last one.
+  connecting,
+
+  /// The panel has its three WebSocket clients already (close code 1013); trying again.
+  busy,
+}
+
 /// Everything a page needs about the panel at one moment.
 class DeviceSnapshot {
   const DeviceSnapshot({
@@ -139,6 +185,8 @@ class DeviceSnapshot {
     required this.cards,
     required this.volume,
     required this.muted,
+    this.status = LinkStatus.ready,
+    this.known = true,
   });
 
   /// The panel's device name — what AirPlay and Bluetooth list it by.
@@ -152,6 +200,10 @@ class DeviceSnapshot {
   /// 0…100 %.
   final int volume;
   final bool muted;
+  final LinkStatus status;
+
+  /// False until the panel has sent its state once: nothing above is the panel's yet.
+  final bool known;
 }
 
 enum TransportAction { toggle, previous, next }

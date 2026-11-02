@@ -217,7 +217,7 @@ class DemoDeviceApi implements DeviceApi {
       case SourceId.bt:
         final t = _phoneTracks[_phoneTrack];
         return NowPlaying(
-          source: SourceId.bt,
+          kind: NowKind.bt,
           title: TextLabel(t.title),
           subtitle: TextLabel(t.artist),
           device: phoneName,
@@ -233,7 +233,7 @@ class DemoDeviceApi implements DeviceApi {
       case SourceId.card:
         final t = _cardTracks[_cardTrack];
         return NowPlaying(
-          source: SourceId.card,
+          kind: NowKind.card,
           title: TextLabel(t.title),
           subtitle: TextLabel(t.artist),
           format: 'FLAC 44.1 kHz 16 bit',
@@ -249,7 +249,7 @@ class DemoDeviceApi implements DeviceApi {
         final (name, line) = _stations[_station];
         final tuning = _tuningLeft > Duration.zero;
         return NowPlaying(
-          source: SourceId.radio,
+          kind: NowKind.radio,
           title: TextLabel(name),
           subtitle: tuning
               ? const LineLabel(CatalogLine.connecting)
@@ -262,19 +262,19 @@ class DemoDeviceApi implements DeviceApi {
         );
       case SourceId.airplay:
         return const NowPlaying(
-          source: SourceId.airplay,
+          kind: NowKind.airplay,
           title: LineLabel(CatalogLine.airplayWaiting),
           subtitle: LineLabel(CatalogLine.airplayPick, name: panelName),
         );
       case SourceId.usb:
         return const NowPlaying(
-          source: SourceId.usb,
+          kind: NowKind.usb,
           title: LineLabel(CatalogLine.usbWaiting),
           subtitle: LineLabel(CatalogLine.usbPick, name: panelName),
         );
       case SourceId.off || SourceId.tone || SourceId.aux:
         return const NowPlaying(
-          source: SourceId.off,
+          kind: NowKind.off,
           title: LineLabel(CatalogLine.off),
           subtitle: LineLabel(CatalogLine.pick),
         );

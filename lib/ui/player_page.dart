@@ -31,9 +31,9 @@ class PlayerPage extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
             child: Column(
               children: [
-                if (now.source != SourceId.off) ...[
+                if (now.kind.hasOrigin) ...[
                   Text(
-                    l.sourceName(now.source).toUpperCase(),
+                    l.kindName(now.kind).toUpperCase(),
                     style: text.labelMedium?.copyWith(
                       color: colors.onSurfaceVariant,
                       letterSpacing: 1.4,

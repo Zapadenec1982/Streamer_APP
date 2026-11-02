@@ -6,7 +6,9 @@ import '../l10n/app_localizations.dart';
 /// The words and icons for the models, in the page's language.
 extension Words on AppLocalizations {
   String sourceName(SourceId source) => switch (source) {
-    SourceId.off || SourceId.tone || SourceId.aux => srcOff,
+    SourceId.off => srcOff,
+    SourceId.tone => srcTone,
+    SourceId.aux => srcAux,
     SourceId.bt => srcBt,
     SourceId.card => srcCard,
     SourceId.radio => srcRadio,
@@ -17,7 +19,12 @@ extension Words on AppLocalizations {
   String cardName(SourceCard card) =>
       card == SourceCard.servers ? srcServers : sourceName(card.source);
 
+  /// Where the sound comes from, over the Player's cover.
+  String kindName(NowKind kind) =>
+      kind == NowKind.dlna ? srcDlna : sourceName(kind.source);
+
   String label(Label label) => switch (label) {
+    TextLabel(:final text, technical: true) => badge(text),
     TextLabel(:final text) => text,
     LineLabel(:final line, :final name, :final count) => _line(
       line,
@@ -28,6 +35,14 @@ extension Words on AppLocalizations {
 
   String _line(CatalogLine line, String name, int count) => switch (line) {
     CatalogLine.noDevice => nowNoDevice,
+    CatalogLine.dlnaTrack => nowDlnaTrack,
+    CatalogLine.buffering => nowBuffering,
+    CatalogLine.reconnecting => nowReconnecting,
+    CatalogLine.stopped => nowStopped,
+    CatalogLine.usb => nowUsb,
+    CatalogLine.tone => nowTone,
+    CatalogLine.aux => nowAux,
+    CatalogLine.radio => srcRadio,
     CatalogLine.airplayWaiting => nowAirplayWaiting,
     CatalogLine.airplayPick => nowAirplayPick(name),
     CatalogLine.usbWaiting => nowUsbWaiting,
@@ -59,7 +74,12 @@ extension Words on AppLocalizations {
   /// glass's i18n::badge write it: «AAC 44,1 кГц 128 кбіт/с». Two channels go unsaid and a whole
   /// number loses its ",0"; words that are not a number and a unit stay as they are.
   String badge(String raw) {
-    final units = {'kHz': unitKhz, 'kbps': unitKbps, 'bit': unitBit};
+    final units = {
+      'Hz': unitHz,
+      'kHz': unitKhz,
+      'kbps': unitKbps,
+      'bit': unitBit,
+    };
     final comma = localeName != 'en';
     final words = raw.split(' ').where((w) => w.isNotEmpty).toList();
     final out = <String>[];

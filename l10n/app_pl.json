@@ -6,5 +6,6 @@
   "mob.app": "Aplikacja",
   "mob.lang_phone": "Jak w telefonie",
   "mob.licenses": "Licencje",
-  "mob.in_web": "To jest w interfejsie WWW panelu"
+  "mob.in_web": "To jest w interfejsie WWW panelu",
+  "mob.busy": "Panel obsługuje już trzech klientów. Ponawiam próbę…"
 }

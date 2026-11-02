@@ -8,6 +8,9 @@ nav.settings
 
 # sources and their cards
 src.off
+src.tone
+src.aux
+src.dlna
 src.bt
 src.airplay
 src.radio
@@ -34,6 +37,13 @@ now.usb_pick
 now.off
 now.pick
 now.connecting
+now.buffering
+now.reconnecting
+now.stopped
+now.dlna_track
+now.usb
+now.tone
+now.aux
 now.cover
 
 # transport and volume
@@ -44,9 +54,13 @@ transport.next
 volume.label
 volume.mute
 volume.unmute
+unit.hz
 unit.khz
 unit.kbps
 unit.bit
+
+# the link to the panel
+conn.lost
 
 # settings
 sys.scheme

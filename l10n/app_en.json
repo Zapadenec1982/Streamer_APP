@@ -6,5 +6,6 @@
   "mob.app": "App",
   "mob.lang_phone": "Same as the phone",
   "mob.licenses": "Licences",
-  "mob.in_web": "This is in the panel's web interface"
+  "mob.in_web": "This is in the panel's web interface",
+  "mob.busy": "The panel already serves three clients. Trying again…"
 }

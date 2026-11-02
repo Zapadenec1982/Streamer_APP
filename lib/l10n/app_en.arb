@@ -16,6 +16,18 @@
   "@srcOff": {
     "description": "src.off"
   },
+  "srcTone": "Tone",
+  "@srcTone": {
+    "description": "src.tone"
+  },
+  "srcAux": "AUX",
+  "@srcAux": {
+    "description": "src.aux"
+  },
+  "srcDlna": "DLNA",
+  "@srcDlna": {
+    "description": "src.dlna"
+  },
   "srcBt": "Bluetooth",
   "@srcBt": {
     "description": "src.bt"
@@ -132,6 +144,34 @@
   "@nowConnecting": {
     "description": "now.connecting"
   },
+  "nowBuffering": "Buffering…",
+  "@nowBuffering": {
+    "description": "now.buffering"
+  },
+  "nowReconnecting": "Reconnecting…",
+  "@nowReconnecting": {
+    "description": "now.reconnecting"
+  },
+  "nowStopped": "Stopped",
+  "@nowStopped": {
+    "description": "now.stopped"
+  },
+  "nowDlnaTrack": "Network track",
+  "@nowDlnaTrack": {
+    "description": "now.dlna_track"
+  },
+  "nowUsb": "Sound from a computer",
+  "@nowUsb": {
+    "description": "now.usb"
+  },
+  "nowTone": "Test tone",
+  "@nowTone": {
+    "description": "now.tone"
+  },
+  "nowAux": "Analogue input",
+  "@nowAux": {
+    "description": "now.aux"
+  },
   "nowCover": "Cover",
   "@nowCover": {
     "description": "now.cover"
@@ -164,6 +204,10 @@
   "@volumeUnmute": {
     "description": "volume.unmute"
   },
+  "unitHz": "Hz",
+  "@unitHz": {
+    "description": "unit.hz"
+  },
   "unitKhz": "kHz",
   "@unitKhz": {
     "description": "unit.khz"
@@ -175,6 +219,10 @@
   "unitBit": "bit",
   "@unitBit": {
     "description": "unit.bit"
+  },
+  "connLost": "Lost the connection to the panel. Reconnecting…",
+  "@connLost": {
+    "description": "conn.lost"
   },
   "sysScheme": "Colour scheme",
   "@sysScheme": {
@@ -211,6 +259,10 @@
   "mobAppName": "ModESP Streamer",
   "@mobAppName": {
     "description": "mob.app_name"
+  },
+  "mobBusy": "The panel already serves three clients. Trying again…",
+  "@mobBusy": {
+    "description": "mob.busy"
   },
   "mobDemoNote": "A made-up panel, to see the app without the device",
   "@mobDemoNote": {
