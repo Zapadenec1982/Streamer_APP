@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/device/demo_art.dart';
 import 'package:streamer/device/demo_device_api.dart';
@@ -92,32 +94,28 @@ void main() {
     expect((cards[SourceCard.servers]! as LineLabel).line, CatalogLine.servers);
   });
 
-  test(
-    'each track wears its own drawn cover, and the Player its dark shade',
-    () async {
-      final covers = <String>{};
-      for (var i = 0; i < 4; i++) {
-        final s = api.current;
-        final key = s.now.coverKey!;
-        covers.add(key);
-        final art = DemoArt.of(key);
-        expect(s.backdrop, art.backdrop);
-        // dark: the Player's light text stays readable on it
-        for (final shift in [16, 8, 0]) {
-          expect((s.backdrop! >> shift) & 0xFF, lessThan(0x40));
-        }
-        await api.transport(TransportAction.next);
-      }
-      expect(covers, hasLength(4));
-      // the same art from the same key, every run
-      expect(DemoArt.of('art:3:1:Copper Lanterns').pattern, 1);
-      expect(
-        DemoArt.of('art:3:1:Copper Lanterns').palette,
-        DemoArt.palettes[3],
-      );
-      expect(DemoArt.of('x').seed, DemoArt.of('x').seed);
-    },
-  );
+  test('each track wears its own drawn cover, and the Player its shade', () async {
+    final covers = <String>{};
+    for (var i = 0; i < 4; i++) {
+      final s = api.current;
+      final key = s.now.coverKey!;
+      covers.add(key);
+      final art = DemoArt.of(key);
+      expect(s.backdrop, art.backdrop);
+      // at the firmware's lightness, 0.20, where the Player's light text reads
+      final channels = [
+        for (final shift in [16, 8, 0]) (s.backdrop! >> shift) & 0xFF,
+      ];
+      final lightness = (channels.reduce(max) + channels.reduce(min)) / 2 / 255;
+      expect(lightness, closeTo(0.20, 0.01));
+      await api.transport(TransportAction.next);
+    }
+    expect(covers, hasLength(4));
+    // the same art from the same key, every run
+    expect(DemoArt.of('art:3:1:Copper Lanterns').pattern, 1);
+    expect(DemoArt.of('art:3:1:Copper Lanterns').palette, DemoArt.palettes[3]);
+    expect(DemoArt.of('x').seed, DemoArt.of('x').seed);
+  });
 
   test(
     'a station has no drawn cover and no shade: its disc stands in',
@@ -126,4 +124,12 @@ void main() {
       expect(api.current.backdrop, isNull);
     },
   );
+
+  test('the backdrop is the firmware\'s: the hue at 20 % lightness, '
+      'its saturation capped', () {
+    // as the firmware's cover_backdrop() makes them (cover_tone.cpp)
+    expect(coverBackdrop(0), 0);
+    expect(coverBackdrop(0xFF0000), 0x4A1C1C);
+    expect(coverBackdrop(0x808080), 0x333333);
+  });
 }

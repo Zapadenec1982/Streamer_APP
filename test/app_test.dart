@@ -10,6 +10,7 @@ import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/state/providers.dart';
+import 'package:streamer/ui/player_page.dart';
 import 'package:streamer/ui/station_card.dart';
 
 import 'support/phone.dart';
@@ -367,6 +368,23 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     expect(slow.current.volume, left.round());
     expect(shown(), left.round());
+  });
+
+  testWidgets('the Player wears the cover\'s colour as the web does: from the '
+      'top, fading into the page', (tester) async {
+    await pumpApp(tester);
+    final box = tester.widget<AnimatedContainer>(
+      find
+          .descendant(
+            of: find.byType(PlayerPage),
+            matching: find.byType(AnimatedContainer),
+          )
+          .first,
+    );
+    final gradient =
+        (box.decoration! as BoxDecoration).gradient! as RadialGradient;
+    expect(gradient.center, Alignment.topCenter);
+    expect(gradient.colors.first, Color(0xFF000000 | api.current.backdrop!));
   });
 
   testWidgets('a panel that does not answer says so, with a retry and the '

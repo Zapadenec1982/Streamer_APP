@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 /// The demo's own artwork for a track: one of [palettes] and one of [patterns], the same every
 /// time. The demo is what a store's reviewer and the store's screenshots show — nobody else's album
 /// covers. A key `art:<palette>:<pattern>:…` names both; any other key picks them by its hash.
@@ -45,9 +47,9 @@ class DemoArt {
   final int pattern;
   final int seed;
 
-  /// The Player's background under the cover, 0xRRGGBB: a dark shade of it, as the panel makes
-  /// one from a real cover (`ui.cover_rgb`).
-  int get backdrop => palette.ground.darker(0.45);
+  /// The Player's background under the cover, 0xRRGGBB, as the panel makes one from a real cover
+  /// (`ui.cover_rgb`): from its vivid colour, the accent.
+  int get backdrop => coverBackdrop(palette.accent);
 }
 
 /// A cover's colours, 0xRRGGBB.
@@ -61,10 +63,38 @@ class ArtPalette {
   final int far;
 }
 
-extension on int {
-  /// This colour, 0xRRGGBB, [by] of the way to black.
-  int darker(double by) {
-    int c(int shift) => (((this >> shift) & 0xFF) * (1 - by)).round();
-    return c(16) << 16 | c(8) << 8 | c(0);
+/// The Player's background from a picture's colour, 0xRRGGBB: the firmware's cover_backdrop()
+/// (components/cover/src/cover_tone.cpp) — the same hue at HSL lightness 0.20, its saturation
+/// capped at 0.45, so the light text reads on it as on the plain surface.
+int coverBackdrop(int rgb) {
+  if (rgb == 0) return 0;
+  const lightness = 0.20, most = 0.45;
+  final r = (rgb >> 16 & 0xFF) / 255, g = (rgb >> 8 & 0xFF) / 255;
+  final b = (rgb & 0xFF) / 255;
+  final mx = [r, g, b].reduce(math.max), mn = [r, g, b].reduce(math.min);
+  final d = mx - mn;
+  // hue in sixths of the circle, and the HSL saturation; a grey has neither
+  var h = 0.0, s = 0.0;
+  if (d > 0) {
+    s = d / (1 - (mx + mn - 1).abs());
+    h = mx == r
+        ? ((g - b) / d + 6) % 6
+        : mx == g
+        ? (b - r) / d + 2
+        : (r - g) / d + 4;
   }
+  s = math.min(s, most);
+  final c = (1 - (2 * lightness - 1).abs()) * s;
+  final x = c * (1 - (h % 2 - 1).abs());
+  final m = lightness - c / 2;
+  final (cr, cg, cb) = switch (h.floor() % 6) {
+    0 => (c, x, 0.0),
+    1 => (x, c, 0.0),
+    2 => (0.0, c, x),
+    3 => (0.0, x, c),
+    4 => (x, 0.0, c),
+    _ => (c, 0.0, x),
+  };
+  int byte(double v) => ((v + m) * 255).round().clamp(0, 255);
+  return byte(cr) << 16 | byte(cg) << 8 | byte(cb);
 }

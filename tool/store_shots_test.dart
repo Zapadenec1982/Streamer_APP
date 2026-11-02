@@ -10,7 +10,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/app.dart';
@@ -19,32 +18,14 @@ import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/state/providers.dart';
 
+import '../test/support/fonts.dart';
 import '../test/support/phone.dart';
 
 // 480×853 dp: a large phone's width, so the Player fits whole in 9:16
 const _ratio = 2.25;
 
-Future<void> _font(String family, List<String> files) async {
-  final dir =
-      '${Platform.environment['FLUTTER_ROOT']}/bin/cache/artifacts/material_fonts';
-  final loader = FontLoader(family);
-  for (final file in files) {
-    loader.addFont(
-      Future.value(ByteData.sublistView(File('$dir/$file').readAsBytesSync())),
-    );
-  }
-  await loader.load();
-}
-
 void main() {
-  setUpAll(() async {
-    await _font('Roboto', [
-      'Roboto-Regular.ttf',
-      'Roboto-Medium.ttf',
-      'Roboto-Bold.ttf',
-    ]);
-    await _font('MaterialIcons', ['MaterialIcons-Regular.otf']);
-  });
+  setUpAll(loadPhoneFonts);
 
   for (final (locale, language) in [('en-US', 'en'), ('uk', 'uk')]) {
     testWidgets(locale, (tester) async {

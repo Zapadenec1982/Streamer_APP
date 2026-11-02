@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -31,27 +30,36 @@ class PlayerPage extends ConsumerWidget {
     final now = snapshot.now;
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-    // the panel's tint of the cover, as the web's Player wears it
     final backdrop = snapshot.backdrop;
     final station = now.kind == NowKind.radio && now.title is TextLabel;
     final subtitle = _SubtitleRow(
       subtitle: now.subtitle == null ? '' : l.label(now.subtitle!),
       format: l.badge(now.format),
     );
+    // the cover's colour from the top, fading into the page, as the web's Player wears the panel's
+    // tint of it (ui.cover_rgb)
     return AnimatedContainer(
       duration: const Duration(milliseconds: 600),
-      color: backdrop == null ? colors.surface : Color(0xFF000000 | backdrop),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        gradient: backdrop == null
+            ? null
+            : RadialGradient(
+                center: Alignment.topCenter,
+                colors: [Color(0xFF000000 | backdrop), colors.surface],
+                transform: const _WebTint(),
+              ),
+      ),
       child: SafeArea(
         child: LayoutBuilder(
-          builder: (context, box) {
-            // a station's disc gives way to its presets, so the page fits on the screen
-            final cover = math.min(
-              box.maxWidth - 48,
-              box.maxHeight * (station ? 0.32 : 0.42),
-            );
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-              child: Column(
+          // the cover takes what the screen has left, so the page scrolls only when even a small
+          // cover leaves no room
+          builder: (context, box) => SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+            child: CoverColumn(
+              height: box.maxHeight - 32,
+              smallest: 120,
+              top: Column(
                 children: [
                   // where it comes from, read as one line; spoken in its own case, not spelt
                   if (now.kind.hasOrigin)
@@ -72,13 +80,20 @@ class PlayerPage extends ConsumerWidget {
                       ),
                     ),
                   const SizedBox(height: 16),
-                  Semantics(
-                    label: l.nowCover,
-                    image: true,
-                    child: ExcludeSemantics(
-                      child: _Cover(now: now, size: cover),
-                    ),
+                ],
+              ),
+              cover: Semantics(
+                label: l.nowCover,
+                image: true,
+                child: ExcludeSemantics(
+                  child: LayoutBuilder(
+                    builder: (context, square) =>
+                        _Cover(now: now, size: square.maxWidth),
                   ),
+                ),
+              ),
+              bottom: Column(
+                children: [
                   const SizedBox(height: 20),
                   // a station's face: its name between ‹ and ›, no transport, no progress
                   if (station) ...[
@@ -120,11 +135,29 @@ class PlayerPage extends ConsumerWidget {
                   const _SoundRow(),
                 ],
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
+  }
+}
+
+/// The web's tint (Shell.svelte, `radial-gradient(130% 560px at 50% 0, tint, transparent)`): an
+/// ellipse 130 % of the page's width across and 560 px down, centred on its top edge.
+/// RadialGradient draws a circle of the box's shortest side; this stretches it to that ellipse.
+class _WebTint extends GradientTransform {
+  const _WebTint();
+
+  @override
+  Matrix4 transform(Rect bounds, {TextDirection? textDirection}) {
+    final side = bounds.shortestSide;
+    final top = bounds.topCenter;
+    return Matrix4.translationValues(top.dx, top.dy, 0)
+      ..multiply(
+        Matrix4.diagonal3Values(1.3 * bounds.width / side, 560 / side, 1),
+      )
+      ..multiply(Matrix4.translationValues(-top.dx, -top.dy, 0));
   }
 }
 
