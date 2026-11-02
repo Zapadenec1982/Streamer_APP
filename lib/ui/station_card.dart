@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../device/models.dart';
 import '../l10n/app_localizations.dart';
+import '../device/radio_browser.dart';
 import '../state/providers.dart';
 import 'fit.dart';
 import 'station_badge.dart';
@@ -15,6 +16,22 @@ import 'writes.dart';
 final stationListProvider = FutureProvider<StationList>((ref) {
   ref.watch(snapshotProvider.select((s) => s.radio.listRev));
   return ref.watch(deviceApiProvider).stations();
+});
+
+/// The list's logos from Radio Browser by the stations' uuids: uuid → logo, '' for none. Without
+/// the catalogue (no internet) there are none, and the discs stand in.
+final stationLogosProvider = FutureProvider<Map<String, String>>((ref) async {
+  final list = await ref.watch(stationListProvider.future);
+  final uuids = [
+    for (final s in list.stations)
+      if (s.uuid.isNotEmpty) s.uuid,
+  ];
+  if (uuids.isEmpty) return const {};
+  try {
+    return await ref.watch(radioBrowserProvider).favicons(uuids);
+  } on CatalogError {
+    return const {};
+  }
 });
 
 /// The station's name between ‹ and ›, the glass's station face (the web's Player station card);
@@ -79,7 +96,10 @@ class StationTitle extends ConsumerWidget {
 /// The six presets, 3×2, with the glass's rules: a tap tunes, a hold stores what plays, a tap on
 /// an empty one stores too. Then the way to every station.
 class StationPresets extends ConsumerWidget {
-  const StationPresets({super.key});
+  const StationPresets({super.key, this.all = true});
+
+  /// The way to every station under them — not on the stations' own page.
+  final bool all;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -118,6 +138,7 @@ class StationPresets extends ConsumerWidget {
     final names = [
       for (var slot = 0; slot < StationList.presetCount; slot++) name(slot),
     ];
+    final logos = ref.watch(stationLogosProvider).value ?? const {};
     return Column(
       children: [
         LayoutBuilder(
@@ -136,6 +157,7 @@ class StationPresets extends ConsumerWidget {
                   slot: slot,
                   name: names[slot],
                   station: at(slot),
+                  logo: logos[at(slot)?.uuid] ?? '',
                   on:
                       list != null &&
                       list.presets[slot] >= 0 &&
@@ -158,7 +180,7 @@ class StationPresets extends ConsumerWidget {
             ],
           ),
         ),
-        if (radio.count > 0)
+        if (all && radio.count > 0)
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
@@ -178,12 +200,16 @@ class _Preset extends StatelessWidget {
     required this.slot,
     required this.name,
     required this.station,
+    this.logo = '',
     required this.on,
     required this.onTap,
     required this.onHold,
   });
 
   final int slot;
+
+  /// The station's logo, or ''.
+  final String logo;
 
   /// What the button says: the station's name, or what an empty one is for.
   final String name;
@@ -256,7 +282,7 @@ class _Preset extends StatelessWidget {
               child: Row(
                 children: [
                   if (st != null)
-                    StationDisc(name: st.name, size: _disc)
+                    StationLogo(name: st.name, logo: logo, size: _disc)
                   else
                     Container(
                       width: _disc,
@@ -283,6 +309,51 @@ class _Preset extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A station's logo where Radio Browser has one, its disc where it has not or the picture does
+/// not come.
+class StationLogo extends StatelessWidget {
+  const StationLogo({
+    super.key,
+    required this.name,
+    required this.logo,
+    required this.size,
+    this.label = false,
+  });
+
+  final String name;
+
+  /// The logo's address, or ''.
+  final String logo;
+  final double size;
+
+  /// The disc's whole label rather than its first character, as [StationDisc.label].
+  final bool label;
+
+  @override
+  Widget build(BuildContext context) {
+    final disc = StationDisc(name: name, size: size, label: label);
+    if (logo.isEmpty) return disc;
+    // logos are drawn for a light ground: a white tile, as station lists show them
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size * 0.22),
+      child: Container(
+        width: size,
+        height: size,
+        color: Colors.white,
+        padding: EdgeInsets.all(size * 0.08),
+        child: Image.network(
+          logo,
+          fit: BoxFit.contain,
+          cacheWidth: (size * MediaQuery.devicePixelRatioOf(context)).round(),
+          errorBuilder: (_, _, _) => disc,
+          frameBuilder: (_, child, frame, sync) =>
+              frame == null && !sync ? disc : child,
         ),
       ),
     );

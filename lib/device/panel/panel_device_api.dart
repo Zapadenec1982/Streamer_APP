@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import '../device_api.dart';
 import '../face.dart';
 import '../keys.dart';
 import '../models.dart';
+import '../stations.dart';
 import 'panel_link.dart';
 
 /// A real panel: its state, heard over [PanelLink], as the app's models, and the app's commands
@@ -169,6 +169,40 @@ class PanelDeviceApi implements DeviceApi {
   @override
   Future<void> keepStation() => link.write({Keys.radioFavAdd.name: true});
 
+  /// The panel takes the list on its next tick (202) and moves `radio.list_rev`.
+  @override
+  Future<StationsSave> saveStations(StationList edited) async {
+    try {
+      await link.postJson(
+        '/api/stations',
+        edited.toJson(),
+        ok: const [200, 202],
+      );
+      return StationsSave.saved;
+    } on PanelError catch (e) {
+      if (e.status == 409) return StationsSave.changed;
+      rethrow;
+    }
+  }
+
+  /// The action last: the panel acts once the other three are written.
+  @override
+  Future<void> catalogStation({
+    required String name,
+    required String url,
+    String uuid = '',
+    required int act,
+  }) => link.write({
+    Keys.radioWebName.name: fitName(name),
+    Keys.radioWebUrl.name: url,
+    Keys.radioWebUuid.name: uuid,
+    Keys.radioWebAct.name: act,
+  });
+
+  @override
+  Future<List<Genre>> radioGenres() async =>
+      genresOf(await link.getJson('/radio_genres.json'));
+
   @override
   Uri? web(String route) =>
       link.endpoint.http('/').replace(fragment: '/$route');
@@ -302,15 +336,6 @@ StationList stationsOf(Object? json) {
   );
 }
 
-/// The name cut to the panel's 63 bytes of UTF-8, at a character, never inside one.
-String fitName(String name) {
-  var runes = name.trim().runes.toList();
-  while (utf8.encode(String.fromCharCodes(runes)).length > 63) {
-    runes = runes.sublist(0, runes.length - 1);
-  }
-  return String.fromCharCodes(runes);
-}
-
 /// What the Player shows: the face, with the buttons the panel says the source takes.
 NowPlaying nowOf(Face f, Map<String, Object?> s) {
   final caps = Keys.audioTransportCaps.of(s) ?? 0;
@@ -342,6 +367,23 @@ NowPlaying nowOf(Face f, Map<String, Object?> s) {
     repeat: f.repeat,
     shuffle: f.shuffle,
   );
+}
+
+/// The panel's genre table (radio_genres.json): `name` is Ukrainian, `name_<lang>` the others.
+List<Genre> genresOf(Object? json) {
+  final d = json is Map ? json : const {};
+  return [
+    for (final g in d['genres'] is List ? d['genres'] as List : const [])
+      if (g is Map && g['tag'] is String && g['name'] is String)
+        Genre(
+          tag: g['tag'] as String,
+          names: {
+            'uk': g['name'] as String,
+            for (final lang in const ['en', 'de', 'pl'])
+              if (g['name_$lang'] is String) lang: g['name_$lang'] as String,
+          },
+        ),
+  ];
 }
 
 /// `GET /api/library?from=&n=`: one page of the card's index.

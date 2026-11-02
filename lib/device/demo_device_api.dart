@@ -232,6 +232,15 @@ class DemoDeviceApi implements DeviceApi {
   int _station = 0;
   final _presets = [0, 1, 2, -1, -1, -1];
   int _listRev = 1;
+
+  /// The station list as it is now: edited, kept and stored into, as the panel's.
+  final _list = [
+    for (final (name, line) in _stations)
+      (name: name, url: 'http://demo.invalid/$name', uuid: '', line: line),
+  ];
+
+  /// A catalogue station that plays and is not in the list.
+  ({String name, String url, String uuid})? _catalog;
   String _sound = 'rock';
   int _eqRev = 1;
   int _bass = 2;
@@ -295,7 +304,8 @@ class DemoDeviceApi implements DeviceApi {
         _cardPosition = Duration.zero;
         _cardPlaying = true;
       case (SourceId.radio, TransportAction.previous || TransportAction.next):
-        _station = _step(_station, _stations.length, action);
+        _station = _step(_station, _list.length, action);
+        _catalog = null;
         _tuningLeft = _tuning;
       default:
         return;
@@ -518,17 +528,17 @@ class DemoDeviceApi implements DeviceApi {
   Future<StationList> stations() async => StationList(
     rev: _listRev,
     stations: [
-      for (final (name, _) in _stations)
-        Station(name: name, url: 'http://demo.invalid/$name'),
+      for (final s in _list) Station(name: s.name, url: s.url, uuid: s.uuid),
     ],
     presets: List.of(_presets),
   );
 
   @override
   Future<void> listen(int index) async {
-    if (index < 0 || index >= _stations.length) return;
-    if (index == _station && _dlna == null) return;
+    if (index < 0 || index >= _list.length) return;
+    if (index == _station && _dlna == null && _catalog == null) return;
     _dlna = null;
+    _catalog = null;
     _station = index;
     _tuningLeft = _tuning;
     _emit();
@@ -537,13 +547,118 @@ class DemoDeviceApi implements DeviceApi {
   @override
   Future<void> storePreset(int slot) async {
     if (slot < 0 || slot >= _presets.length) return;
+    // a catalogue station goes into the list as it goes onto the preset, as on the panel
+    final catalog = _catalog;
+    if (catalog != null) _keep(catalog.name, catalog.url, catalog.uuid);
     _presets[slot] = _station;
     _listRev++;
     _emit();
   }
 
   @override
-  Future<void> keepStation() async {}
+  Future<void> keepStation() async {
+    final catalog = _catalog;
+    if (catalog == null) return;
+    _keep(catalog.name, catalog.url, catalog.uuid);
+    _listRev++;
+    _emit();
+  }
+
+  /// A station into the list, if it is not there; the one that plays becomes it.
+  int _keep(String name, String url, String uuid) {
+    var i = _list.indexWhere((s) => s.url == url);
+    if (i < 0) {
+      _list.add((name: name, url: url, uuid: uuid, line: ''));
+      i = _list.length - 1;
+    }
+    if (_catalog?.url == url) {
+      _catalog = null;
+      _station = i;
+    }
+    return i;
+  }
+
+  /// As the panel: a list edited from an older generation is refused (409).
+  @override
+  Future<StationsSave> saveStations(StationList edited) async {
+    if (edited.rev != _listRev) return StationsSave.changed;
+    final playing = _station >= 0 && _station < _list.length
+        ? _list[_station].url
+        : null;
+    final lines = {for (final s in _list) s.url: s.line};
+    _list
+      ..clear()
+      ..addAll([
+        for (final s in edited.stations)
+          (name: s.name, url: s.url, uuid: s.uuid, line: lines[s.url] ?? ''),
+      ]);
+    for (var k = 0; k < _presets.length; k++) {
+      _presets[k] = k < edited.presets.length ? edited.presets[k] : -1;
+    }
+    final at = _list.indexWhere((s) => s.url == playing);
+    _station = at < 0 ? 0 : at;
+    _listRev++;
+    _emit();
+    return StationsSave.saved;
+  }
+
+  @override
+  Future<void> catalogStation({
+    required String name,
+    required String url,
+    String uuid = '',
+    required int act,
+  }) async {
+    if (act == 0) {
+      final i = _list.indexWhere((s) => s.url == url);
+      _source = SourceId.radio;
+      _dlna = null;
+      _tuningLeft = _tuning;
+      if (i >= 0) {
+        _catalog = null;
+        _station = i;
+      } else {
+        _catalog = (name: name, url: url, uuid: uuid);
+      }
+      _emit();
+      return;
+    }
+    final i = _keep(name, url, uuid);
+    if (act >= 2 && act <= 7) _presets[act - 2] = i;
+    _listRev++;
+    _emit();
+  }
+
+  /// A few of the panel's genres, the demo's own table.
+  @override
+  Future<List<Genre>> radioGenres() async => const [
+    Genre(
+      tag: 'jazz',
+      names: {'uk': 'Джаз', 'en': 'Jazz', 'de': 'Jazz', 'pl': 'Jazz'},
+    ),
+    Genre(
+      tag: 'classical',
+      names: {
+        'uk': 'Класика',
+        'en': 'Classical',
+        'de': 'Klassik',
+        'pl': 'Klasyczna',
+      },
+    ),
+    Genre(
+      tag: 'rock',
+      names: {'uk': 'Рок', 'en': 'Rock', 'de': 'Rock', 'pl': 'Rock'},
+    ),
+    Genre(
+      tag: 'ambient',
+      names: {
+        'uk': 'Ембієнт',
+        'en': 'Ambient',
+        'de': 'Ambient',
+        'pl': 'Ambient',
+      },
+    ),
+  ];
 
   /// The demo has no web interface.
   @override
@@ -612,8 +727,8 @@ class DemoDeviceApi implements DeviceApi {
         eqRev: _eqRev,
       ),
       radio: StationState(
-        current: _station,
-        count: _stations.length,
+        current: _catalog != null ? -1 : _station,
+        count: _list.length,
         listRev: _listRev,
         storable: true,
       ),
@@ -632,7 +747,7 @@ class DemoDeviceApi implements DeviceApi {
       SourceCard.bt => playingTitle ?? const LineLabel(CatalogLine.phoneOn),
       SourceCard.airplay => const LineLabel(CatalogLine.airplayWait),
       SourceCard.radio =>
-        playingTitle ?? LineLabel(CatalogLine.stations, count: stationCount),
+        playingTitle ?? LineLabel(CatalogLine.stations, count: _list.length),
       SourceCard.card =>
         playingTitle ?? LineLabel(CatalogLine.tracks, count: cardTrackCount),
       SourceCard.servers =>
@@ -698,7 +813,10 @@ class DemoDeviceApi implements DeviceApi {
           coverKey: DemoArt.key(n.art.$1, n.art.$2, n.title),
         );
       case SourceId.radio:
-        final (name, line) = _stations[_station];
+        final catalog = _catalog;
+        final (name, line) = catalog != null
+            ? (catalog.name, '')
+            : (_list[_station].name, _list[_station].line);
         final tuning = _tuningLeft > Duration.zero;
         return NowPlaying(
           kind: NowKind.radio,

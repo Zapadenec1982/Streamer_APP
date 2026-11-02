@@ -59,6 +59,22 @@ abstract interface class DeviceApi {
   /// The catalog station that plays, into the list.
   Future<void> keepStation();
 
+  /// The edited list, sent whole with the generation it was made from ([StationList.rev]).
+  /// Throws what the panel refused for any other reason.
+  Future<StationsSave> saveStations(StationList edited);
+
+  /// A station of the catalogue to the panel: [act] 0 plays it, 1 keeps it in the list, 2…7 keeps
+  /// it on preset 1…6 (`radio.web_act`).
+  Future<void> catalogStation({
+    required String name,
+    required String url,
+    String uuid = '',
+    required int act,
+  });
+
+  /// The catalogue's genres, as the panel lists them.
+  Future<List<Genre>> radioGenres();
+
   /// A page of the card's index, at most [count] rows from [from].
   Future<LibraryPage> library({int from = 0, int count = 200});
 

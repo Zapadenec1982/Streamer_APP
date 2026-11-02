@@ -9,6 +9,7 @@ import 'package:streamer/device/demo_device_api.dart';
 import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
+import 'package:streamer/device/radio_browser.dart';
 import 'package:streamer/state/providers.dart';
 import 'package:streamer/ui/player_page.dart';
 import 'package:streamer/ui/station_card.dart';
@@ -69,6 +70,63 @@ class SlowVolumeDemo extends CountingDemo {
     await done.future;
     await super.setVolume(percent);
   }
+}
+
+/// The demo whose list always moves on just before an edit lands: 409, every time.
+class MovedListDemo extends CountingDemo {
+  @override
+  Future<StationsSave> saveStations(StationList edited) async =>
+      StationsSave.changed;
+}
+
+/// The catalogue without the internet: two stations, three countries; what was asked, kept.
+class FakeRadioBrowser extends RadioBrowser {
+  FakeRadioBrowser() : super(base: 'http://catalogue.invalid');
+
+  final asked = <CatalogQuery>[];
+
+  @override
+  Future<({List<CatalogStation> rows, bool more})> stations(
+    CatalogQuery query, {
+    CatalogSort sort = CatalogSort.popular,
+    CatalogFloor floor = CatalogFloor.k128,
+    bool uaOnly = false,
+    int offset = 0,
+  }) async {
+    asked.add(query);
+    return (
+      rows: const [
+        CatalogStation(
+          name: 'Lviv Lamp FM',
+          url: 'https://lamp.invalid/live',
+          uuid: '11111111-1111-1111-1111-111111111111',
+          codec: 'MP3',
+          bitrate: 192,
+          countryCode: 'UA',
+          clicks: 1200,
+        ),
+        CatalogStation(
+          name: 'Kyiv Night Jazz',
+          url: 'https://night.invalid/live',
+          codec: 'FLAC',
+          countryCode: 'UA',
+          clicks: 300,
+        ),
+      ],
+      more: false,
+    );
+  }
+
+  @override
+  Future<List<({String code, int count})>> countries() async => const [
+    (code: 'UA', count: 900),
+    (code: 'PL', count: 600),
+    (code: 'DE', count: 1500),
+  ];
+
+  @override
+  Future<Map<String, String>> favicons(Iterable<String> uuids) async =>
+      const {};
 }
 
 /// A panel that never answers: no state, ever, and the link trying all the while.
@@ -656,10 +714,172 @@ void main() {
     await tester.tap(find.text('Усі станції · 12'));
     await tester.pumpAndSettle();
     expect(find.text('Станції'), findsOneWidget);
-    await tester.tap(find.text('Cedar Jazz'));
+    // a tap on a station plays it, and the page stays for the next, as the web's does
+    await tester.tap(find.widgetWithText(ListTile, 'Cedar Jazz'));
     await tester.pumpAndSettle();
     expect(api.current.radio.current, 2);
-    expect(find.text('Станції'), findsNothing);
+    expect(find.text('Станції'), findsOneWidget);
+  });
+
+  testWidgets(
+    'the list edited: renamed, moved, onto a preset, deleted, a stream '
+    'added — each sent whole and the next waits for it',
+    (tester) async {
+      await api.selectSource(SourceId.radio);
+      await pumpApp(tester);
+      await tester.tap(find.text('Усі станції · 12'));
+      await tester.pumpAndSettle();
+      Future<void> more(String name) async {
+        await tester.tap(find.byTooltip('Дії зі станцією «$name»'));
+        await tester.pumpAndSettle();
+      }
+
+      Future<List<String>> names() async => [
+        for (final s in (await api.stations()).stations) s.name,
+      ];
+
+      await more('Cedar Jazz');
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Cedar Jazz'),
+        'Cedar',
+      );
+      await tester.tap(find.text('Зберегти'));
+      await tester.pumpAndSettle();
+      expect((await names())[2], 'Cedar');
+      await more('Cedar');
+      await tester.tap(find.text('Вище'));
+      await tester.pumpAndSettle();
+      expect((await names()).take(3), [
+        'Radio Lantern',
+        'Cedar',
+        'Northbound FM',
+      ]);
+      expect((await api.stations()).presets.take(3), [
+        0,
+        2,
+        1,
+      ], reason: 'presets follow');
+      await more('Amber Wave');
+      await tester.tap(find.widgetWithText(ChoiceChip, '6'));
+      await tester.pumpAndSettle();
+      expect((await api.stations()).presets[5], 4);
+      await more('Amber Wave');
+      await tester.tap(find.text('Видалити'));
+      await tester.pumpAndSettle();
+      expect(await names(), isNot(contains('Amber Wave')));
+      expect((await api.stations()).presets[5], -1);
+      // the station that plays is not deleted
+      await more('Radio Lantern');
+      expect(
+        tester
+            .widget<TextButton>(find.widgetWithText(TextButton, 'Видалити'))
+            .onPressed,
+        isNull,
+      );
+      await tester.tapAt(const Offset(8, 8));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Додати потік'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Адреса потоку'),
+        'ftp://x',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Додати потік'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Потрібна адреса, що починається з http:// або https://'),
+        findsOne,
+      );
+      await tester.tap(find.byTooltip('Додати потік'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Адреса потоку'),
+        'https://stream.invalid/live',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Додати потік'));
+      await tester.pumpAndSettle();
+      expect(
+        (await names()).last,
+        'stream.invalid',
+        reason: 'no name: its host',
+      );
+      await tester.pump(const Duration(seconds: 4));
+    },
+  );
+
+  testWidgets('an edit made from a list that has moved is refused, and the '
+      'moved list shown', (tester) async {
+    api.dispose();
+    api = MovedListDemo();
+    await api.selectSource(SourceId.radio);
+    await pumpApp(tester);
+    await tester.tap(find.text('Усі станції · 12'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Дії зі станцією «Cedar Jazz»'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Нижче'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Список змінився на стрімері — показую новий, повторіть правку',
+      ),
+      findsOne,
+    );
+    expect(find.text('Cedar Jazz'), findsWidgets);
+    await tester.pump(const Duration(seconds: 4));
+  });
+
+  testWidgets('the catalogue: Ukraine\'s top, a station played, kept, put on a '
+      'preset; the countries; the genres', (tester) async {
+    final catalogue = FakeRadioBrowser();
+    await api.selectSource(SourceId.radio);
+    await tester.binding.setSurfaceSize(const Size(412, 892));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          deviceApiProvider.overrideWithValue(api as DeviceApi),
+          settingsStoreProvider.overrideWithValue(store),
+          radioBrowserProvider.overrideWithValue(catalogue),
+        ],
+        child: const StreamerApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Усі станції · 12'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Топ'));
+    await tester.pumpAndSettle();
+    expect(find.text('Україна'), findsOne);
+    expect(catalogue.asked.last, isA<ByCountry>());
+    await tester.tap(find.text('Lviv Lamp FM'));
+    await tester.pumpAndSettle();
+    expect((api.current.now.title as TextLabel).text, 'Lviv Lamp FM');
+    expect(api.current.radio.keepable, isTrue);
+    await tester.tap(find.byTooltip('В улюблені').first);
+    await tester.pumpAndSettle();
+    expect((await api.stations()).stations.last.name, 'Lviv Lamp FM');
+    await tester.tap(find.byTooltip('На кнопку').at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, '5'));
+    await tester.pumpAndSettle();
+    final list = await api.stations();
+    expect(list.stations[list.presets[4]].name, 'Kyiv Night Jazz');
+    // the countries, named in the app's language
+    await tester.tap(find.text('Країни'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Польща'));
+    await tester.pumpAndSettle();
+    expect((catalogue.asked.last as ByCountry).code, 'PL');
+    await tester.tap(find.byTooltip('Країни'));
+    await tester.pumpAndSettle();
+    expect(find.text('Німеччина'), findsOne);
+    // the genres, from the streamer
+    await tester.tap(find.text('Жанри'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Джаз'));
+    await tester.pumpAndSettle();
+    expect((catalogue.asked.last as ByTag).tag, 'jazz');
   });
 
   testWidgets('with no panel yet: what to do, and the demo a tap away', (

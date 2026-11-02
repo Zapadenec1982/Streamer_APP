@@ -184,6 +184,32 @@ class FakePanel {
         return _reply(req, 200, {'rev': eqRev});
       case ('GET', '/api/stations'):
         return _reply(req, 200, stations);
+      // the whole list back with the generation it was made from: queued (202), or refused when
+      // the list moved meanwhile (409)
+      case ('POST', '/api/stations'):
+        final edit = (body! as Map).cast<String, Object?>();
+        final rev = stations['rev'];
+        if (edit['rev'] != rev) {
+          return _reply(req, 409, {'error': 'changed'});
+        }
+        stations = {
+          'rev': (rev! as int) + 1,
+          'list': {'stations': edit['stations'], 'presets': edit['presets']},
+        };
+        change({'radio.list_rev': stations['rev']});
+        return _reply(req, 202, {'ok': true});
+      case ('GET', '/radio_genres.json'):
+        return _reply(req, 200, {
+          'genres': [
+            {
+              'name': 'Джаз',
+              'name_en': 'Jazz',
+              'name_de': 'Jazz',
+              'tag': 'jazz',
+            },
+            {'name': 'Без тегу'},
+          ],
+        });
       case ('GET', '/api/library'):
         final from = int.tryParse(req.uri.queryParameters['from'] ?? '') ?? 0;
         final n = int.tryParse(req.uri.queryParameters['n'] ?? '') ?? 100;

@@ -408,3 +408,25 @@ class DlnaRow {
   final bool folder;
   final bool playable;
 }
+
+/// What the panel said to an edited station list.
+enum StationsSave {
+  /// It took the list; `radio.list_rev` moves.
+  saved,
+
+  /// The list had moved on the panel meanwhile (409): read it again, edit again.
+  changed,
+}
+
+/// A genre of the catalogue: its Radio Browser tag and its name in the four languages — the
+/// table the panel serves (data/www/radio_genres.json) and the glass reads too.
+class Genre {
+  const Genre({required this.tag, required this.names});
+
+  final String tag;
+
+  /// Language code → name; Ukrainian is the table's own `name`.
+  final Map<String, String> names;
+
+  String nameIn(String language) => names[language] ?? names['uk'] ?? tag;
+}

@@ -17,6 +17,15 @@ class FakePhone {
         return null;
       },
     );
+    // the countries the tests name; any other stays its code
+    messenger.setMockMethodCallHandler(
+      const MethodChannel('streamer/regions'),
+      (call) async {
+        const uk = {'UA': 'Україна', 'PL': 'Польща', 'DE': 'Німеччина'};
+        final codes = ((call.arguments as Map)['codes'] as List).cast<String>();
+        return {for (final c in codes) c: uk[c] ?? c};
+      },
+    );
     messenger.setMockStreamHandler(
       const EventChannel('streamer/volume_keys/presses'),
       MockStreamHandler.inline(

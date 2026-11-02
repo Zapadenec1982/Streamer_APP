@@ -32,5 +32,9 @@
   "mob.conn_lost": "Verbindung zum Streamer verloren. Erneut verbinden…",
   "mob.no_link": "Streamer nicht erreichbar",
   "mob.err_code": "Der Streamer antwortete: {code}",
-  "mob.as_streamer": "Wie am Streamer"
+  "mob.as_streamer": "Wie am Streamer",
+  "mob.cat_play": "Auf dem Streamer abspielen",
+  "mob.cat_played": "Läuft auf dem Streamer: {name}",
+  "mob.cat_no_genres": "Der Streamer hat keine Genreliste",
+  "mob.st_conflict": "Die Liste wurde am Streamer geändert – sie wird angezeigt, wiederholen Sie Ihre Änderung"
 }

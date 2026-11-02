@@ -1,63 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../l10n/app_localizations.dart';
-import '../state/providers.dart';
-import 'station_card.dart';
-import 'writes.dart';
+import 'catalog.dart';
+import 'favourites.dart';
 
-/// Every station of the list; a tap tunes it and goes back to the Player. Editing the list and the
-/// catalog stay in the web (plan, §1).
-class StationsPage extends ConsumerWidget {
+/// Stations: the glass's tabs — Favourites · Top · Countries · Genres · Search (the web's
+/// StationsPage). Favourites edit the list on the streamer; the others are the catalogue.
+class StationsPage extends StatelessWidget {
   const StationsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final current = ref.watch(snapshotProvider.select((s) => s.radio.current));
-    final list = ref.watch(stationListProvider);
-    return Scaffold(
-      appBar: AppBar(title: Text(l.pageStations)),
-      body: switch (list) {
-        AsyncData(:final value) when value.stations.isEmpty => Center(
-          child: Text(l.stNone),
-        ),
-        AsyncData(:final value) => ListView.builder(
-          itemCount: value.stations.length,
-          itemBuilder: (context, i) {
-            final st = value.stations[i];
-            final preset = value.presets.indexOf(i);
-            return ListTile(
-              leading: StationDisc(name: st.name, size: 40),
-              title: Text(
-                st.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: preset >= 0 ? Text(l.stPresetN('${preset + 1}')) : null,
-              selected: i == current,
-              onTap: () {
-                act(context, ref, (api) => api.listen(i));
-                context.go('/player');
-              },
-            );
-          },
-        ),
-        AsyncError() => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l.stLoadFailed),
-              TextButton(
-                onPressed: () => ref.invalidate(stationListProvider),
-                child: Text(l.appRetry),
-              ),
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l.pageStations),
+          bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: [
+              Tab(text: l.stTabFav),
+              Tab(text: l.stTabTop),
+              Tab(text: l.stTabCountries),
+              Tab(text: l.stTabGenres),
+              Tab(text: l.stTabSearch),
             ],
           ),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
-      },
+        body: const TabBarView(
+          children: [
+            FavouritesTab(),
+            CatalogPage(tab: CatalogTab.top),
+            CatalogPage(tab: CatalogTab.countries),
+            CatalogPage(tab: CatalogTab.genres),
+            CatalogPage(tab: CatalogTab.search),
+          ],
+        ),
+      ),
     );
   }
 }

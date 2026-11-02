@@ -174,6 +174,15 @@ class _Cover extends ConsumerWidget {
   final NowPlaying now;
   final double size;
 
+  /// The tuned station's logo from Radio Browser, or ''.
+  String _logo(WidgetRef ref) {
+    final list = ref.watch(stationListProvider).value;
+    final i = ref.watch(snapshotProvider.select((s) => s.radio.current));
+    if (list == null || i < 0 || i >= list.stations.length) return '';
+    final logos = ref.watch(stationLogosProvider).value ?? const {};
+    return logos[list.stations[i].uuid] ?? '';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final title = now.title;
@@ -184,7 +193,7 @@ class _Cover extends ConsumerWidget {
         ref.watch(activePanelProvider) is DemoPanel) {
       return DemoCover(art: DemoArt.of(key), size: size);
     }
-    // a station without a picture shows its disc, as the glass and the web do
+    // a station without a picture shows its logo, or its disc, as the glass and the web do
     final Widget drawn = now.kind == NowKind.radio && title is TextLabel
         ? Container(
             width: size,
@@ -194,7 +203,12 @@ class _Cover extends ConsumerWidget {
               color: Theme.of(context).colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(size / 16),
             ),
-            child: StationDisc(name: title.text, size: size * 0.6, label: true),
+            child: StationLogo(
+              name: title.text,
+              logo: _logo(ref),
+              size: size * 0.6,
+              label: true,
+            ),
           )
         : CoverArt(coverKey: now.coverKey, source: now.source, size: size);
     if (key == null) return drawn;

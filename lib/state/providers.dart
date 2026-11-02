@@ -10,6 +10,31 @@ import '../device/models.dart';
 import '../device/panel/panel_device_api.dart';
 import '../device/panel/panel_link.dart';
 import '../device/panels.dart';
+import '../device/radio_browser.dart';
+
+/// Every setting the app keeps. The phone's store is opened with this list and refuses any other
+/// key (SharedPreferencesWithCache's allowList, main.dart) — and so does the tests' store, so a key
+/// the list forgot fails a test rather than a page on the phone.
+abstract final class SettingsKeys {
+  static const language = 'language';
+  static const panels = 'panels';
+  static const activePanel = 'active_panel';
+
+  /// The catalogue's order, quality floor and «Лише Україна», kept between visits under the names
+  /// the web keeps them by.
+  static const catalogSort = 'radio.sort';
+  static const catalogFloor = 'radio.floor';
+  static const catalogUaOnly = 'radio.ua_only';
+
+  static const all = {
+    language,
+    panels,
+    activePanel,
+    catalogSort,
+    catalogFloor,
+    catalogUaOnly,
+  };
+}
 
 /// Where the app's own settings live: SharedPreferences on a phone, a map in tests.
 abstract interface class SettingsStore {
@@ -22,11 +47,19 @@ class MemorySettingsStore implements SettingsStore {
   final _values = <String, String>{};
 
   @override
-  String? getString(String key) => _values[key];
+  String? getString(String key) => _values[_kept(key)];
 
   @override
   Future<void> setString(String key, String value) async =>
-      _values[key] = value;
+      _values[_kept(key)] = value;
+
+  /// As the phone's store: a key not on the list is refused.
+  static String _kept(String key) {
+    if (!SettingsKeys.all.contains(key)) {
+      throw ArgumentError.value(key, 'key', 'not in SettingsKeys.all');
+    }
+    return key;
+  }
 }
 
 /// Set by main() before the app starts.
@@ -86,7 +119,7 @@ final panelsProvider = NotifierProvider<PanelsNotifier, List<SavedPanel>>(
 );
 
 class PanelsNotifier extends Notifier<List<SavedPanel>> {
-  static const _key = 'panels';
+  static const _key = SettingsKeys.panels;
 
   @override
   List<SavedPanel> build() =>
@@ -151,7 +184,7 @@ final activeIdProvider = NotifierProvider<ActiveIdNotifier, String?>(
 );
 
 class ActiveIdNotifier extends Notifier<String?> {
-  static const _key = 'active_panel';
+  static const _key = SettingsKeys.activePanel;
 
   @override
   String? build() {
@@ -330,6 +363,21 @@ class NoPanelApi implements DeviceApi {
   Future<void> keepStation() async {}
 
   @override
+  Future<StationsSave> saveStations(StationList edited) async =>
+      StationsSave.saved;
+
+  @override
+  Future<void> catalogStation({
+    required String name,
+    required String url,
+    String uuid = '',
+    required int act,
+  }) async {}
+
+  @override
+  Future<List<Genre>> radioGenres() async => const [];
+
+  @override
   Uri? web(String route) => null;
 
   @override
@@ -383,7 +431,7 @@ final appLanguageProvider = NotifierProvider<AppLanguageNotifier, AppLanguage>(
 );
 
 class AppLanguageNotifier extends Notifier<AppLanguage> {
-  static const _key = 'language';
+  static const _key = SettingsKeys.language;
 
   @override
   AppLanguage build() {
@@ -399,3 +447,10 @@ class AppLanguageNotifier extends Notifier<AppLanguage> {
     await ref.read(settingsStoreProvider).setString(_key, language.name);
   }
 }
+
+/// Radio Browser, asked from the phone: the catalogue and the stations' logos (D12).
+final radioBrowserProvider = Provider<RadioBrowser>((ref) {
+  final rb = RadioBrowser();
+  ref.onDispose(rb.close);
+  return rb;
+});

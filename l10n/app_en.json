@@ -32,5 +32,9 @@
   "mob.conn_lost": "Lost the connection to the streamer. Reconnecting…",
   "mob.no_link": "Cannot reach the streamer",
   "mob.err_code": "The streamer answered: {code}",
-  "mob.as_streamer": "Same as the streamer"
+  "mob.as_streamer": "Same as the streamer",
+  "mob.cat_play": "Play on the streamer",
+  "mob.cat_played": "Playing on the streamer: {name}",
+  "mob.cat_no_genres": "The streamer has no genre list",
+  "mob.st_conflict": "The list changed on the streamer — showing it; repeat your edit"
 }

@@ -26,6 +26,21 @@ class MainActivity : FlutterActivity() {
                 result.notImplemented()
             }
         }
+        // Countries by their ISO codes, in the app's language: the catalogue's country list. The
+        // web asks Intl.DisplayNames; here the phone's own locale data says it.
+        MethodChannel(messenger, "streamer/regions").setMethodCallHandler { call, result ->
+            if (call.method == "names") {
+                val codes = call.argument<List<String>>("codes").orEmpty()
+                val language = java.util.Locale(call.argument<String>("language") ?: "en")
+                result.success(
+                    codes.associateWith { code ->
+                        java.util.Locale("", code).getDisplayCountry(language).ifEmpty { code }
+                    },
+                )
+            } else {
+                result.notImplemented()
+            }
+        }
         EventChannel(messenger, "streamer/volume_keys/presses").setStreamHandler(
             object : EventChannel.StreamHandler {
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink) {

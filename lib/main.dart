@@ -11,12 +11,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {'language', 'panels', 'active_panel'},
+      allowList: SettingsKeys.all,
     ),
   );
   const secure = FlutterSecureStorage();
   final logins = <String, PanelLogin>{};
-  for (final panel in SavedPanel.listFromJson(prefs.getString('panels'))) {
+  for (final panel in SavedPanel.listFromJson(
+    prefs.getString(SettingsKeys.panels),
+  )) {
     final login = PanelLogin.fromJson(
       await secure.read(key: LoginsNotifier.key(panel.id)),
     );

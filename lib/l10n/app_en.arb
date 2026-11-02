@@ -466,6 +466,272 @@
       }
     }
   },
+  "stTabFav": "Favourites",
+  "@stTabFav": {
+    "description": "st.tab_fav"
+  },
+  "stTabTop": "Top",
+  "@stTabTop": {
+    "description": "st.tab_top"
+  },
+  "stTabCountries": "Countries",
+  "@stTabCountries": {
+    "description": "st.tab_countries"
+  },
+  "stTabGenres": "Genres",
+  "@stTabGenres": {
+    "description": "st.tab_genres"
+  },
+  "stTabSearch": "Search",
+  "@stTabSearch": {
+    "description": "st.tab_search"
+  },
+  "stAdd": "Add a stream",
+  "@stAdd": {
+    "description": "st.add"
+  },
+  "stActions": "Actions for “{name}”",
+  "@stActions": {
+    "description": "st.actions",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "stPlay": "Play",
+  "@stPlay": {
+    "description": "st.play"
+  },
+  "stName": "Name",
+  "@stName": {
+    "description": "st.name"
+  },
+  "stUrl": "Stream address",
+  "@stUrl": {
+    "description": "st.url"
+  },
+  "stToPreset": "To a button",
+  "@stToPreset": {
+    "description": "st.to_preset"
+  },
+  "stUnpreset": "Remove from the button",
+  "@stUnpreset": {
+    "description": "st.unpreset"
+  },
+  "stUp": "Up",
+  "@stUp": {
+    "description": "st.up"
+  },
+  "stDown": "Down",
+  "@stDown": {
+    "description": "st.down"
+  },
+  "stDelete": "Delete",
+  "@stDelete": {
+    "description": "st.delete"
+  },
+  "stDeletePlaying": "This station is playing — switch to another one to delete it.",
+  "@stDeletePlaying": {
+    "description": "st.delete_playing"
+  },
+  "stAddTitle": "Stream by address",
+  "@stAddTitle": {
+    "description": "st.add_title"
+  },
+  "stErrUrl": "An address starting with http:// or https:// is needed",
+  "@stErrUrl": {
+    "description": "st.err_url"
+  },
+  "stErrUrlLong": "The address is too long for the list: over 223 bytes",
+  "@stErrUrlLong": {
+    "description": "st.err_url_long"
+  },
+  "stErrDup": "This station is already there: “{name}”",
+  "@stErrDup": {
+    "description": "st.err_dup",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "stErrFull": "The list is full: 64 stations",
+  "@stErrFull": {
+    "description": "st.err_full"
+  },
+  "stSaved": "Saved",
+  "@stSaved": {
+    "description": "st.saved"
+  },
+  "stSaveFailed": "Could not save the list",
+  "@stSaveFailed": {
+    "description": "st.save_failed"
+  },
+  "catSortPop": "Popular",
+  "@catSortPop": {
+    "description": "cat.sort_pop"
+  },
+  "catSortVotes": "Votes",
+  "@catSortVotes": {
+    "description": "cat.sort_votes"
+  },
+  "catSortQuality": "Quality",
+  "@catSortQuality": {
+    "description": "cat.sort_quality"
+  },
+  "catSortAz": "A–Z",
+  "@catSortAz": {
+    "description": "cat.sort_az"
+  },
+  "catQuality": "Stream quality",
+  "@catQuality": {
+    "description": "cat.quality"
+  },
+  "catQAll": "All",
+  "@catQAll": {
+    "description": "cat.q_all"
+  },
+  "catQ128": "From 128 kbit/s",
+  "@catQ128": {
+    "description": "cat.q_128"
+  },
+  "catQ192": "From 192 kbit/s",
+  "@catQ192": {
+    "description": "cat.q_192"
+  },
+  "catQ320": "320 kbit/s",
+  "@catQ320": {
+    "description": "cat.q_320"
+  },
+  "catQFlac": "Lossless (FLAC)",
+  "@catQFlac": {
+    "description": "cat.q_flac"
+  },
+  "catUaOnly": "Ukraine only",
+  "@catUaOnly": {
+    "description": "cat.ua_only"
+  },
+  "catSearchPh": "Station name",
+  "@catSearchPh": {
+    "description": "cat.search_ph"
+  },
+  "catSearch": "Search",
+  "@catSearch": {
+    "description": "cat.search"
+  },
+  "catSearchHint": "Station name",
+  "@catSearchHint": {
+    "description": "cat.search_hint"
+  },
+  "catLossless": "lossless",
+  "@catLossless": {
+    "description": "cat.lossless"
+  },
+  "catPerDay": "{n} a day",
+  "@catPerDay": {
+    "description": "cat.per_day",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "catVotes": "{n, plural, one{{n} vote} few{{n} votes} many{{n} votes} other{{n} votes}}",
+  "@catVotes": {
+    "description": "cat.votes",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "catCountries": "{n, plural, one{{n} country} few{{n} countries} many{{n} countries} other{{n} countries}}",
+  "@catCountries": {
+    "description": "cat.countries",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "catGenres": "{n, plural, one{{n} genre} few{{n} genres} many{{n} genres} other{{n} genres}}",
+  "@catGenres": {
+    "description": "cat.genres",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "catStations": "{n, plural, one{{n} station} few{{n} stations} many{{n} stations} other{{n} stations}}",
+  "@catStations": {
+    "description": "cat.stations",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "catUnavailable": "The catalogue is unavailable: {e}",
+  "@catUnavailable": {
+    "description": "cat.unavailable",
+    "placeholders": {
+      "e": {
+        "type": "String"
+      }
+    }
+  },
+  "catNothing": "Nothing found",
+  "@catNothing": {
+    "description": "cat.nothing"
+  },
+  "catNothingPage": "Nothing playable on this page — try the next one",
+  "@catNothingPage": {
+    "description": "cat.nothing_page"
+  },
+  "catKeep": "To favourites",
+  "@catKeep": {
+    "description": "cat.keep"
+  },
+  "catToPreset": "To a button",
+  "@catToPreset": {
+    "description": "cat.to_preset"
+  },
+  "catKept": "Added to favourites: {name}",
+  "@catKept": {
+    "description": "cat.kept",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "catPrev": "Previous page",
+  "@catPrev": {
+    "description": "cat.prev"
+  },
+  "catNext": "Next page",
+  "@catNext": {
+    "description": "cat.next"
+  },
+  "catPage": "Page {n}",
+  "@catPage": {
+    "description": "cat.page",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "common.close"
+  },
+  "btnSave": "Save",
+  "@btnSave": {
+    "description": "btn.save"
+  },
   "manageKeep": "Keep this station in favourites",
   "@manageKeep": {
     "description": "manage.keep"
@@ -744,6 +1010,23 @@
   "@mobByAddress": {
     "description": "mob.by_address"
   },
+  "mobCatNoGenres": "The streamer has no genre list",
+  "@mobCatNoGenres": {
+    "description": "mob.cat_no_genres"
+  },
+  "mobCatPlay": "Play on the streamer",
+  "@mobCatPlay": {
+    "description": "mob.cat_play"
+  },
+  "mobCatPlayed": "Playing on the streamer: {name}",
+  "@mobCatPlayed": {
+    "description": "mob.cat_played",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "mobConnLost": "Lost the connection to the streamer. Reconnecting…",
   "@mobConnLost": {
     "description": "mob.conn_lost"
@@ -852,6 +1135,10 @@
   "mobSearching": "Looking for streamers…",
   "@mobSearching": {
     "description": "mob.searching"
+  },
+  "mobStConflict": "The list changed on the streamer — showing it; repeat your edit",
+  "@mobStConflict": {
+    "description": "mob.st_conflict"
   },
   "mobTryDemo": "Try the demo",
   "@mobTryDemo": {

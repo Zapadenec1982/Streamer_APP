@@ -109,10 +109,15 @@ class PanelLink {
   Future<void> write(Map<String, Object?> values) =>
       postJson('/api/settings', values);
 
-  /// A JSON POST of the HTTP API; the panel's JSON answer.
-  Future<Object?> postJson(String path, Map<String, Object?> body) async {
+  /// A JSON POST of the HTTP API; the panel's JSON answer. [ok] are the statuses that mean it was
+  /// taken — 202 where the panel queues the work.
+  Future<Object?> postJson(
+    String path,
+    Map<String, Object?> body, {
+    List<int> ok = const [200],
+  }) async {
     final res = await _send('POST', endpoint.http(path), jsonEncode(body));
-    final text = await _drain(res, ok: const [200]);
+    final text = await _drain(res, ok: ok);
     return text.isEmpty ? null : jsonDecode(text);
   }
 
