@@ -162,6 +162,43 @@ abstract final class Keys {
     'system.mdns_hostname',
     framework: true,
   );
+  static const uiBacklight = StateKey<int>('ui.backlight', writable: true);
+  static const uiStandbyBl = StateKey<int>('ui.standby_bl', writable: true);
+  static const uiStandbyMin = StateKey<int>('ui.standby_min', writable: true);
+  static const uiLang = StateKey<int>('ui.lang', writable: true);
+  static const airplayEnabled = StateKey<bool>(
+    'airplay.enabled',
+    writable: true,
+  );
+  static const airplayMode = StateKey<int>('airplay.mode', writable: true);
+  static const airplayModeError = StateKey<String>('airplay.mode_error');
+  static const airplaySwitching = StateKey<bool>('airplay.switching');
+  static const airplayModeStatus = StateKey<String>('airplay.mode_status');
+  static const dlnaEnabled = StateKey<bool>('dlna.enabled', writable: true);
+  static const radioCovers = StateKey<bool>('radio.covers', writable: true);
+  static const btLink = StateKey<bool>('bt.link');
+  static const btCodec = StateKey<String>('bt.codec');
+  static const btCfgRev = StateKey<int>('bt.cfg_rev');
+  static const btPairSeq = StateKey<int>('bt.pair_seq');
+  static const btPairActive = StateKey<bool>('bt.pair_active');
+  static const btPairKind = StateKey<int>('bt.pair_kind');
+  static const btPairName = StateKey<String>('bt.pair_name');
+  static const btPairBy = StateKey<int>('bt.pair_by');
+  static const btPairResult = StateKey<int>('bt.pair_result');
+
+  // the framework's Wi-Fi and clock (the firmware's NETWORK.md, "WiFiService", "Time")
+  static const wifiMode = StateKey<String>('wifi.mode', framework: true);
+  static const wifiConnected = StateKey<bool>(
+    'wifi.connected',
+    framework: true,
+  );
+  static const wifiSsid = StateKey<String>('wifi.ssid', framework: true);
+  static const wifiIp = StateKey<String>('wifi.ip', framework: true);
+  static const wifiTry = StateKey<String>('wifi.try', framework: true);
+  static const wifiTrySsid = StateKey<String>('wifi.try_ssid', framework: true);
+  static const wifiReason = StateKey<int>('wifi.reason', framework: true);
+  static const systemTime = StateKey<String>('system.time', framework: true);
+  static const systemDate = StateKey<String>('system.date', framework: true);
 
   static const all = <StateKey<Object>>[
     audioSource,
@@ -233,6 +270,35 @@ abstract final class Keys {
     radioSeekS,
     dlnaBrowseCmd,
     mdnsHostname,
+    uiBacklight,
+    uiStandbyBl,
+    uiStandbyMin,
+    uiLang,
+    airplayEnabled,
+    airplayMode,
+    airplayModeError,
+    airplaySwitching,
+    airplayModeStatus,
+    dlnaEnabled,
+    radioCovers,
+    btLink,
+    btCodec,
+    btCfgRev,
+    btPairSeq,
+    btPairActive,
+    btPairKind,
+    btPairName,
+    btPairBy,
+    btPairResult,
+    wifiMode,
+    wifiConnected,
+    wifiSsid,
+    wifiIp,
+    wifiTry,
+    wifiTrySsid,
+    wifiReason,
+    systemTime,
+    systemDate,
   ];
 }
 

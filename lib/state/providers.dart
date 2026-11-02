@@ -14,6 +14,7 @@ import '../device/panel/panel_link.dart';
 import '../device/panels.dart';
 import '../device/radio_browser.dart';
 import '../device/speakers.dart';
+import '../device/streamer.dart';
 
 /// Every setting the app keeps. The phone's store is opened with this list and refuses any other
 /// key (SharedPreferencesWithCache's allowList, main.dart) — and so does the tests' store, so a key
@@ -383,6 +384,72 @@ class NoPanelApi implements DeviceApi {
 
   @override
   Future<void> stopTone({SourceId? then, SpeakerWrite? write}) async {}
+
+  @override
+  Future<void> setPanel(PanelSetting setting, int value) async {}
+
+  @override
+  Future<void> setSwitch(PanelSwitch service, bool on) async {}
+
+  @override
+  Future<void> setAirplayMode(int mode) async {}
+
+  @override
+  Future<List<WifiNetwork>?> wifiScan() async => const [];
+
+  @override
+  Future<void> wifiJoin(String ssid, String password) async {}
+
+  @override
+  Future<void> wifiForget() async {}
+
+  @override
+  Future<WifiAp> wifiAp() async =>
+      const WifiAp(ssid: '', channel: 1, passwordSet: false);
+
+  @override
+  Future<void> setWifiAp(String ssid, String password, int channel) async {}
+
+  @override
+  Future<PanelTime> panelTime() async => const PanelTime(
+    time: '',
+    date: '',
+    ntp: true,
+    timezone: '',
+    synced: false,
+    unix: 0,
+  );
+
+  @override
+  Future<void> setPanelTime({
+    required bool ntp,
+    required String timezone,
+    int? unix,
+  }) async {}
+
+  @override
+  Future<BtInfo> bt() async => const BtInfo();
+
+  @override
+  Future<void> btSet({
+    bool? radio,
+    bool? discoverable,
+    bool? autoReconnect,
+    int? codecs,
+    String? name,
+  }) async {}
+
+  @override
+  Future<void> btForget(String addr) async {}
+
+  @override
+  Future<void> btDisconnect() async {}
+
+  @override
+  Future<void> btPair({required bool accept, required int seq}) async {}
+
+  @override
+  Future<void> restart() async {}
 
   @override
   Future<void> setLeveler(bool on) async {}

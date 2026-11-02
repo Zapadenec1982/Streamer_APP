@@ -33,6 +33,41 @@ class FakePanel {
     {'type': 'peak', 'f': 125, 'gain': 0.0, 'q': 1, 'on': false},
   ];
 
+  /// Wi-Fi, the clock and the Bluetooth module as their routes answer.
+  Map<String, Object?> wifiScan = const {
+    'ok': true,
+    'networks': [
+      {'ssid': 'Lantern Home', 'rssi': -48, 'auth': 'WPA2'},
+      {'ssid': 'Northbound Guest', 'rssi': -71, 'auth': 'open'},
+    ],
+  };
+  Map<String, Object?> wifiAp = const {
+    'ssid': 'ModESP-2C4C',
+    'channel': 1,
+    'password_set': false,
+  };
+  Map<String, Object?> time = const {
+    'time': '23:41',
+    'date': '02.11.2026',
+    'ntp_enabled': true,
+    'timezone': 'EET-2EEST,M3.5.0/3,M10.5.0/4',
+    'synced': true,
+    'unix': 1793662860,
+  };
+  Map<String, Object?> bt = const {
+    'linked': true,
+    'settings': true,
+    'known': true,
+    'radio': true,
+    'name': 'MODEsp',
+    'bonds': [],
+    'total': 0,
+  };
+
+  /// The next POST to /api/wifi or /api/bt is refused with this (status, body), once.
+  (int, Map<String, Object?>)? refuseNext;
+  int restarts = 0;
+
   /// The next EQ edit finds the document moved on the panel: 409, once.
   bool eqConflict = false;
   int eqKeeps = 0;
@@ -165,6 +200,27 @@ class FakePanel {
       // the whole state, as the poll of a page that shows diagnostics reads it
       case ('GET', '/api/state'):
         return _reply(req, 200, state);
+      case ('GET', '/api/wifi/scan'):
+        return _reply(req, 200, wifiScan);
+      case ('GET', '/api/wifi/ap'):
+        return _reply(req, 200, wifiAp);
+      case ('POST', '/api/wifi/ap'):
+        return _reply(req, 200, {'ok': true});
+      case ('GET', '/api/time'):
+        return _reply(req, 200, time);
+      case ('POST', '/api/time'):
+        return _reply(req, 200, {'ok': true});
+      case ('GET', '/api/bt'):
+        return _reply(req, 200, bt);
+      case ('POST', '/api/wifi') || ('POST', '/api/bt'):
+        if (refuseNext case (final status, final reply)) {
+          refuseNext = null;
+          return _reply(req, status, reply);
+        }
+        return _reply(req, 200, {'ok': true});
+      case ('POST', '/api/restart'):
+        restarts++;
+        return _reply(req, 200, {'ok': true});
       case ('GET', '/api/eq'):
         return _reply(req, 200, {
           'rev': eqRev,

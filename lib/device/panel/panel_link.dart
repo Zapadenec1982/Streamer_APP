@@ -9,13 +9,16 @@ import 'endpoint.dart';
 
 /// A refusal from the panel's HTTP API.
 class PanelError implements Exception {
-  const PanelError(this.status, [this.code]);
+  const PanelError(this.status, [this.code, this.body]);
 
   /// The HTTP status; 0 when the panel did not answer at all.
   final int status;
 
   /// The panel's own word for it (`{"error": code}`), when it gave one.
   final String? code;
+
+  /// The whole refusal, when it was JSON: what else the panel said (`{"error","by"}`).
+  final Map<String, Object?>? body;
 
   bool get unauthorized => status == 401;
 
@@ -189,15 +192,17 @@ class PanelLink {
     final text = await utf8.decodeStream(res);
     if (ok.contains(res.statusCode)) return text;
     String? code;
+    Map<String, Object?>? said;
     try {
       final body = jsonDecode(text);
+      if (body is Map) said = body.cast<String, Object?>();
       if (body is Map && body['error'] is String) {
         code = body['error'] as String;
       }
     } on FormatException {
       // a plain-text refusal (httpd's own pages)
     }
-    throw PanelError(res.statusCode, code);
+    throw PanelError(res.statusCode, code, said);
   }
 
   Future<void> _connect() async {

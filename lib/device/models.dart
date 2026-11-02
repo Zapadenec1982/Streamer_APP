@@ -3,8 +3,10 @@
 library;
 
 import 'speakers.dart';
+import 'streamer.dart';
 
 export 'speakers.dart' show Speakers, ToneState;
+export 'streamer.dart' show PairingState, StreamerState, WifiState;
 
 /// The values of `audio.source` (the firmware's CONCEPT.md, "SharedState contract: sources").
 enum SourceId {
@@ -210,6 +212,7 @@ class DeviceSnapshot {
     this.radio = const StationState(),
     this.speakers = const SpeakerState(),
     this.tone = const ToneState(),
+    this.streamer = const StreamerState(),
     this.hostname = '',
     this.cardIndex = -1,
     this.cardCount = 0,
@@ -247,6 +250,9 @@ class DeviceSnapshot {
   final StationState radio;
   final SpeakerState speakers;
   final ToneState tone;
+
+  /// The streamer's own settings: the screen, the services, Bluetooth, Wi-Fi, the clock.
+  final StreamerState streamer;
 }
 
 enum TransportAction { toggle, previous, next }

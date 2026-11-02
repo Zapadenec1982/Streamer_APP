@@ -4,6 +4,7 @@ import 'eq.dart';
 import 'keys.dart';
 import 'models.dart';
 import 'speakers.dart';
+import 'streamer.dart';
 
 /// A panel as the app sees it: `DemoDeviceApi`, or `PanelDeviceApi` for a real one. The app sends
 /// a command and shows what the panel then reports — it never assumes a command took effect, and
@@ -96,6 +97,65 @@ abstract interface class DeviceApi {
   /// The tone off and its mode back through the DSP: the source [then] first (null leaves it as
   /// it is), and [write] in the same body — what a search by hand found.
   Future<void> stopTone({SourceId? then, SpeakerWrite? write});
+
+  /// A setting of the screen's page or the language's, held to the streamer's range.
+  Future<void> setPanel(PanelSetting setting, int value);
+
+  /// AirPlay, DLNA, the radio's covers: on or off.
+  Future<void> setSwitch(PanelSwitch service, bool on);
+
+  /// 0 AirPlay 2, 1 AirPlay 1 for Windows.
+  Future<void> setAirplayMode(int mode);
+
+  /// The networks the streamer hears, strongest first; null when it could not look.
+  Future<List<WifiNetwork>?> wifiScan();
+
+  /// Joins [ssid] the way the glass does: the stored network is kept until the new one gives an
+  /// address, and comes back if it does not; the outcome comes over the WebSocket (wifi.try).
+  /// A join while another is on its way is refused, 409 `busy`.
+  Future<void> wifiJoin(String ssid, String password);
+
+  /// Forgets the network: the streamer goes to its own access point.
+  Future<void> wifiForget();
+
+  /// The access point the streamer falls back to.
+  Future<WifiAp> wifiAp();
+
+  /// The access point's name, password ('' for an open one) and channel, from the next start.
+  Future<void> setWifiAp(String ssid, String password, int channel);
+
+  Future<PanelTime> panelTime();
+
+  /// The clock from the internet or by hand ([unix], seconds), and its time zone.
+  Future<void> setPanelTime({
+    required bool ntp,
+    required String timezone,
+    int? unix,
+  });
+
+  /// The Bluetooth module's settings.
+  Future<BtInfo> bt();
+
+  /// A change of the Bluetooth module's settings; a refusal is a [PanelError] (409, its code).
+  Future<void> btSet({
+    bool? radio,
+    bool? discoverable,
+    bool? autoReconnect,
+    int? codecs,
+    String? name,
+  });
+
+  /// Forgets a phone by its address, or every one ("all").
+  Future<void> btForget(String addr);
+
+  /// Lets the connected phone go.
+  Future<void> btDisconnect();
+
+  /// The answer to pairing request [seq]; one answered first elsewhere is 409 `answered`.
+  Future<void> btPair({required bool accept, required int seq});
+
+  /// Saves the settings, stops the modules, restarts.
+  Future<void> restart();
 
   Future<StationList> stations();
 

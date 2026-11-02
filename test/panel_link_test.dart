@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/device/eq.dart';
+import 'package:streamer/device/streamer.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/endpoint.dart';
 import 'package:streamer/device/panel/panel_device_api.dart';
@@ -295,6 +296,109 @@ void main() {
     );
     final old = snapshotOf(const {}).sound;
     expect((old.volMax, old.volStart, old.levSchedule), (null, null, null));
+  });
+
+  test('Wi-Fi, the clock and Bluetooth go to their routes in the bodies the '
+      'streamer reads', () async {
+    final api = PanelDeviceApi(link);
+    Map<String, Object?> last() =>
+        (panel.requests.last.body! as Map).cast<String, Object?>();
+    expect(
+      [for (final n in (await api.wifiScan())!) n.ssid],
+      ['Lantern Home', 'Northbound Guest'],
+    );
+    await api.wifiJoin('Lantern Home', 'secret-pass');
+    expect(last(), {
+      'ssid': 'Lantern Home',
+      'password': 'secret-pass',
+      'join': true,
+    });
+    panel.refuseNext = (409, {'error': 'busy'});
+    await expectLater(
+      api.wifiJoin('Lantern Home', 'secret-pass'),
+      throwsA(isA<PanelError>().having((e) => e.code, 'code', 'busy')),
+    );
+    await api.wifiForget();
+    expect(last(), {'forget': true});
+    expect((await api.wifiAp()).ssid, 'ModESP-2C4C');
+    await api.setWifiAp('Lantern AP', 'appass123', 20);
+    expect(last(), {
+      'ssid': 'Lantern AP',
+      'password': 'appass123',
+      'channel': 13,
+    });
+    expect((await api.panelTime()).timezone, 'EET-2EEST,M3.5.0/3,M10.5.0/4');
+    await api.setPanelTime(
+      ntp: false,
+      timezone: 'CET-1CEST,M3.5.0,M10.5.0/3',
+      unix: 1793662860,
+    );
+    expect(last(), {
+      'mode': 'manual',
+      'timezone': 'CET-1CEST,M3.5.0,M10.5.0/3',
+      'time': 1793662860,
+    });
+    await api.setPanelTime(ntp: true, timezone: 'UTC12');
+    expect(last(), {'mode': 'ntp', 'timezone': 'UTC12'});
+    expect((await api.bt()).name, 'MODEsp');
+    await api.btSet(discoverable: true, codecs: 3);
+    expect(last(), {'discoverable': true, 'codecs': 3});
+    await api.btSet(name: 'Kitchen');
+    expect(last(), {'name': 'Kitchen'});
+    await api.btForget('all');
+    expect(last(), {'forget': 'all'});
+    await api.btDisconnect();
+    expect(last(), {'disconnect': true});
+    panel.refuseNext = (409, {'error': 'answered', 'by': 1});
+    await expectLater(
+      api.btPair(accept: true, seq: 4),
+      throwsA(
+        isA<PanelError>()
+            .having((e) => e.code, 'code', 'answered')
+            .having((e) => e.body?['by'], 'by', 1),
+      ),
+    );
+    expect(last(), {'pair': 'accept', 'seq': 4});
+    await api.restart();
+    expect(panel.restarts, 1);
+  });
+
+  test('the streamer\'s own settings in a snapshot', () {
+    final s = snapshotOf({
+      'ui.backlight': 60,
+      'ui.standby_min': 15,
+      'ui.lang': 2,
+      'airplay.enabled': true,
+      'airplay.mode': 1,
+      'airplay.switching': true,
+      'airplay.mode_status': '@airplay.st_switching',
+      'dlna.enabled': false,
+      'bt.link': true,
+      'bt.peer': 'Phone',
+      'bt.cfg_rev': 9,
+      'bt.pair_seq': 3,
+      'bt.pair_active': true,
+      'bt.pair_kind': 1,
+      'bt.pair_name': 'Tablet',
+      'wifi.mode': 'sta',
+      'wifi.connected': true,
+      'wifi.ssid': 'Lantern Home',
+      'wifi.ip': '192.168.1.47',
+      'wifi.try': 'fail',
+      'wifi.reason': 202,
+      'system.time': '23:41',
+    }).streamer;
+    expect((s.backlight, s.sleepMinutes, s.language), (60, 15, 2));
+    expect((s.airplay, s.airplayMode, s.airplaySwitching), (true, 1, true));
+    expect((s.dlna, s.covers), (false, null));
+    expect((s.btLink, s.btPeer, s.btConfigRev), (true, 'Phone', 9));
+    expect(
+      (s.pairing.seq, s.pairing.active, s.pairing.kind, s.pairing.name),
+      (3, true, PairKind.consent, 'Tablet'),
+    );
+    expect(s.wifi.network, 'Lantern Home');
+    expect((s.wifi.tryState, s.wifi.reason), ('fail', 202));
+    expect(s.time, '23:41');
   });
 
   test('the station list: a preset naming no station is empty', () async {

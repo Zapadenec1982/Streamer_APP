@@ -7,6 +7,7 @@ import '../face.dart';
 import '../keys.dart';
 import '../models.dart';
 import '../speakers.dart';
+import '../streamer.dart';
 import '../stations.dart';
 import 'panel_link.dart';
 
@@ -211,6 +212,90 @@ class PanelDeviceApi implements DeviceApi {
   });
 
   @override
+  Future<void> setPanel(PanelSetting setting, int value) =>
+      link.write({setting.key.name: value.clamp(setting.min, setting.max)});
+
+  @override
+  Future<void> setSwitch(PanelSwitch service, bool on) =>
+      link.write({service.key.name: on});
+
+  @override
+  Future<void> setAirplayMode(int mode) =>
+      link.write({Keys.airplayMode.name: mode == 1 ? 1 : 0});
+
+  @override
+  Future<List<WifiNetwork>?> wifiScan() async =>
+      networksOf(await link.getJson('/api/wifi/scan'));
+
+  @override
+  Future<void> wifiJoin(String ssid, String password) => link.postJson(
+    '/api/wifi',
+    {'ssid': ssid, 'password': password, 'join': true},
+  );
+
+  @override
+  Future<void> wifiForget() => link.postJson('/api/wifi', {'forget': true});
+
+  @override
+  Future<WifiAp> wifiAp() async =>
+      WifiAp.fromJson(await link.getJson('/api/wifi/ap'));
+
+  @override
+  Future<void> setWifiAp(String ssid, String password, int channel) =>
+      link.postJson('/api/wifi/ap', {
+        'ssid': ssid,
+        'password': password,
+        'channel': channel.clamp(1, 13),
+      });
+
+  @override
+  Future<PanelTime> panelTime() async =>
+      PanelTime.fromJson(await link.getJson('/api/time'));
+
+  @override
+  Future<void> setPanelTime({
+    required bool ntp,
+    required String timezone,
+    int? unix,
+  }) => link.postJson('/api/time', {
+    'mode': ntp ? 'ntp' : 'manual',
+    'timezone': timezone,
+    'time': ?unix,
+  });
+
+  @override
+  Future<BtInfo> bt() async => BtInfo.fromJson(await link.getJson('/api/bt'));
+
+  @override
+  Future<void> btSet({
+    bool? radio,
+    bool? discoverable,
+    bool? autoReconnect,
+    int? codecs,
+    String? name,
+  }) => link.postJson('/api/bt', {
+    'radio': ?radio,
+    'discoverable': ?discoverable,
+    'auto_reconnect': ?autoReconnect,
+    'codecs': ?codecs,
+    'name': ?name,
+  });
+
+  @override
+  Future<void> btForget(String addr) =>
+      link.postJson('/api/bt', {'forget': addr});
+
+  @override
+  Future<void> btDisconnect() => link.postJson('/api/bt', {'disconnect': true});
+
+  @override
+  Future<void> btPair({required bool accept, required int seq}) => link
+      .postJson('/api/bt', {'pair': accept ? 'accept' : 'reject', 'seq': seq});
+
+  @override
+  Future<void> restart() => link.postJson('/api/restart', const {});
+
+  @override
   Future<void> stopTone({SourceId? then, SpeakerWrite? write}) => link.write({
     Keys.audioSource.name: ?then?.value,
     Keys.audioToneMode.name: ToneMode.chain.value,
@@ -381,6 +466,7 @@ DeviceSnapshot snapshotOf(
       meterStatus: Keys.audioPortMeasStatus.of(s) ?? '',
       meterHz: Keys.audioPortMeasHz.of(s) ?? 0,
     ),
+    streamer: streamerOf(s),
     tone: ToneState(
       on: Keys.audioSource.of(s) == SourceId.tone.value,
       mode: ToneMode.of(Keys.audioToneMode.of(s)),
@@ -391,6 +477,44 @@ DeviceSnapshot snapshotOf(
     radio: radioOf(s),
   );
 }
+
+/// The streamer's own settings in a state.
+StreamerState streamerOf(Map<String, Object?> s) => StreamerState(
+  backlight: Keys.uiBacklight.of(s) ?? 80,
+  standbyBacklight: Keys.uiStandbyBl.of(s) ?? 25,
+  sleepMinutes: Keys.uiStandbyMin.of(s) ?? 5,
+  language: Keys.uiLang.of(s),
+  airplay: Keys.airplayEnabled.of(s),
+  airplayMode: Keys.airplayMode.of(s) ?? 0,
+  airplayModeError: Keys.airplayModeError.of(s) ?? '',
+  airplaySwitching: Keys.airplaySwitching.of(s) ?? false,
+  airplayModeStatus: Keys.airplayModeStatus.of(s) ?? '',
+  dlna: Keys.dlnaEnabled.of(s),
+  covers: Keys.radioCovers.of(s),
+  btLink: Keys.btLink.of(s) ?? false,
+  btPeer: Keys.btPeer.of(s) ?? '',
+  btCodec: Keys.btCodec.of(s) ?? '',
+  btConfigRev: Keys.btCfgRev.of(s) ?? 0,
+  pairing: PairingState(
+    seq: Keys.btPairSeq.of(s) ?? 0,
+    active: Keys.btPairActive.of(s) ?? false,
+    kind: PairKind.of(Keys.btPairKind.of(s)),
+    name: Keys.btPairName.of(s) ?? '',
+    by: Keys.btPairBy.of(s) ?? 0,
+    result: Keys.btPairResult.of(s) ?? 255,
+  ),
+  wifi: WifiState(
+    mode: Keys.wifiMode.of(s) ?? '',
+    connected: Keys.wifiConnected.of(s) ?? false,
+    ssid: Keys.wifiSsid.of(s) ?? '',
+    ip: Keys.wifiIp.of(s) ?? '',
+    tryState: Keys.wifiTry.of(s) ?? '',
+    trySsid: Keys.wifiTrySsid.of(s) ?? '',
+    reason: Keys.wifiReason.of(s) ?? 0,
+  ),
+  time: Keys.systemTime.of(s) ?? '',
+  date: Keys.systemDate.of(s) ?? '',
+);
 
 /// The speakers as the panel keeps them.
 Speakers speakersOf(Map<String, Object?> s) => Speakers(

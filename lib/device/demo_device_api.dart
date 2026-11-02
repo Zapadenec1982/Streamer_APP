@@ -8,7 +8,9 @@ import 'eq.dart';
 import 'keys.dart';
 import 'media.dart';
 import 'models.dart';
+import 'panel/panel_link.dart';
 import 'speakers.dart';
+import 'streamer.dart';
 
 class _Track {
   const _Track(
@@ -314,6 +316,61 @@ class DemoDeviceApi implements DeviceApi {
   int _balance = 0;
   var _speakers = const Speakers();
 
+  // the streamer's own settings
+  int _backlight = 80;
+  int _standbyBacklight = 25;
+  int _sleepMinutes = 5;
+  int _scheme = 0;
+  int _language = 0;
+  bool _airplay = true;
+  int _airplayMode = 0;
+  bool _dlnaOn = true;
+  bool _covers = true;
+
+  /// The Bluetooth module and the phones it remembers — made up, as the rest.
+  var _bt = const BtInfo(
+    linked: true,
+    settings: true,
+    known: true,
+    radio: true,
+    autoReconnect: true,
+    name: panelName,
+    codecsSupported: 1 | 2 | 4 | 16,
+    codecsEnabled: 1 | 2 | 16,
+    bonds: [
+      BtBond(
+        addr: '4C:2E:5E:00:12:7A',
+        name: 'Phone',
+        connected: true,
+        last: true,
+      ),
+      BtBond(addr: '9A:51:0C:3B:44:E1', name: 'Tablet'),
+    ],
+    total: 2,
+  );
+  int _btRev = 1;
+  var _pairing = const PairingState();
+  int? _pairCode;
+
+  /// Wi-Fi: the networks the demo hears, the one it is on, a join on its way.
+  static const _networks = [
+    WifiNetwork(ssid: 'Lantern Home', rssi: -48, auth: 'WPA2'),
+    WifiNetwork(ssid: 'Cedar Line 5G', rssi: -63, auth: 'WPA2/WPA3'),
+    WifiNetwork(ssid: 'Northbound Guest', rssi: -71, auth: 'open'),
+    WifiNetwork(ssid: 'Old Attic', rssi: -80, auth: 'WEP'),
+  ];
+  String _wifiMode = 'sta';
+  String _wifiSsid = 'Lantern Home';
+  String _wifiTry = '';
+  String _wifiTrySsid = '';
+  Duration _joinLeft = Duration.zero;
+  var _ap = const WifiAp(ssid: 'ModESP-2C4C', channel: 1, passwordSet: false);
+
+  /// The clock: the phone's, as an NTP-set streamer's would be, or one set by hand.
+  bool _ntp = true;
+  String _timezone = 'EET-2EEST,M3.5.0/3,M10.5.0/4';
+  Duration _clockOffset = Duration.zero;
+
   /// The port meter: on, at which speaker, how far its sweep is, its last word and what it found.
   bool _measuring = false;
   int _meterChannel = 1;
@@ -419,6 +476,15 @@ class DemoDeviceApi implements DeviceApi {
     }
     if (_measuring) {
       _measure(elapsed);
+      changed = true;
+    }
+    if (_joinLeft > Duration.zero) {
+      _joinLeft -= elapsed;
+      if (_joinLeft <= Duration.zero) {
+        _wifiMode = 'sta';
+        _wifiSsid = _wifiTrySsid;
+        _wifiTry = 'ok';
+      }
       changed = true;
     }
     if (changed) _emit();
@@ -736,6 +802,239 @@ class DemoDeviceApi implements DeviceApi {
   }
 
   @override
+  Future<void> setPanel(PanelSetting setting, int value) async {
+    final v = value.clamp(setting.min, setting.max);
+    switch (setting) {
+      case PanelSetting.backlight:
+        _backlight = v;
+      case PanelSetting.standbyBacklight:
+        _standbyBacklight = v;
+      case PanelSetting.sleepMinutes:
+        _sleepMinutes = v;
+      case PanelSetting.scheme:
+        _scheme = v;
+      case PanelSetting.language:
+        _language = v;
+    }
+    _emit();
+  }
+
+  @override
+  Future<void> setSwitch(PanelSwitch service, bool on) async {
+    switch (service) {
+      case PanelSwitch.airplay:
+        _airplay = on;
+      case PanelSwitch.dlna:
+        _dlnaOn = on;
+      case PanelSwitch.covers:
+        _covers = on;
+    }
+    _emit();
+  }
+
+  @override
+  Future<void> setAirplayMode(int mode) async {
+    _airplayMode = mode == 1 ? 1 : 0;
+    _emit();
+  }
+
+  @override
+  Future<List<WifiNetwork>?> wifiScan() async => _networks;
+
+  /// A join takes the demo three seconds and works: the networks are made up.
+  @override
+  Future<void> wifiJoin(String ssid, String password) async {
+    if (_wifiTry == 'connecting') throw const PanelError(409, 'busy');
+    _wifiTry = 'connecting';
+    _wifiTrySsid = ssid;
+    _joinLeft = const Duration(seconds: 3);
+    _emit();
+  }
+
+  @override
+  Future<void> wifiForget() async {
+    _wifiMode = 'ap';
+    _wifiSsid = _ap.ssid;
+    _wifiTry = '';
+    _emit();
+  }
+
+  @override
+  Future<WifiAp> wifiAp() async => _ap;
+
+  @override
+  Future<void> setWifiAp(String ssid, String password, int channel) async {
+    _ap = WifiAp(
+      ssid: ssid,
+      channel: channel.clamp(1, 13),
+      passwordSet: password.isNotEmpty,
+    );
+  }
+
+  DateTime get _clockNow => DateTime.now().add(_clockOffset);
+
+  @override
+  Future<PanelTime> panelTime() async {
+    final now = _clockNow;
+    return PanelTime(
+      time: _clock(now),
+      date: _date(now),
+      ntp: _ntp,
+      timezone: _timezone,
+      synced: true,
+      unix: now.millisecondsSinceEpoch ~/ 1000,
+    );
+  }
+
+  static String _two(int n) => '$n'.padLeft(2, '0');
+  static String _clock(DateTime t) => '${_two(t.hour)}:${_two(t.minute)}';
+  static String _date(DateTime t) =>
+      '${_two(t.day)}.${_two(t.month)}.${t.year}';
+
+  @override
+  Future<void> setPanelTime({
+    required bool ntp,
+    required String timezone,
+    int? unix,
+  }) async {
+    _ntp = ntp;
+    _timezone = timezone;
+    if (ntp) {
+      _clockOffset = Duration.zero;
+    } else if (unix != null) {
+      _clockOffset = DateTime.fromMillisecondsSinceEpoch(unix * 1000)
+          .difference(DateTime.now());
+    }
+    _emit();
+  }
+
+  @override
+  Future<BtInfo> bt() async => BtInfo(
+    linked: _bt.linked,
+    settings: _bt.settings,
+    known: _bt.known,
+    radio: _bt.radio,
+    discoverable: _bt.discoverable,
+    autoReconnect: _bt.autoReconnect,
+    name: _bt.name,
+    codecsSupported: _bt.codecsSupported,
+    codecsEnabled: _bt.codecsEnabled,
+    bonds: _bt.bonds,
+    total: _bt.bonds.length,
+    pairingSeq: _pairing.active ? _pairing.seq : 0,
+    pairingCode: _pairing.active ? _pairCode : null,
+  );
+
+  @override
+  Future<void> btSet({
+    bool? radio,
+    bool? discoverable,
+    bool? autoReconnect,
+    int? codecs,
+    String? name,
+  }) async {
+    if (name != null) {
+      final n = name.trim();
+      if (n.isEmpty || utf8Length(n) > btNameMax) {
+        throw const PanelError(400, 'name');
+      }
+    }
+    _bt = BtInfo(
+      linked: true,
+      settings: true,
+      known: true,
+      radio: radio ?? _bt.radio,
+      discoverable: discoverable ?? _bt.discoverable,
+      autoReconnect: autoReconnect ?? _bt.autoReconnect,
+      name: name?.trim() ?? _bt.name,
+      codecsSupported: _bt.codecsSupported,
+      codecsEnabled: codecs ?? _bt.codecsEnabled,
+      bonds: _bt.bonds,
+      total: _bt.bonds.length,
+    );
+    _btRev++;
+    _emit();
+  }
+
+  @override
+  Future<void> btForget(String addr) async {
+    final bonds = addr == 'all'
+        ? const <BtBond>[]
+        : [
+            for (final b in _bt.bonds)
+              if (b.addr != addr) b,
+          ];
+    _bt = BtInfo(
+      linked: true,
+      settings: true,
+      known: true,
+      radio: _bt.radio,
+      discoverable: _bt.discoverable,
+      autoReconnect: _bt.autoReconnect,
+      name: _bt.name,
+      codecsSupported: _bt.codecsSupported,
+      codecsEnabled: _bt.codecsEnabled,
+      bonds: bonds,
+      total: bonds.length,
+    );
+    _btRev++;
+    _emit();
+  }
+
+  @override
+  Future<void> btDisconnect() async {
+    _bt = BtInfo(
+      linked: true,
+      settings: true,
+      known: true,
+      radio: _bt.radio,
+      discoverable: _bt.discoverable,
+      autoReconnect: _bt.autoReconnect,
+      name: _bt.name,
+      codecsSupported: _bt.codecsSupported,
+      codecsEnabled: _bt.codecsEnabled,
+      bonds: [
+        for (final b in _bt.bonds)
+          BtBond(addr: b.addr, name: b.name, last: b.last),
+      ],
+      total: _bt.bonds.length,
+    );
+    _btRev++;
+    _emit();
+  }
+
+  /// A phone asks to pair, as one would over the air: the question, and its code.
+  void askToPair(String phone, {PairKind kind = PairKind.numeric}) {
+    _pairing = PairingState(
+      seq: _pairing.seq + 1,
+      active: true,
+      kind: kind,
+      name: phone,
+    );
+    _pairCode = 482916;
+    _emit();
+  }
+
+  @override
+  Future<void> btPair({required bool accept, required int seq}) async {
+    if (!_pairing.active || seq != _pairing.seq) {
+      throw const PanelError(409, 'answered', {'error': 'answered', 'by': 1});
+    }
+    _pairing = PairingState(
+      seq: _pairing.seq,
+      kind: _pairing.kind,
+      name: _pairing.name,
+      by: 2,
+      result: accept ? 0 : 1,
+    );
+    _emit();
+  }
+
+  /// The demo has nothing to restart: it comes straight back.
+  @override
+  Future<void> restart() async {}
+
+  @override
   Future<StationList> stations() async => StationList(
     rev: _listRev,
     stations: [
@@ -911,7 +1210,7 @@ class DemoDeviceApi implements DeviceApi {
     final cover = now.coverKey;
     return DeviceSnapshot(
       name: panelName,
-      scheme: 0,
+      scheme: _scheme,
       now: now,
       // the Player's background follows the cover, as the panel's does (ui.cover_rgb)
       backdrop: cover != null && now.kind != NowKind.radio
@@ -964,6 +1263,31 @@ class DemoDeviceApi implements DeviceApi {
         on: _source == SourceId.tone,
         mode: _toneMode,
         hz: _toneHz,
+      ),
+      streamer: StreamerState(
+        backlight: _backlight,
+        standbyBacklight: _standbyBacklight,
+        sleepMinutes: _sleepMinutes,
+        language: _language,
+        airplay: _airplay,
+        airplayMode: _airplayMode,
+        dlna: _dlnaOn,
+        covers: _covers,
+        btLink: true,
+        btPeer: _bt.bonds.any((b) => b.connected) ? 'Phone' : '',
+        btCodec: 'LHDC V5',
+        btConfigRev: _btRev,
+        pairing: _pairing,
+        wifi: WifiState(
+          mode: _wifiMode,
+          connected: _wifiMode == 'sta',
+          ssid: _wifiSsid,
+          ip: _wifiMode == 'sta' ? '192.168.1.47' : accessPointIp,
+          tryState: _wifiTry,
+          trySsid: _wifiTrySsid,
+        ),
+        time: _clock(_clockNow),
+        date: _date(_clockNow),
       ),
       radio: StationState(
         current: _catalog != null ? -1 : _station,
