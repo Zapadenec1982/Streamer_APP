@@ -190,10 +190,15 @@ class DeviceSnapshot {
     this.backdrop,
     this.sound = const SoundState(),
     this.radio = const StationState(),
+    this.hostname = '',
   });
 
   /// The panel's device name — what AirPlay and Bluetooth list it by.
   final String name;
+
+  /// The panel's mDNS host name ("modesp-2c4c"): what the app knows it by, however it was added;
+  /// empty until it says so, and for the demo.
+  final String hostname;
 
   /// `ui.theme`: the panel's colour scheme, which the app wears too.
   final int scheme;

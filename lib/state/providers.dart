@@ -111,6 +111,38 @@ class PanelsNotifier extends Notifier<List<SavedPanel>> {
       await ref.read(activeIdProvider.notifier).set(null);
     }
   }
+
+  /// A panel added by its address has said its mDNS host name: from now on it goes by that, as
+  /// discovery knows it, so one panel stays one entry however it was added. An entry that already
+  /// had that name gives way to this one — its address is the one that just worked. The login and
+  /// the choice follow.
+  Future<void> rename(String from, String to) async {
+    final i = state.indexWhere((p) => p.id == from);
+    if (i < 0 || from == to) return;
+    final old = state[i];
+    final moved = SavedPanel(
+      id: to,
+      name: old.name,
+      host: old.host,
+      port: old.port,
+    );
+    state = [
+      for (final p in state)
+        if (p.id == from) moved else if (p.id != to) p,
+    ];
+    await ref
+        .read(settingsStoreProvider)
+        .setString(_key, SavedPanel.listToJson(state));
+    final logins = ref.read(loginsProvider.notifier);
+    final login = ref.read(loginsProvider)[from];
+    if (login != null) {
+      await logins.save(to, login);
+      await logins.forget(from);
+    }
+    if (ref.read(activeIdProvider) == from) {
+      await ref.read(activeIdProvider.notifier).set(to);
+    }
+  }
 }
 
 /// The id of the panel the app shows: a saved panel's, [PanelChoice.demoId], or null.
@@ -157,18 +189,21 @@ final deviceApiProvider = Provider<DeviceApi>((ref) {
         ? panel.endpoint
         : panel.endpoint.withLogin(login.user, login.password);
     final panelApi = PanelDeviceApi(PanelLink(endpoint));
-    // the panel names itself once it has spoken: keep that name in the list
+    // the panel names itself once it has spoken: keep that name in the list, and know the panel by
+    // its host name from then on (a new connection, once, for one added by its address)
     final sub = panelApi.changes.listen((s) {
-      if (s.known && s.name.isNotEmpty && s.name != panel.name) {
-        final saved = ref
-            .read(panelsProvider)
-            .where((p) => p.id == panel.id)
-            .firstOrNull;
-        if (saved != null && saved.name != s.name) {
-          unawaited(
-            ref.read(panelsProvider.notifier).put(saved.copyWith(name: s.name)),
-          );
-        }
+      if (!s.known) return;
+      final panels = ref.read(panelsProvider.notifier);
+      final saved = ref
+          .read(panelsProvider)
+          .where((p) => p.id == panel.id)
+          .firstOrNull;
+      if (saved == null) return;
+      if (s.name.isNotEmpty && saved.name != s.name) {
+        unawaited(panels.put(saved.copyWith(name: s.name)));
+      }
+      if (s.hostname.isNotEmpty && s.hostname != panel.id) {
+        unawaited(panels.rename(panel.id, s.hostname));
       }
     });
     ref.onDispose(sub.cancel);

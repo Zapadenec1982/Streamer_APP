@@ -200,6 +200,7 @@ DeviceSnapshot snapshotOf(
       final rgb? when rgb > 0 => rgb,
       _ => null,
     },
+    hostname: Keys.mdnsHostname.of(s) ?? '',
     sound: SoundState(
       bass: Keys.audioBassDb.of(s) ?? 0,
       treble: Keys.audioTrebleDb.of(s) ?? 0,
