@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +22,10 @@ class PanelPage extends ConsumerWidget {
     final choice = ref.watch(activePanelProvider);
     if (choice is NoPanel) return const _ConnectPrompt();
     final snapshot = ref.watch(snapshotProvider);
-    if (!snapshot.known) return _Waiting(status: snapshot.status);
+    // another panel chosen is waited for afresh
+    if (!snapshot.known) {
+      return _Waiting(key: ValueKey(choice.id), status: snapshot.status);
+    }
     return Column(
       children: [
         if (snapshot.status != LinkStatus.ready)
@@ -45,48 +50,134 @@ class _Strip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      color: colors.surfaceContainerHigh,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          const SizedBox.square(
-            dimension: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              _words(AppLocalizations.of(context), status, known: true),
-              style: Theme.of(context).textTheme.bodyMedium,
+    // TalkBack says it as it appears
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        width: double.infinity,
+        color: colors.surfaceContainerHigh,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            const SizedBox.square(
+              dimension: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _words(AppLocalizations.of(context), status, known: true),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _Waiting extends StatelessWidget {
-  const _Waiting({required this.status});
+/// The panel has not spoken yet. For a while that is «Підключення…»; a panel that still has not
+/// answered after [_patience] is said to be out of reach, with the way to try again at once or to
+/// choose another — the link keeps trying by itself all the while. A busy panel is not out of
+/// reach: it says so, and the link tries again every 5 s.
+class _Waiting extends ConsumerStatefulWidget {
+  const _Waiting({super.key, required this.status});
 
   final LinkStatus status;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const CircularProgressIndicator(),
-        const SizedBox(height: 16),
-        Text(
-          _words(AppLocalizations.of(context), status, known: false),
-          textAlign: TextAlign.center,
+  ConsumerState<_Waiting> createState() => _WaitingState();
+}
+
+class _WaitingState extends ConsumerState<_Waiting> {
+  static const _patience = Duration(seconds: 10);
+
+  Timer? _timer;
+  bool _late = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _wait();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _wait() {
+    _timer?.cancel();
+    _late = false;
+    _timer = Timer(_patience, () {
+      if (mounted) setState(() => _late = true);
+    });
+  }
+
+  void _retry() {
+    // let go of the panel and take it again: a new attempt now, not at the end of the backoff
+    ref.read(deviceApiProvider)
+      ..suspend()
+      ..resume();
+    setState(_wait);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final text = Theme.of(context).textTheme;
+    final unreachable = _late && widget.status == LinkStatus.connecting;
+    return SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Semantics(
+            liveRegion: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: unreachable
+                  ? [
+                      Icon(
+                        Icons.wifi_off,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l.appError,
+                        style: text.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l.mobNoPanelNote,
+                        style: text.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton(onPressed: _retry, child: Text(l.appRetry)),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () => context.go('/settings/panels'),
+                        child: Text(l.mobOtherPanel),
+                      ),
+                    ]
+                  : [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(
+                        _words(l, widget.status, known: false),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+            ),
+          ),
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 class _ConnectPrompt extends ConsumerWidget {

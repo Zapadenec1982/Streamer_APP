@@ -45,6 +45,7 @@ now.usb
 now.tone
 now.aux
 now.cover
+progress.position
 
 # transport and volume
 transport.play

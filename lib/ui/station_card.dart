@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
+import 'fit.dart';
 import 'station_badge.dart';
 import 'writes.dart';
 
@@ -84,7 +85,8 @@ class StationPresets extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final radio = ref.watch(snapshotProvider.select((s) => s.radio));
-    final list = ref.watch(stationListProvider).value;
+    final stations = ref.watch(stationListProvider);
+    final list = stations.value;
     Future<void> store(int slot) async {
       HapticFeedback.mediumImpact();
       final name = ref.read(snapshotProvider).now.title;
@@ -94,46 +96,67 @@ class StationPresets extends ConsumerWidget {
       }
     }
 
+    // the list did not come: say so where the presets would be, with the way to ask again
+    if (list == null && stations.hasError) {
+      return Row(
+        children: [
+          Expanded(child: Text(l.stLoadFailed)),
+          TextButton(
+            onPressed: () => ref.invalidate(stationListProvider),
+            child: Text(l.appRetry),
+          ),
+        ],
+      );
+    }
+    Station? at(int slot) => switch (list?.presets[slot]) {
+      final int i? when i >= 0 => list!.stations[i],
+      _ => null,
+    };
+    // until the list comes the buttons show their numbers only, not «Порожньо»
+    String name(int slot) =>
+        list == null ? '' : at(slot)?.name ?? _Preset.empty(l, radio.storable);
+    final names = [
+      for (var slot = 0; slot < StationList.presetCount; slot++) name(slot),
+    ];
     return Column(
       children: [
-        GridView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            mainAxisExtent: _Preset.height(context),
+        LayoutBuilder(
+          builder: (context, box) => GridView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: _Preset.columns(context, box.maxWidth, names),
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              mainAxisExtent: _Preset.height(context),
+            ),
+            children: [
+              for (var slot = 0; slot < StationList.presetCount; slot++)
+                _Preset(
+                  slot: slot,
+                  name: names[slot],
+                  station: at(slot),
+                  on:
+                      list != null &&
+                      list.presets[slot] >= 0 &&
+                      list.presets[slot] == radio.current,
+                  onTap: list == null
+                      ? null
+                      : list.presets[slot] >= 0
+                      ? () => act(
+                          context,
+                          ref,
+                          (api) => api.listen(list.presets[slot]),
+                        )
+                      : radio.storable
+                      ? () => store(slot)
+                      : null,
+                  onHold: list != null && radio.storable
+                      ? () => store(slot)
+                      : null,
+                ),
+            ],
           ),
-          children: [
-            for (var slot = 0; slot < StationList.presetCount; slot++)
-              _Preset(
-                slot: slot,
-                station: switch (list?.presets[slot]) {
-                  final int i? when i >= 0 => list!.stations[i],
-                  _ => null,
-                },
-                on:
-                    list != null &&
-                    list.presets[slot] >= 0 &&
-                    list.presets[slot] == radio.current,
-                storable: radio.storable,
-                onTap: list == null
-                    ? null
-                    : list.presets[slot] >= 0
-                    ? () => act(
-                        context,
-                        ref,
-                        (api) => api.listen(list.presets[slot]),
-                      )
-                    : radio.storable
-                    ? () => store(slot)
-                    : null,
-                onHold: list != null && radio.storable
-                    ? () => store(slot)
-                    : null,
-              ),
-          ],
         ),
         if (radio.count > 0)
           Align(
@@ -153,19 +176,27 @@ class StationPresets extends ConsumerWidget {
 class _Preset extends StatelessWidget {
   const _Preset({
     required this.slot,
+    required this.name,
     required this.station,
     required this.on,
-    required this.storable,
     required this.onTap,
     required this.onHold,
   });
 
   final int slot;
+
+  /// What the button says: the station's name, or what an empty one is for.
+  final String name;
   final Station? station;
   final bool on;
-  final bool storable;
   final VoidCallback? onTap;
   final VoidCallback? onHold;
+
+  static const _gap = 8.0;
+  static const _disc = 28.0;
+
+  static String empty(AppLocalizations l, bool storable) =>
+      storable ? l.stPresetStore : l.stPresetEmpty;
 
   /// Two lines of the name at the phone's text size, and never under the 56 dp a finger needs.
   static double height(BuildContext context) {
@@ -176,53 +207,81 @@ class _Preset extends StatelessWidget {
     return (2 * line + 16).clamp(56, double.infinity);
   }
 
+  /// Three to a row, as the glass has them — fewer when a word of a name would not fit a button
+  /// and break in the middle at the phone's text size.
+  static int columns(BuildContext context, double width, List<String> names) {
+    final word = widestWord(
+      context,
+      names,
+      Theme.of(context).textTheme.labelMedium,
+    );
+    for (final n in const [3, 2]) {
+      final button = (width - (n - 1) * _gap) / n;
+      if (button - 2 * _gap - _disc - _gap >= word) return n;
+    }
+    return 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final st = station;
-    return Material(
-      color: on ? colors.primaryContainer : colors.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: on
-            ? BorderSide(color: colors.primary, width: 2)
-            : BorderSide.none,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onHold,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            children: [
-              if (st != null)
-                StationDisc(name: st.name, size: 28)
-              else
-                Container(
-                  width: 28,
-                  height: 28,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colors.outlineVariant),
+    // one stop for TalkBack: «кнопка 2, Northbound FM», with what a tap and a hold do
+    return Semantics(
+      container: true,
+      button: true,
+      selected: on,
+      label: name.isEmpty
+          ? l.stPresetN('${slot + 1}')
+          : '${l.stPresetN('${slot + 1}')}, $name',
+      onTapHint: st != null ? l.mobHintListen : null,
+      onLongPressHint: onHold != null ? l.mobHintStore : null,
+      child: Material(
+        color: on ? colors.primaryContainer : colors.surfaceContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: on
+              ? BorderSide(color: colors.primary, width: 2)
+              : BorderSide.none,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          onLongPress: onHold,
+          child: ExcludeSemantics(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: _gap),
+              child: Row(
+                children: [
+                  if (st != null)
+                    StationDisc(name: st.name, size: _disc)
+                  else
+                    Container(
+                      width: _disc,
+                      height: _disc,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.outlineVariant),
+                      ),
+                      child: Text('${slot + 1}', style: text.labelMedium),
+                    ),
+                  const SizedBox(width: _gap),
+                  Expanded(
+                    child: Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: text.labelMedium?.copyWith(
+                        color: st == null ? colors.onSurfaceVariant : null,
+                      ),
+                    ),
                   ),
-                  child: Text('${slot + 1}', style: text.labelMedium),
-                ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  st?.name ?? (storable ? l.stPresetStore : l.stPresetEmpty),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: text.labelMedium?.copyWith(
-                    color: st == null ? colors.onSurfaceVariant : null,
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -176,6 +176,10 @@
   "@nowCover": {
     "description": "now.cover"
   },
+  "progressPosition": "Position in the track",
+  "@progressPosition": {
+    "description": "progress.position"
+  },
   "transportPlay": "Play",
   "@transportPlay": {
     "description": "transport.play"
@@ -503,6 +507,10 @@
   "@mobAddPanel": {
     "description": "mob.add_panel"
   },
+  "mobAdded": "Already added",
+  "@mobAdded": {
+    "description": "mob.added"
+  },
   "mobAddress": "Panel address",
   "@mobAddress": {
     "description": "mob.address"
@@ -547,6 +555,14 @@
   "@mobForget": {
     "description": "mob.forget"
   },
+  "mobHintListen": "listen",
+  "@mobHintListen": {
+    "description": "mob.hint_listen"
+  },
+  "mobHintStore": "store what is playing here",
+  "@mobHintStore": {
+    "description": "mob.hint_store"
+  },
   "mobInWeb": "This is in the panel's web interface",
   "@mobInWeb": {
     "description": "mob.in_web"
@@ -575,9 +591,25 @@
   "@mobNotPanel": {
     "description": "mob.not_panel"
   },
+  "mobOfTime": "{pos} of {dur}",
+  "@mobOfTime": {
+    "description": "mob.of_time",
+    "placeholders": {
+      "pos": {
+        "type": "String"
+      },
+      "dur": {
+        "type": "String"
+      }
+    }
+  },
   "mobOnNetwork": "On the network",
   "@mobOnNetwork": {
     "description": "mob.on_network"
+  },
+  "mobOtherPanel": "Another panel",
+  "@mobOtherPanel": {
+    "description": "mob.other_panel"
   },
   "mobPanel": "Panel",
   "@mobPanel": {

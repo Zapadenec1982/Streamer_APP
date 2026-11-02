@@ -23,5 +23,10 @@
   "mob.find": "Panel suchen",
   "mob.try_demo": "Demo ausprobieren",
   "mob.forget": "Vergessen",
-  "mob.panel_settings": "Panel-Einstellungen"
+  "mob.panel_settings": "Panel-Einstellungen",
+  "mob.of_time": "{pos} von {dur}",
+  "mob.other_panel": "Anderes Panel",
+  "mob.hint_listen": "anhören",
+  "mob.hint_store": "das Laufende hier speichern",
+  "mob.added": "Bereits hinzugefügt"
 }

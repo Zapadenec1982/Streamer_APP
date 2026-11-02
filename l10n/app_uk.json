@@ -23,5 +23,10 @@
   "mob.find": "Знайти панель",
   "mob.try_demo": "Спробувати демо",
   "mob.forget": "Забути",
-  "mob.panel_settings": "Налаштування панелі"
+  "mob.panel_settings": "Налаштування панелі",
+  "mob.of_time": "{pos} з {dur}",
+  "mob.other_panel": "Інша панель",
+  "mob.hint_listen": "слухати",
+  "mob.hint_store": "зберегти сюди те, що грає",
+  "mob.added": "Уже додано"
 }

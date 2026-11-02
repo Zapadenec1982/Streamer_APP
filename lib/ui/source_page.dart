@@ -64,40 +64,45 @@ class _Card extends ConsumerWidget {
       margin: EdgeInsets.zero,
       color: state.active ? colors.primaryContainer : colors.surfaceContainer,
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => _open(context, ref, l),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(cardIcon(state.card), size: 28, color: fg),
-                  const Spacer(),
-                  if (state.active)
-                    Icon(Icons.check_circle, size: 22, color: fg),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                l.cardName(state.card),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: text.titleMedium?.copyWith(color: fg),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                l.label(state.status),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: text.bodySmall?.copyWith(
-                  color: state.active
-                      ? colors.onPrimaryContainer
-                      : colors.onSurfaceVariant,
+      // the card is one stop for TalkBack: its name and status, and whether it is the one playing
+      child: Semantics(
+        button: true,
+        selected: state.active,
+        child: InkWell(
+          onTap: () => _open(context, ref, l),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(cardIcon(state.card), size: 28, color: fg),
+                    const Spacer(),
+                    if (state.active)
+                      Icon(Icons.check_circle, size: 22, color: fg),
+                  ],
                 ),
-              ),
-            ],
+                const Spacer(),
+                Text(
+                  l.cardName(state.card),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.titleMedium?.copyWith(color: fg),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l.label(state.status),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: text.bodySmall?.copyWith(
+                    color: state.active
+                        ? colors.onPrimaryContainer
+                        : colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

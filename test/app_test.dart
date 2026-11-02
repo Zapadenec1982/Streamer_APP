@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streamer/app.dart';
@@ -7,6 +8,7 @@ import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/state/providers.dart';
+import 'package:streamer/ui/station_card.dart';
 
 import 'support/phone.dart';
 
@@ -34,6 +36,44 @@ class CountingDemo extends DemoDeviceApi {
 class FailingDemo extends CountingDemo {
   @override
   Future<void> setMuted(bool muted) => Future.error(const PanelError(0));
+}
+
+/// The demo with a station whose first word is long, on a preset.
+class LongNamesDemo extends CountingDemo {
+  @override
+  Future<StationList> stations() async => const StationList(
+    rev: 1,
+    stations: [
+      Station(name: 'Radio Lantern', url: 'http://a.invalid/1'),
+      Station(name: 'Nightride FM', url: 'http://a.invalid/2'),
+      Station(name: 'Harbour Lights FM', url: 'http://a.invalid/3'),
+    ],
+    presets: [0, 1, 2, -1, -1, -1],
+  );
+}
+
+/// A panel that never answers: no state, ever, and the link trying all the while.
+class SilentPanel extends NoPanelApi {
+  int suspended = 0;
+  int resumed = 0;
+
+  @override
+  DeviceSnapshot get current => const DeviceSnapshot(
+    name: '',
+    scheme: 0,
+    now: NowPlaying(kind: NowKind.off, title: LineLabel(CatalogLine.off)),
+    cards: [],
+    volume: 0,
+    muted: false,
+    status: LinkStatus.connecting,
+    known: false,
+  );
+
+  @override
+  void suspend() => suspended++;
+
+  @override
+  void resume() => resumed++;
 }
 
 void main() {
@@ -120,8 +160,12 @@ void main() {
     expect(api.current.now.source, SourceId.bt);
   });
 
-  // The web's layout was checked at 390×844, 390×664 and 360×740; the app keeps to the same.
+  // The web's layout was checked at 390×844, 390×664 and 360×740; the app keeps to the same, and
+  // to Android's largest text (200 %), here as a plain ×2 — harder than Android's own scaling,
+  // which grows large text less.
   for (final (size, scale) in [
+    (const Size(412, 892), 2.0),
+    (const Size(360, 740), 2.0),
     (const Size(412, 892), 1.6),
     (const Size(360, 740), 1.3),
     (const Size(390, 664), 1.0),
@@ -134,10 +178,173 @@ void main() {
         await tester.tap(find.text(section));
         await tester.pumpAndSettle();
       }
+      // the sheet, as tall as it gets
+      await tester.ensureVisible(find.text('Звук'));
+      await tester.tap(find.text('Звук'));
+      await tester.pumpAndSettle();
+      await tester.tapAt(const Offset(8, 8));
+      await tester.pumpAndSettle();
       await api.selectSource(SourceId.radio);
+      api.tick(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Усі станції · 12'));
+      await tester.tap(find.text('Усі станції · 12'));
       await tester.pumpAndSettle();
     });
   }
+
+  testWidgets('a long word on a preset moves the presets fewer to a row, '
+      'never breaks in the middle', (tester) async {
+    api.dispose();
+    api = LongNamesDemo();
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpApp(tester);
+    await api.selectSource(SourceId.radio);
+    api.tick(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    final presets = find.byType(StationPresets);
+    final grid = tester.widget<GridView>(
+      find.descendant(of: presets, matching: find.byType(GridView)),
+    );
+    final delegate =
+        grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    expect(delegate.crossAxisCount, lessThan(3));
+    final name = tester.renderObject<RenderParagraph>(
+      find.descendant(of: presets, matching: find.text('Nightride FM')),
+    );
+    // «Nightride» stays on one line
+    final word = name.getBoxesForSelection(
+      const TextSelection(baseOffset: 0, extentOffset: 9),
+    );
+    expect(word.map((box) => box.top).toSet(), hasLength(1));
+  });
+
+  testWidgets('TalkBack hears the Player in words, a stop for each thing', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pumpApp(tester);
+    // spoken in its own case, with the phone it comes from
+    expect(find.bySemanticsLabel(RegExp(r'^Bluetooth\nPhone$')), findsOne);
+    // the title, the artist and the format: one stop
+    expect(
+      find.bySemanticsLabel(RegExp(r'^Amber Hours\nLantern Theory\nLHDC')),
+      findsOne,
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Позиція в треку')),
+      isSemantics(value: '0:56 з 3:42'),
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Гучність')),
+      isSemantics(
+        value: '32%',
+        hasIncreaseAction: true,
+        hasDecreaseAction: true,
+      ),
+    );
+    semantics.dispose();
+  });
+
+  testWidgets('TalkBack moves Bass a step at a time and hears it signed', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pumpApp(tester);
+    await tester.tap(find.text('Звук'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Бас')),
+      isSemantics(value: '+2', increasedValue: '+3'),
+    );
+    tester.semantics.performAction(
+      find.semantics.byLabel('Бас'),
+      SemanticsAction.increase,
+    );
+    await tester.pumpAndSettle();
+    expect(api.current.sound.bass, 3);
+    semantics.dispose();
+  });
+
+  testWidgets('TalkBack: a preset says its number, its station and what a tap '
+      'and a hold do', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpApp(tester);
+    await api.selectSource(SourceId.radio);
+    api.tick(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('кнопка 1, Radio Lantern')),
+      isSemantics(
+        isButton: true,
+        isSelected: true,
+        hasTapAction: true,
+        hasLongPressAction: true,
+        onTapHint: 'слухати',
+        onLongPressHint: 'зберегти сюди те, що грає',
+      ),
+    );
+    expect(find.bySemanticsLabel('кнопка 4, Зберегти сюди'), findsOne);
+    semantics.dispose();
+  });
+
+  testWidgets('every page keeps Android\'s rules: 48 dp targets, each with a '
+      'name, text that reads', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpApp(tester);
+    Future<void> check() async {
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
+    }
+
+    await check();
+    await tester.tap(find.text('Звук'));
+    await tester.pumpAndSettle();
+    await check();
+    await tester.tapAt(const Offset(8, 8));
+    await tester.pumpAndSettle();
+    await api.selectSource(SourceId.radio);
+    api.tick(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    await check();
+    for (final section in ['Джерело', 'Налаштування']) {
+      await tester.tap(find.text(section));
+      await tester.pumpAndSettle();
+      await check();
+    }
+    semantics.dispose();
+  });
+
+  testWidgets('a panel that does not answer says so, with a retry and the '
+      'other panels', (tester) async {
+    final silent = SilentPanel();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          deviceApiProvider.overrideWithValue(silent),
+          settingsStoreProvider.overrideWithValue(store),
+        ],
+        child: const StreamerApp(),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Підключення…'), findsOne);
+    await tester.pump(const Duration(seconds: 11));
+    expect(find.text("Немає зв'язку з панеллю"), findsOne);
+    // at once, not at the end of the backoff
+    final resumed = silent.resumed;
+    await tester.tap(find.text('Повторити'));
+    await tester.pump();
+    expect(silent.suspended, 1);
+    expect(silent.resumed, resumed + 1);
+    expect(find.text('Підключення…'), findsOne);
+    await tester.pump(const Duration(seconds: 11));
+    await tester.tap(find.text('Інша панель'));
+    await tester.pumpAndSettle();
+    expect(find.text('Демо-панель'), findsOne);
+  });
 
   testWidgets(
     'in the background the app lets go of the panel; back, it takes it again',

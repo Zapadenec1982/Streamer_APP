@@ -23,5 +23,10 @@
   "mob.find": "Znajdź panel",
   "mob.try_demo": "Wypróbuj demo",
   "mob.forget": "Zapomnij",
-  "mob.panel_settings": "Ustawienia panelu"
+  "mob.panel_settings": "Ustawienia panelu",
+  "mob.of_time": "{pos} z {dur}",
+  "mob.other_panel": "Inny panel",
+  "mob.hint_listen": "słuchać",
+  "mob.hint_store": "zapisać tu to, co gra",
+  "mob.added": "Już dodany"
 }

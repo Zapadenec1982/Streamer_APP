@@ -137,10 +137,17 @@ class _AddPanelPageState extends ConsumerState<AddPanelPage> {
     await _add(endpoint.address, endpoint.address, endpoint);
   }
 
+  /// The saved panel a found one already is — by its host name, or by the address it was added by.
+  SavedPanel? _saved(FoundPanel p) => ref
+      .read(panelsProvider)
+      .where((s) => s.id == p.id || s.host == p.endpoint.host)
+      .firstOrNull;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
+    ref.watch(panelsProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l.mobAddPanel)),
       body: ListView(
@@ -148,12 +155,25 @@ class _AddPanelPageState extends ConsumerState<AddPanelPage> {
         children: [
           _Header(l.mobOnNetwork),
           for (final p in _found)
-            ListTile(
-              leading: const Icon(Icons.speaker),
-              title: Text(p.name),
-              subtitle: Text(p.endpoint.address),
-              onTap: () => _add(p.id, p.name, p.endpoint),
-            ),
+            if (_saved(p) case final saved?)
+              // a panel the app has already: a tap only chooses it
+              ListTile(
+                leading: const Icon(Icons.speaker),
+                title: Text(p.name),
+                subtitle: Text(l.mobAdded),
+                trailing: const Icon(Icons.check),
+                onTap: () async {
+                  await ref.read(activeIdProvider.notifier).set(saved.id);
+                  if (context.mounted) context.go('/player');
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.speaker),
+                title: Text(p.name),
+                subtitle: Text(p.endpoint.address),
+                onTap: () => _add(p.id, p.name, p.endpoint),
+              ),
           if (_found.isEmpty)
             ListTile(
               leading: _searching
@@ -213,10 +233,13 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-    child: Text(
-      title,
-      style: Theme.of(context).textTheme.titleSmall
-          ?.copyWith(color: Theme.of(context).colorScheme.primary),
+    child: Semantics(
+      header: true,
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall
+            ?.copyWith(color: Theme.of(context).colorScheme.primary),
+      ),
     ),
   );
 }

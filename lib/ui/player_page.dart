@@ -11,6 +11,7 @@ import '../device/panels.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'cover_art.dart';
+import 'fit.dart';
 import 'labels.dart';
 import 'sound_sheet.dart';
 import 'station_card.dart';
@@ -32,53 +33,74 @@ class PlayerPage extends ConsumerWidget {
     // the panel's tint of the cover, as the web's Player wears it
     final backdrop = snapshot.backdrop;
     final station = now.kind == NowKind.radio && now.title is TextLabel;
+    final subtitle = _SubtitleRow(
+      subtitle: now.subtitle == null ? '' : l.label(now.subtitle!),
+      format: l.badge(now.format),
+    );
     return AnimatedContainer(
       duration: const Duration(milliseconds: 600),
       color: backdrop == null ? colors.surface : Color(0xFF000000 | backdrop),
       child: SafeArea(
         child: LayoutBuilder(
           builder: (context, box) {
-            final cover = math.min(box.maxWidth - 48, box.maxHeight * 0.42);
+            // a station's disc gives way to its presets, so the page fits on the screen
+            final cover = math.min(
+              box.maxWidth - 48,
+              box.maxHeight * (station ? 0.32 : 0.42),
+            );
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
               child: Column(
                 children: [
-                  if (now.kind.hasOrigin) ...[
-                    Text(
-                      l.kindName(now.kind).toUpperCase(),
-                      style: text.labelMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        letterSpacing: 1.4,
+                  // where it comes from, read as one line; spoken in its own case, not spelt
+                  if (now.kind.hasOrigin)
+                    MergeSemantics(
+                      child: Column(
+                        children: [
+                          Text(
+                            l.kindName(now.kind).toUpperCase(),
+                            semanticsLabel: l.kindName(now.kind),
+                            style: text.labelMedium?.copyWith(
+                              color: colors.onSurfaceVariant,
+                              letterSpacing: 1.4,
+                            ),
+                          ),
+                          if (now.device.isNotEmpty)
+                            Text(now.device, style: text.bodyMedium),
+                        ],
                       ),
                     ),
-                    if (now.device.isNotEmpty)
-                      Text(now.device, style: text.bodyMedium),
-                  ],
                   const SizedBox(height: 16),
                   Semantics(
                     label: l.nowCover,
                     image: true,
-                    child: _Cover(now: now, size: cover),
+                    child: ExcludeSemantics(
+                      child: _Cover(now: now, size: cover),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   // a station's face: its name between ‹ and ›, no transport, no progress
-                  if (station)
-                    StationTitle(name: l.label(now.title), now: now)
-                  else
-                    Text(
-                      l.label(now.title),
-                      style: text.titleLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
+                  if (station) ...[
+                    StationTitle(name: l.label(now.title), now: now),
+                    const SizedBox(height: 4),
+                    subtitle,
+                  ] else
+                    // what plays, by whom, in what: one stop for TalkBack
+                    MergeSemantics(
+                      child: Column(
+                        children: [
+                          Text(
+                            l.label(now.title),
+                            style: text.titleLarge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4),
+                          subtitle,
+                        ],
+                      ),
                     ),
-                  const SizedBox(height: 4),
-                  _SubtitleRow(
-                    subtitle: now.subtitle == null
-                        ? ''
-                        : l.label(now.subtitle!),
-                    format: l.badge(now.format),
-                  ),
                   const SizedBox(height: 16),
                   if (station)
                     const StationPresets()
@@ -236,27 +258,36 @@ class _Progress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme.labelSmall;
     final value = (position.inMilliseconds / duration.inMilliseconds).clamp(
       0.0,
       1.0,
     );
-    return Column(
-      children: [
-        LinearProgressIndicator(
-          value: value,
-          minHeight: 4,
-          borderRadius: BorderRadius.circular(2),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // TalkBack hears «0:56 of 3:42», not a bar's percent and two loose clocks
+    return Semantics(
+      container: true,
+      label: l.progressPosition,
+      value: l.mobOfTime(clock(position), clock(duration)),
+      child: ExcludeSemantics(
+        child: Column(
           children: [
-            Text(clock(position), style: text),
-            Text(clock(duration), style: text),
+            LinearProgressIndicator(
+              value: value,
+              minHeight: 4,
+              borderRadius: BorderRadius.circular(2),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(clock(position), style: text),
+                Text(clock(duration), style: text),
+              ],
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -357,6 +388,7 @@ class _VolumeState extends ConsumerState<_Volume> {
     final l = AppLocalizations.of(context);
     final snapshot = ref.watch(snapshotProvider);
     final value = _dragging ?? snapshot.volume.toDouble();
+    final style = Theme.of(context).textTheme.labelLarge;
     return Row(
       children: [
         IconButton(
@@ -366,30 +398,36 @@ class _VolumeState extends ConsumerState<_Volume> {
           icon: Icon(snapshot.muted ? Icons.volume_off : Icons.volume_up),
         ),
         Expanded(
-          child: Semantics(
-            label: l.volumeLabel,
-            child: Slider(
-              value: value,
-              max: 100,
-              onChanged: (v) {
-                setState(() => _dragging = v);
-                _send(v.round());
-              },
-              onChangeEnd: (v) {
-                _timer?.cancel();
-                _pending = v.round();
-                _flush();
-                setState(() => _dragging = null);
-              },
+          // one node: «Гучність, 32 %», which TalkBack moves up and down
+          child: MergeSemantics(
+            child: Semantics(
+              label: l.volumeLabel,
+              child: Slider(
+                value: value,
+                max: 100,
+                onChanged: (v) {
+                  setState(() => _dragging = v);
+                  _send(v.round());
+                },
+                onChangeEnd: (v) {
+                  _timer?.cancel();
+                  _pending = v.round();
+                  _flush();
+                  setState(() => _dragging = null);
+                },
+              ),
             ),
           ),
         ),
+        // room for «100» at the phone's text size, so the number never wraps; the slider says it
         SizedBox(
-          width: 32,
-          child: Text(
-            '${value.round()}',
-            textAlign: TextAlign.end,
-            style: Theme.of(context).textTheme.labelLarge,
+          width: textWidth(context, '100', style),
+          child: ExcludeSemantics(
+            child: Text(
+              '${value.round()}',
+              textAlign: TextAlign.end,
+              style: style,
+            ),
           ),
         ),
       ],

@@ -41,14 +41,18 @@ class _SoundSheet extends ConsumerWidget {
     final sound = ref.watch(snapshotProvider.select((s) => s.sound));
     final presets = ref.watch(soundPresetsProvider);
     final text = Theme.of(context).textTheme;
+    // at a large text size the sheet can be taller than the screen: it scrolls then
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(l.sysSound, style: text.titleLarge),
+            Semantics(
+              header: true,
+              child: Text(l.sysSound, style: text.titleLarge),
+            ),
             const SizedBox(height: 12),
             if (!sound.eqOn)
               Card(
@@ -177,20 +181,36 @@ class _ToneSliderState extends ConsumerState<_ToneSlider> {
     if (v != null && mounted) act(context, ref, (api) => widget.send(api, v));
   }
 
+  static String _signed(double v) {
+    final n = v.round();
+    return '${n > 0 ? '+' : ''}$n';
+  }
+
   @override
   Widget build(BuildContext context) {
     final value = _dragging ?? widget.value.toDouble();
-    final shown = value.round();
-    return Row(
-      children: [
-        SizedBox(width: 72, child: Text(widget.label)),
-        Expanded(
-          child: Slider(
+    // the name and the value over the slider, so neither wraps at the phone's text size; one node
+    // for TalkBack — «Бас, +2» — that it moves a step at a time
+    return MergeSemantics(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              children: [
+                Expanded(child: Text(widget.label)),
+                ExcludeSemantics(child: Text(_signed(value))),
+              ],
+            ),
+          ),
+          Slider(
             value: value,
             min: -6,
             max: 6,
             divisions: 12,
-            label: '${shown > 0 ? '+' : ''}$shown',
+            label: _signed(value),
+            semanticFormatterCallback: _signed,
             onChanged: (v) {
               setState(() => _dragging = v);
               _pending = v.round();
@@ -206,15 +226,8 @@ class _ToneSliderState extends ConsumerState<_ToneSlider> {
               setState(() => _dragging = null);
             },
           ),
-        ),
-        SizedBox(
-          width: 32,
-          child: Text(
-            '${shown > 0 ? '+' : ''}$shown',
-            textAlign: TextAlign.end,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
