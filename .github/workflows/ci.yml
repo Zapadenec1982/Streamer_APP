@@ -14,8 +14,9 @@ jobs:
       - id: firmware
         run: echo "ref=$(cat tool/firmware_ref)" >> "$GITHUB_OUTPUT"
 
-      # The panel's colour table, the web's catalogs and the modules' manifests, at the firmware
-      # commit the app's generated files were made from (tool/firmware_ref).
+      # The panel's colour table, the web's catalogs, the modules' manifests, the EQ vectors and the
+      # web's EQ libraries, at the firmware commit the app's generated files were made from
+      # (tool/firmware_ref).
       - uses: actions/checkout@v7
         with:
           repository: Zapadenec1982/ModESP_Streamer
@@ -23,8 +24,10 @@ jobs:
           path: firmware
           sparse-checkout: |
             modules
+            tests/host/fixtures/eq_curve
             tools/ui
             webui/src/i18n
+            webui/src/lib
 
       - uses: actions/setup-java@v6
         with:
@@ -44,6 +47,8 @@ jobs:
           python3 tool/gen_theme.py --check
           python3 tool/gen_l10n.py --check
           python3 tool/sync_state_meta.py --check
+          python3 tool/sync_eq_vectors.py --check
+          node tool/eq_cases.mjs --check
 
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test
