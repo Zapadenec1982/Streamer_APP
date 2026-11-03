@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../device/models.dart';
@@ -8,6 +10,7 @@ import '../device/panel/panel_link.dart';
 import '../device/stations.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
+import 'files.dart';
 import 'station_card.dart';
 import 'writes.dart';
 
@@ -107,6 +110,41 @@ class _FavouritesTabState extends ConsumerState<FavouritesTab>
     await _commit(list.add(stream.name, stream.url));
   }
 
+  /// Stations from an .m3u, .m3u8 or .pls, as the web's importFile takes them: each the list
+  /// would take, in the file's order; the rest left out.
+  Future<void> _import(StationList list) async {
+    final l = AppLocalizations.of(context);
+    final ({String name, Uint8List bytes})? file;
+    try {
+      file = await ref.read(phoneFilesProvider).open(FileTypes.playlist);
+    } on PlatformException catch (e) {
+      _say(e.message ?? e.code);
+      return;
+    }
+    if (file == null || !mounted) return;
+    final got = importPlaylist(list, parsePlaylist(textOf(file.bytes)));
+    if (got.added == 0) {
+      _say(l.stImportNone);
+    } else if (await _commit(got.list, say: false) && mounted) {
+      _say(l.stImported('${got.added}'));
+    }
+  }
+
+  /// The list as an .m3u, saved where the person chooses.
+  Future<void> _export(StationList list) async {
+    try {
+      await ref
+          .read(phoneFilesProvider)
+          .save(
+            'p4-player-stations.m3u',
+            'audio/x-mpegurl',
+            Uint8List.fromList(utf8.encode(toM3u(list.stations))),
+          );
+    } on PlatformException catch (e) {
+      _say(e.message ?? e.code);
+    }
+  }
+
   /// The station's sheet. What the last edit said goes first: it would lie over the sheet's foot.
   void _actions(StationList list, int i, bool playing) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -193,6 +231,16 @@ class _FavouritesTabState extends ConsumerState<FavouritesTab>
                 tooltip: l.stAdd,
                 onPressed: _saving ? null : () => _add(list),
                 icon: const Icon(Icons.add_link),
+              ),
+              IconButton(
+                tooltip: l.stImport,
+                onPressed: _saving ? null : () => _import(list),
+                icon: const Icon(Icons.upload_file),
+              ),
+              IconButton(
+                tooltip: l.stExport,
+                onPressed: list.stations.isEmpty ? null : () => _export(list),
+                icon: const Icon(Icons.download),
               ),
             ],
           ),

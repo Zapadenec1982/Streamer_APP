@@ -6,7 +6,6 @@
   "mob.app": "App",
   "mob.lang_phone": "Same as the phone",
   "mob.licenses": "Licences",
-  "mob.in_web": "This is in the streamer's web interface",
   "mob.busy": "The streamer already serves three clients. Trying again…",
   "mob.panels": "Streamers",
   "mob.add_panel": "Add a streamer",
@@ -23,7 +22,6 @@
   "mob.find": "Find a streamer",
   "mob.try_demo": "Try the demo",
   "mob.forget": "Forget",
-  "mob.panel_settings": "Streamer settings",
   "mob.of_time": "{pos} of {dur}",
   "mob.other_panel": "Another streamer",
   "mob.hint_listen": "listen",
@@ -33,5 +31,10 @@
   "mob.wifi_join_note": "The streamer will leave its current network for a few seconds. If “{name}” does not answer, it comes back and this shows why. If “{name}” is a different network, join it with the phone too.",
   "mob.wifi_forget_body": "The streamer will leave the network and turn on its own access point. The app will lose the connection to it.",
   "mob.wifi_forget_back": "To come back, join “{name}” with the phone and add the streamer at {ip}.",
-  "mob.pair_elsewhere": "Answered on another device."
+  "mob.pair_elsewhere": "Answered on another device.",
+  "mob.access_login": "Password sign-in",
+  "mob.fw_restarting": "Installed. The streamer is restarting — {n} s",
+  "mob.backup_save": "Save to a file",
+  "mob.fw_pick": "Choose a .bin file",
+  "mob.fw_not_image": "This is not a firmware image"
 }

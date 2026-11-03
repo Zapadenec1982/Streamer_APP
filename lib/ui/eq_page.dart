@@ -1,17 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../device/device_api.dart';
 import '../device/eq.dart';
+import '../device/eq_file.dart';
 import '../device/eq_math.dart';
 import '../device/models.dart';
 import '../l10n/app_localizations.dart';
 import '../state/providers.dart';
 import 'band_sheet.dart';
 import 'eq_editor.dart';
+import 'eq_import.dart';
 import 'eq_plot.dart';
+import 'files.dart';
 import 'labels.dart';
 import 'link_state.dart';
 import 'sound_sheet.dart';
@@ -21,7 +26,8 @@ import 'writes.dart';
 /// Налаштування › Звук › Еквалайзер, and the Player's way into it: the equalizer for enthusiasts,
 /// as the web's DspPage.svelte has it. The switch; the sounds; the curve with a point per band;
 /// the bands as a list, each opened in a sheet; «Скинути «Власний»» for «Власний» alone — a sound
-/// never changes: an edit of one makes it «Власний»; the whole system's curve on request.
+/// never changes: an edit of one makes it «Власний»; in the menu, filters in and out as text
+/// (REW, Equalizer APO) and the whole system's curve.
 ///
 /// The EQ is one document on the panel, edited from here and from the glass ([EqEditor]). An
 /// edit is heard at once; the panel writes it a minute after the last one, or at once when this
@@ -35,6 +41,8 @@ class EqPage extends ConsumerStatefulWidget {
 }
 
 typedef _Point = ({EqBand band, String preset});
+
+enum _Menu { import, export, system }
 
 class _EqPageState extends ConsumerState<EqPage> {
   late final DeviceApi _api;
@@ -132,6 +140,55 @@ class _EqPageState extends ConsumerState<EqPage> {
       );
   }
 
+  /// Filters from a text become «Власний»; «Повернути» brings back the sound that was.
+  Future<void> _import(AppLocalizations l) async {
+    final bands = await showEqImport(context);
+    final d = _editor.doc.value;
+    if (bands == null || d == null || !mounted) return;
+    final was = (preset: d.preset, bands: d.bands);
+    _editor.setBands(bands);
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l.eqImported),
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(
+            label: l.soundUndo,
+            onPressed: () {
+              if (!mounted) return;
+              if (was.preset != 'custom') {
+                unawaited(_editor.choose(was.preset));
+              } else {
+                _editor.setBands(was.bands);
+              }
+            },
+          ),
+        ),
+      );
+  }
+
+  /// The sound's bands that are on as filters, saved where the person chooses.
+  Future<void> _export(AppLocalizations l) async {
+    final d = _editor.doc.value;
+    if (d == null) return;
+    final text = formatFilters(d.bands, 'P4 Player - ${l.soundName(d.preset)}');
+    try {
+      await ref
+          .read(phoneFilesProvider)
+          .save(
+            'p4-eq-${d.preset}.txt',
+            'text/plain',
+            Uint8List.fromList(utf8.encode(text)),
+          );
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text(e.message ?? e.code)));
+    }
+  }
+
   void _grab(int i) {
     final d = _editor.doc.value;
     if (d == null || i >= d.bands.length) return;
@@ -196,16 +253,41 @@ class _EqPageState extends ConsumerState<EqPage> {
       appBar: AppBar(
         title: Text(l.pageEq),
         actions: [
-          PopupMenuButton<bool>(
+          PopupMenuButton<_Menu>(
             tooltip: l.eqMenu,
-            onSelected: (_) => setState(() => _system = !_system),
-            itemBuilder: (context) => [
-              CheckedPopupMenuItem(
-                value: true,
-                checked: _system,
-                child: Text(l.eqSystem),
-              ),
-            ],
+            onSelected: (m) => switch (m) {
+              _Menu.import => unawaited(_import(l)),
+              _Menu.export => unawaited(_export(l)),
+              _Menu.system => setState(() => _system = !_system),
+            },
+            itemBuilder: (context) {
+              final d = _editor.doc.value;
+              return [
+                PopupMenuItem(
+                  value: _Menu.import,
+                  enabled: d != null,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.upload_file),
+                    title: Text(l.eqImport),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _Menu.export,
+                  enabled: d != null && d.bands.isNotEmpty,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.download),
+                    title: Text(l.eqExport),
+                  ),
+                ),
+                CheckedPopupMenuItem(
+                  value: _Menu.system,
+                  checked: _system,
+                  child: Text(l.eqSystem),
+                ),
+              ];
+            },
           ),
         ],
       ),

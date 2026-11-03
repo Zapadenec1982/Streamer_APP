@@ -5,10 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'state/providers.dart';
 import 'theme/app_theme.dart';
+import 'ui/access_page.dart';
+import 'ui/backup_page.dart';
 import 'ui/bt_page.dart';
 import 'ui/display_page.dart';
 import 'ui/dlna_page.dart';
 import 'ui/eq_page.dart';
+import 'ui/firmware_page.dart';
 import 'ui/library_page.dart';
 import 'ui/link_state.dart';
 import 'ui/panels_page.dart';
@@ -124,6 +127,18 @@ final routerProvider = Provider<GoRouter>(
                   GoRoute(
                     path: 'time',
                     builder: (context, state) => const TimePage(),
+                  ),
+                  GoRoute(
+                    path: 'access',
+                    builder: (context, state) => const AccessPage(),
+                  ),
+                  GoRoute(
+                    path: 'firmware',
+                    builder: (context, state) => const FirmwarePage(),
+                  ),
+                  GoRoute(
+                    path: 'backup',
+                    builder: (context, state) => const BackupPage(),
                   ),
                   GoRoute(
                     path: 'wifi',

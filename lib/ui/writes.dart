@@ -51,6 +51,24 @@ Future<void> sayFailed(
     ..showSnackBar(SnackBar(content: Text(text)));
 }
 
+/// The login the app signs in with from now on, kept for this streamer in the phone's secure
+/// storage — or none, forgotten. Changing the login on the streamer changes it here too: requests
+/// with the old one would each count as a wrong login, and five lock the streamer's login.
+Future<void> useLogin(WidgetRef ref, PanelLogin? login) async {
+  final api = ref.read(deviceApiProvider);
+  final id = ref.read(activeIdProvider);
+  if (api is! PanelDeviceApi || id == null) return;
+  api.link.endpoint = login == null
+      ? api.link.endpoint.withoutLogin()
+      : api.link.endpoint.withLogin(login.user, login.password);
+  final logins = ref.read(loginsProvider.notifier);
+  if (login == null) {
+    await logins.forget(id);
+  } else {
+    await logins.save(id, login);
+  }
+}
+
 /// The panel's login (the firmware's NETWORK.md, "Authentication"), kept for this panel in the
 /// phone's secure storage.
 Future<void> askLogin(

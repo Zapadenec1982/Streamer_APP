@@ -2369,6 +2369,316 @@
   "@airplayStWifi": {
     "description": "airplay.st_wifi"
   },
+  "accessWrong": "The current password is wrong",
+  "@accessWrong": {
+    "description": "access.wrong"
+  },
+  "accessOnDone": "Sign-in is on",
+  "@accessOnDone": {
+    "description": "access.on_done"
+  },
+  "accessOffDone": "Sign-in is off",
+  "@accessOffDone": {
+    "description": "access.off_done"
+  },
+  "accessSaved": "Saved",
+  "@accessSaved": {
+    "description": "access.saved"
+  },
+  "accessMismatch": "The new passwords do not match",
+  "@accessMismatch": {
+    "description": "access.mismatch"
+  },
+  "accessPassDone": "Password changed",
+  "@accessPassDone": {
+    "description": "access.pass_done"
+  },
+  "accessLoginOn": "On",
+  "@accessLoginOn": {
+    "description": "access.login_on"
+  },
+  "accessLoginOff": "Off",
+  "@accessLoginOff": {
+    "description": "access.login_off"
+  },
+  "accessName": "User name",
+  "@accessName": {
+    "description": "access.name"
+  },
+  "accessNameRule": "Up to 31 characters (15 in Cyrillic), no colon.",
+  "@accessNameRule": {
+    "description": "access.name_rule"
+  },
+  "accessSave": "Save",
+  "@accessSave": {
+    "description": "access.save"
+  },
+  "accessPass": "Password",
+  "@accessPass": {
+    "description": "access.pass"
+  },
+  "accessCurrent": "Current password",
+  "@accessCurrent": {
+    "description": "access.current"
+  },
+  "accessNew": "New password",
+  "@accessNew": {
+    "description": "access.new"
+  },
+  "accessRepeat": "New password again",
+  "@accessRepeat": {
+    "description": "access.repeat"
+  },
+  "accessRule": "At least 4 characters, at most 63 (31 in Cyrillic).",
+  "@accessRule": {
+    "description": "access.rule"
+  },
+  "accessChange": "Change password",
+  "@accessChange": {
+    "description": "access.change"
+  },
+  "accessSignOut": "Sign out",
+  "@accessSignOut": {
+    "description": "access.sign_out"
+  },
+  "accessOffQ": "Turn sign-in off?",
+  "@accessOffQ": {
+    "description": "access.off_q"
+  },
+  "accessOffBody": "Anyone on your network will be able to change the streamer's settings without a password.",
+  "@accessOffBody": {
+    "description": "access.off_body"
+  },
+  "accessOff": "Turn off",
+  "@accessOff": {
+    "description": "access.off"
+  },
+  "unitKb": "KB",
+  "@unitKb": {
+    "description": "unit.kb"
+  },
+  "unitMb": "MB",
+  "@unitMb": {
+    "description": "unit.mb"
+  },
+  "fwOnlyBin": "A .bin file is needed",
+  "@fwOnlyBin": {
+    "description": "fw.only_bin"
+  },
+  "fwTooBig": "The file is {size}, larger than the app slot (4 MB)",
+  "@fwTooBig": {
+    "description": "fw.too_big",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "fwBoardMismatch": "The image is for another board: {incoming} (this is {running})",
+  "@fwBoardMismatch": {
+    "description": "fw.board_mismatch",
+    "placeholders": {
+      "incoming": {
+        "type": "String"
+      },
+      "running": {
+        "type": "String"
+      }
+    }
+  },
+  "fwRunning": "Running now",
+  "@fwRunning": {
+    "description": "fw.running"
+  },
+  "fwSlot": "Slot",
+  "@fwSlot": {
+    "description": "fw.slot"
+  },
+  "fwUpdate": "Update",
+  "@fwUpdate": {
+    "description": "fw.update"
+  },
+  "fwInstall": "Install",
+  "@fwInstall": {
+    "description": "fw.install"
+  },
+  "fwNote": "This does not update the web interface",
+  "@fwNote": {
+    "description": "fw.note"
+  },
+  "fwConfirmQ": "Install the firmware?",
+  "@fwConfirmQ": {
+    "description": "fw.confirm_q"
+  },
+  "fwConfirmBody": "The image is written to the other slot and the streamer restarts into it. The music stops.",
+  "@fwConfirmBody": {
+    "description": "fw.confirm_body"
+  },
+  "backupNotJson": "This is not a backup file",
+  "@backupNotJson": {
+    "description": "backup.not_json"
+  },
+  "backupWrongKind": "This backup is of the other kind",
+  "@backupWrongKind": {
+    "description": "backup.wrong_kind"
+  },
+  "backupBadFile": "The file {file} is damaged — nothing was restored",
+  "@backupBadFile": {
+    "description": "backup.bad_file",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "backupSettingsDone": "Settings restored",
+  "@backupSettingsDone": {
+    "description": "backup.settings_done"
+  },
+  "backupFiles": "My files",
+  "@backupFiles": {
+    "description": "backup.files"
+  },
+  "backupFilesSub": "Stations, equalizer, devices, last track",
+  "@backupFilesSub": {
+    "description": "backup.files_sub"
+  },
+  "backupRestore": "Restore from a file",
+  "@backupRestore": {
+    "description": "backup.restore"
+  },
+  "backupSettings": "Settings",
+  "@backupSettings": {
+    "description": "backup.settings"
+  },
+  "backupSettingsSub": "Volume, brightness, colour scheme, services",
+  "@backupSettingsSub": {
+    "description": "backup.settings_sub"
+  },
+  "backupStaged": "Files ready: {n}",
+  "@backupStaged": {
+    "description": "backup.staged",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "backupStagedBody": "They take their place when the streamer restarts.",
+  "@backupStagedBody": {
+    "description": "backup.staged_body"
+  },
+  "backupLater": "Later",
+  "@backupLater": {
+    "description": "backup.later"
+  },
+  "eqImportPreamp": "Preamp {db} dB is not carried over: the device keeps headroom for boosts itself",
+  "@eqImportPreamp": {
+    "description": "eq.import_preamp",
+    "placeholders": {
+      "db": {
+        "type": "String"
+      }
+    }
+  },
+  "eqImportUnsupported": "Types this streamer lacks: {n} — skipped",
+  "@eqImportUnsupported": {
+    "description": "eq.import_unsupported",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "eqImportUnreadable": "Lines that could not be read: {n}",
+  "@eqImportUnreadable": {
+    "description": "eq.import_unreadable",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "eqImportExtra": "Over 10 bands: {n} left out",
+  "@eqImportExtra": {
+    "description": "eq.import_extra",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "eqImportClamped": "Held to the device’s limits: {n}",
+  "@eqImportClamped": {
+    "description": "eq.import_clamped",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "eqImport": "Import filters",
+  "@eqImport": {
+    "description": "eq.import"
+  },
+  "eqImportHint": "REW or Equalizer APO filters",
+  "@eqImportHint": {
+    "description": "eq.import_hint"
+  },
+  "eqImportFile": "Choose a file",
+  "@eqImportFile": {
+    "description": "eq.import_file"
+  },
+  "eqImportNone": "No filters found",
+  "@eqImportNone": {
+    "description": "eq.import_none"
+  },
+  "eqImportGo": "Import",
+  "@eqImportGo": {
+    "description": "eq.import_go"
+  },
+  "eqImportN": "{n, plural, one{Found {n} band} few{Found {n} bands} many{Found {n} bands} other{Found {n} bands}}",
+  "@eqImportN": {
+    "description": "eq.import_n",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "eqExport": "Export the preset",
+  "@eqExport": {
+    "description": "eq.export"
+  },
+  "eqImported": "Filters imported — this is “Custom”",
+  "@eqImported": {
+    "description": "eq.imported"
+  },
+  "stImport": "Import an .m3u file",
+  "@stImport": {
+    "description": "st.import"
+  },
+  "stExport": "Export to an .m3u file",
+  "@stExport": {
+    "description": "st.export"
+  },
+  "stImported": "Stations added: {n}",
+  "@stImported": {
+    "description": "st.imported",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "stImportNone": "No new stations in the file",
+  "@stImportNone": {
+    "description": "st.import_none"
+  },
+  "mobAccessLogin": "Password sign-in",
+  "@mobAccessLogin": {
+    "description": "mob.access_login"
+  },
   "mobAddPanel": "Add a streamer",
   "@mobAddPanel": {
     "description": "mob.add_panel"
@@ -2392,6 +2702,10 @@
   "mobAppName": "ModESP Streamer",
   "@mobAppName": {
     "description": "mob.app_name"
+  },
+  "mobBackupSave": "Save to a file",
+  "@mobBackupSave": {
+    "description": "mob.backup_save"
   },
   "mobBusy": "The streamer already serves three clients. Trying again…",
   "@mobBusy": {
@@ -2421,6 +2735,23 @@
   "@mobForget": {
     "description": "mob.forget"
   },
+  "mobFwNotImage": "This is not a firmware image",
+  "@mobFwNotImage": {
+    "description": "mob.fw_not_image"
+  },
+  "mobFwPick": "Choose a .bin file",
+  "@mobFwPick": {
+    "description": "mob.fw_pick"
+  },
+  "mobFwRestarting": "Installed. The streamer is restarting — {n} s",
+  "@mobFwRestarting": {
+    "description": "mob.fw_restarting",
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "mobHintListen": "listen",
   "@mobHintListen": {
     "description": "mob.hint_listen"
@@ -2428,10 +2759,6 @@
   "mobHintStore": "store what is playing here",
   "@mobHintStore": {
     "description": "mob.hint_store"
-  },
-  "mobInWeb": "This is in the streamer's web interface",
-  "@mobInWeb": {
-    "description": "mob.in_web"
   },
   "mobLangPhone": "Same as the phone",
   "@mobLangPhone": {
@@ -2484,10 +2811,6 @@
   "mobPanel": "Streamer",
   "@mobPanel": {
     "description": "mob.panel"
-  },
-  "mobPanelSettings": "Streamer settings",
-  "@mobPanelSettings": {
-    "description": "mob.panel_settings"
   },
   "mobPanels": "Streamers",
   "@mobPanels": {

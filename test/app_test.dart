@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,6 +10,7 @@ import 'package:streamer/app.dart';
 import 'package:streamer/device/demo_device_api.dart';
 import 'package:streamer/device/device_api.dart';
 import 'package:streamer/device/eq.dart';
+import 'package:streamer/device/maintenance.dart';
 import 'package:streamer/device/models.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 import 'package:streamer/device/radio_browser.dart';
@@ -18,6 +21,7 @@ import 'package:streamer/ui/player_page.dart';
 import 'package:streamer/ui/sound_sheet.dart';
 import 'package:streamer/ui/station_card.dart';
 
+import 'support/images.dart';
 import 'support/phone.dart';
 
 /// The demo, counting how often the app lets go of it and takes it back.
@@ -156,6 +160,15 @@ class SilentPanel extends NoPanelApi {
   @override
   void resume() => resumed++;
 }
+
+/// Filters as REW writes them, with one of each that does not come in: a Preamp, a shelf by its
+/// corner, a peak without its gain, one past 20 kHz.
+const filters = '''Preamp: -6.4 dB
+Filter 1: ON PK Fc 1000 Hz Gain -3 dB Q 1.41
+Filter 2: ON LS 6dB Fc 100 Hz Gain 2 dB
+Filter 3: ON LSC Fc 105 Hz Gain 5.5 dB Q 0.71
+Filter 4: ON PK Fc 30000 Hz Gain 3 dB Q 1
+Filter 5: ON PK Fc 300 Hz Q 2''';
 
 void main() {
   late CountingDemo api;
@@ -497,6 +510,43 @@ void main() {
             : find.text('Сховати'),
       );
       await tester.pumpAndSettle();
+      // an answer's note closes by itself
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      // Обслуговування: the login on with all its fields, a firmware file picked, the backups;
+      // the equalizer's import with a text that says something on every line
+      await api.setAuth(enabled: true);
+      await settings(tester, 'Доступ');
+      await reveal(tester, find.text('Змінити пароль'));
+      phone.picked = (
+        name: 'modesp_p4_player.bin',
+        bytes: appImage('modesp_p4_player', size: 1500000),
+      );
+      await settings(tester, 'Оновлення прошивки');
+      await reveal(tester, find.text('Вибрати файл .bin'));
+      await tester.tap(find.text('Вибрати файл .bin'));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Вебінтерфейс цим не оновлюється'));
+      await settings(tester, 'Резервна копія');
+      await reveal(tester, find.text('Відновити з файлу').last);
+      await settings(tester, 'Тембр і гучність');
+      await reveal(tester, find.text('Еквалайзер'));
+      await tester.tap(find.text('Еквалайзер'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Ще'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Імпорт фільтрів'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        filters,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Скасувати'));
+      await tester.pumpAndSettle();
     });
   }
 
@@ -632,9 +682,25 @@ void main() {
     await tester.tap(find.text('Low Shelf'));
     await tester.pumpAndSettle();
     await check();
-    // Колонки, the wizard, the port page, Тонке налаштування — the tone's bar over them
+    // the equalizer's import, a text read
     await tester.tap(find.text('Готово'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Ще'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Імпорт фільтрів'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      filters,
+    );
+    await tester.pumpAndSettle();
+    await check();
+    await tester.tap(find.text('Скасувати'));
+    await tester.pumpAndSettle();
+    // Колонки, the wizard, the port page, Тонке налаштування — the tone's bar over them
     await api.playTone(hz: 40);
     for (final row in ['Колонки', 'Тонке налаштування']) {
       await settings(tester, row);
@@ -656,6 +722,19 @@ void main() {
     await api.stopTone(then: SourceId.bt);
     for (final row in ['Екран', 'Мова стрімера', 'Час', 'Wi-Fi', 'Bluetooth']) {
       await settings(tester, row);
+      await check();
+    }
+    await api.setAuth(enabled: true);
+    phone.picked = (
+      name: 'modesp_p4_player.bin',
+      bytes: appImage('modesp_p4_player'),
+    );
+    for (final row in ['Доступ', 'Оновлення прошивки', 'Резервна копія']) {
+      await settings(tester, row);
+      if (row == 'Оновлення прошивки') {
+        await tester.tap(find.text('Вибрати файл .bin'));
+        await tester.pumpAndSettle();
+      }
       await check();
     }
     semantics.dispose();
@@ -1540,5 +1619,297 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(find.text('Перезапуск…'), findsNothing);
+  });
+
+  testWidgets('Доступ: the login on, its name and password changed — the '
+      'current one asked for — and off only after a question', (tester) async {
+    await pumpApp(tester);
+    await settings(tester, 'Доступ');
+    expect(find.text('Вимкнено'), findsOne);
+    await tester.tap(find.text('Вхід за паролем'));
+    await tester.pumpAndSettle();
+    expect(find.text('Вхід увімкнено'), findsOne);
+    expect((await api.auth()).enabled, isTrue);
+    TextField field(String label) =>
+        tester.widget<TextField>(find.widgetWithText(TextField, label));
+    expect(field("Ім'я користувача").controller!.text, 'admin');
+    await tester.enterText(
+      find.widgetWithText(TextField, "Ім'я користувача"),
+      'kitchen',
+    );
+    await tester.tap(find.text('Зберегти'));
+    await tester.pumpAndSettle();
+    expect(find.text('Збережено'), findsOne);
+    expect((await api.auth()).username, 'kitchen');
+    Future<void> password(String current, String next, String again) async {
+      // what was said last has gone: it would lie over the button
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      await reveal(tester, find.text('Змінити пароль'));
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Поточний пароль'),
+        current,
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Новий пароль'),
+        next,
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Новий пароль ще раз'),
+        again,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Змінити пароль'));
+      await tester.pumpAndSettle();
+    }
+
+    await password('modesp', 'lantern42', 'lantern24');
+    expect(find.text('Нові паролі не збігаються'), findsOne);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Змінити пароль'),
+          )
+          .enabled,
+      isFalse,
+    );
+    await password('nope', 'lantern42', 'lantern42');
+    expect(find.text('Поточний пароль неправильний'), findsOne);
+    await password('modesp', 'lantern42', 'lantern42');
+    expect(find.text('Пароль змінено'), findsOne);
+    expect(field('Поточний пароль').controller!.text, isEmpty);
+    // the new one is what the streamer asks for now
+    await api.setAuth(currentPassword: 'lantern42', newPassword: 'lantern42');
+    await reveal(tester, find.text('Вхід за паролем'), up: true);
+    await tester.tap(find.text('Вхід за паролем'));
+    await tester.pumpAndSettle();
+    expect(find.text('Вимкнути вхід?'), findsOne);
+    await tester.tap(find.text('Скасувати'));
+    await tester.pumpAndSettle();
+    expect((await api.auth()).enabled, isTrue);
+    await tester.tap(find.text('Вхід за паролем'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Вимкнути'));
+    await tester.pumpAndSettle();
+    expect(find.text('Вхід вимкнено'), findsOne);
+    expect((await api.auth()).enabled, isFalse);
+    expect(find.text('Змінити пароль'), findsNothing);
+  });
+
+  testWidgets('Оновлення прошивки: a file looked at before it is sent, '
+      'asked about, its progress, and the streamer followed back', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await settings(tester, 'Оновлення прошивки');
+    expect(find.text('demo'), findsOne);
+    expect(find.text('modesp_p4_player'), findsOne);
+    expect(find.text('Розділ ota_0 · IDF v5.5.5'), findsOne);
+    Future<void> pick(String name, Uint8List bytes) async {
+      phone.picked = (name: name, bytes: bytes);
+      await tester.tap(find.text('Вибрати файл .bin'));
+      await tester.pumpAndSettle();
+    }
+
+    final install = find.widgetWithText(FilledButton, 'Встановити');
+    bool installable() => tester.widget<FilledButton>(install).enabled;
+    await pick('notes.txt', Uint8List(10));
+    expect(phone.askedFor, ['application/octet-stream']);
+    expect(find.text('Потрібен файл .bin'), findsOne);
+    await pick('big.bin', appImage('modesp_p4_player', size: otaSlot + 1));
+    expect(
+      find.text('Файл 4,00 МБ — більший за розділ програми (4 МБ)'),
+      findsOne,
+    );
+    await pick('photo.bin', Uint8List(4096));
+    expect(find.text('Це не образ прошивки'), findsOne);
+    await pick('c6.bin', appImage('modesp_c6_bridge'));
+    expect(
+      find.text(
+        'Образ для іншої плати: modesp_c6_bridge (тут modesp_p4_player)',
+      ),
+      findsOne,
+    );
+    expect(installable(), isFalse);
+    await pick(
+      'modesp_p4_player.bin',
+      appImage('modesp_p4_player', size: 1500000),
+    );
+    expect(find.text('modesp_p4_player.bin · 1,43 МБ'), findsOne);
+    expect(installable(), isTrue);
+    await tester.tap(install);
+    await tester.pumpAndSettle();
+    expect(find.text('Встановити прошивку?'), findsOne);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(FilledButton, 'Встановити'),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Встановлено. Стрімер перезапускається — 10 с'), findsOne);
+    expect(installable(), isFalse);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Встановлено. Стрімер перезапускається — 9 с'), findsOne);
+    // the demo is back after 4 s: what runs there, read again
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Встановлено'), findsNothing);
+    expect(find.text('modesp_p4_player.bin · 1,43 МБ'), findsNothing);
+    expect(find.text('demo'), findsOne);
+  });
+
+  testWidgets('Резервна копія: each saved where the person chooses, read '
+      'back only as its own kind; the files staged, and a restart offered', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await settings(tester, 'Резервна копія');
+    final day = DateTime.now();
+    final filesName = BackupKind.files.fileName(day);
+    final settingsName = BackupKind.settings.fileName(day);
+    await tester.tap(find.text('Зберегти у файл').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Зберегти у файл').last);
+    await tester.pumpAndSettle();
+    expect(phone.saved.keys, [filesName, settingsName]);
+    final files = jsonDecode(utf8.decode(phone.saved[filesName]!)) as Map;
+    expect(files['modesp_userdata'], 1);
+    Future<void> restore(
+      String name,
+      List<int> bytes, {
+      bool files = true,
+    }) async {
+      phone.picked = (name: name, bytes: Uint8List.fromList(bytes));
+      await tester.tap(find.text('Відновити з файлу').at(files ? 0 : 1));
+      await tester.pumpAndSettle();
+    }
+
+    await restore(settingsName, phone.saved[settingsName]!);
+    expect(phone.askedFor, contains('application/json'));
+    expect(find.text('Ця копія іншого виду'), findsOne);
+    await restore('notes.txt', utf8.encode('Filter 1: ON PK'));
+    expect(find.text('Це не файл резервної копії'), findsOne);
+    await restore(filesName, phone.saved[filesName]!);
+    expect(find.text('Готово файлів: 2'), findsOne);
+    await tester.tap(find.text('Пізніше'));
+    await tester.pumpAndSettle();
+    expect(find.text('Готово файлів: 2'), findsNothing);
+    // a restart now: said until the streamer is back
+    await restore(filesName, phone.saved[filesName]!);
+    await tester.tap(find.widgetWithText(FilledButton, 'Перезапустити'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Перезапуск…'), findsOne);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(find.text('Готово файлів: 2'), findsNothing);
+    // the settings, applied at once
+    final kept = jsonDecode(utf8.decode(phone.saved[settingsName]!)) as Map;
+    (kept['keys'] as Map)['ui.backlight'] = 35;
+    // followed frame by frame: the lost link's spinner never lets the page settle
+    phone.picked = (
+      name: settingsName,
+      bytes: Uint8List.fromList(utf8.encode(jsonEncode(kept))),
+    );
+    await tester.tap(find.text('Відновити з файлу').at(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Налаштування відновлено'), findsOne);
+    expect(((await api.settingsBackup())['keys']! as Map)['ui.backlight'], 35);
+    // and the streamer restarts with them
+    expect(api.current.status, LinkStatus.connecting);
+    await tester.pump(const Duration(seconds: 5));
+    expect(api.current.status, LinkStatus.ready);
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('filters in as text — from a file or pasted, said before they '
+      'go — become «Власний», «Повернути» brings the sound back; the sound '
+      'goes out as filters', (tester) async {
+    await pumpApp(tester);
+    await openEq(tester);
+    Future<void> menu(String item) async {
+      await tester.tap(find.byTooltip('Ще'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(item));
+      await tester.pumpAndSettle();
+    }
+
+    await menu('Експорт пресету');
+    final out = utf8.decode(phone.saved['p4-eq-rock.txt']!);
+    expect(out, startsWith('# P4 Player - Рок\nFilter 1: ON '));
+    await menu('Імпорт фільтрів');
+    phone.picked = (
+      name: 'rew.txt',
+      bytes: Uint8List.fromList(
+        utf8.encode('﻿Filter 1: ON PK Fc 50 Hz Gain -4 dB Q 2\n'),
+      ),
+    );
+    await tester.tap(find.text('Вибрати файл'));
+    await tester.pumpAndSettle();
+    expect(phone.askedFor, contains('text/plain'));
+    expect(find.text('Знайдено 1 смугу'), findsOne);
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      filters,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Знайдено 3 смуги'), findsOne);
+    for (final note in [
+      'Preamp −6,4 дБ не переноситься: запас для підсилень пристрій тримає сам',
+      'Типів, яких тут немає: 1 — пропущено',
+      'Нечитабельних рядків: 1',
+      'Обмежено межами пристрою: 1',
+    ]) {
+      expect(find.text(note), findsOne, reason: note);
+    }
+    await tester.tap(find.text('Імпортувати'));
+    await tester.pumpAndSettle();
+    expect(find.text('Фільтри імпортовано — це «Власний»'), findsOne);
+    var doc = await api.eq();
+    expect(doc.preset, 'custom');
+    expect([for (final b in doc.bands) b.f], [1000, 105, EqLimits.fMax]);
+    await tester.tap(find.text('Повернути'));
+    await tester.pumpAndSettle();
+    doc = await api.eq();
+    expect(doc.preset, 'rock');
+  });
+
+  testWidgets('stations in from a playlist — the ones the list takes — and '
+      'the list out as an .m3u', (tester) async {
+    await api.selectSource(SourceId.radio);
+    await pumpApp(tester);
+    await tester.tap(find.text('Усі станції · 12'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Експорт у файл .m3u'));
+    await tester.pumpAndSettle();
+    final m3u = utf8.decode(phone.saved['p4-player-stations.m3u']!);
+    expect(m3u, startsWith('#EXTM3U\n#EXTINF:-1,Radio Lantern\n'));
+    final first = m3u.split('\n')[2];
+    Future<void> import(String text) async {
+      phone.picked = (
+        name: 'more.m3u',
+        bytes: Uint8List.fromList(utf8.encode(text)),
+      );
+      await tester.tap(find.byTooltip('Імпорт із файлу .m3u'));
+      await tester.pumpAndSettle();
+    }
+
+    await import(
+      '#EXTM3U\n#EXTINF:-1,Amber Coast\nhttps://amber.invalid/live\n$first\n',
+    );
+    expect(phone.askedFor, contains('audio/x-mpegurl'));
+    expect(find.text('Додано станцій: 1'), findsOne);
+    final list = await api.stations();
+    expect(list.stations, hasLength(13));
+    expect(list.stations.last.name, 'Amber Coast');
+    await tester.pump(const Duration(seconds: 4));
+    await import('[playlist]\nFile1=$first\nTitle1=Radio Lantern\n');
+    expect(find.text('У файлі немає нових станцій'), findsOne);
   });
 }

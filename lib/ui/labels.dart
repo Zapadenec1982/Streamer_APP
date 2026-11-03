@@ -216,6 +216,11 @@ extension Words on AppLocalizations {
     EqType.notch => eqTypeNotch,
   };
 
+  /// A file's size as the web's firmware page says it: «812 КБ», «1,94 МБ».
+  String fileSize(int bytes) => bytes < 1048576
+      ? '${(bytes / 1024).toStringAsFixed(0)} $unitKb'
+      : '${decimal(bytes / 1048576, 2)} $unitMb';
+
   /// «125 Гц», «1,25 кГц».
   String frequency(double f) => f >= 1000
       ? '${decimal(f / 1000, 2)} $unitKhz'

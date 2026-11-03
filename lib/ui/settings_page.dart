@@ -15,8 +15,9 @@ import 'speakers_page.dart';
 import 'writes.dart';
 
 /// Налаштування, as the web's SystemPage.svelte and the glass's screen_set.cpp: the streamer the
-/// app talks to; its sound, the device, its links and its services, each page under its row; and
-/// the app's own settings. The crossover stays hidden, as on the web and the glass.
+/// app talks to; its sound, the device — with its login, its firmware and its backups — its links
+/// and its services, each page under its row; and the app's own settings. The crossover stays
+/// hidden, as on the web and the glass; «Сервіс» is the web's alone (D13).
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
@@ -185,6 +186,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               title: Text(l.pageTime),
               subtitle: s.time.isNotEmpty ? Text(s.time) : null,
               onTap: () => context.go('/settings/time'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: Text(l.pageAccess),
+              onTap: () => context.go('/settings/access'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.system_update),
+              title: Text(l.pageFirmware),
+              onTap: () => context.go('/settings/firmware'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_backup_restore),
+              title: Text(l.pageBackup),
+              onTap: () => context.go('/settings/backup'),
             ),
             ListTile(
               enabled: !_restarting,

@@ -6,7 +6,6 @@
   "mob.app": "App",
   "mob.lang_phone": "Wie am Telefon",
   "mob.licenses": "Lizenzen",
-  "mob.in_web": "Das gibt es in der Weboberfläche des Streamers",
   "mob.busy": "Der Streamer bedient bereits drei Clients. Neuer Versuch…",
   "mob.panels": "Streamer",
   "mob.add_panel": "Streamer hinzufügen",
@@ -23,7 +22,6 @@
   "mob.find": "Streamer suchen",
   "mob.try_demo": "Demo ausprobieren",
   "mob.forget": "Vergessen",
-  "mob.panel_settings": "Streamer-Einstellungen",
   "mob.of_time": "{pos} von {dur}",
   "mob.other_panel": "Anderer Streamer",
   "mob.hint_listen": "anhören",
@@ -33,5 +31,10 @@
   "mob.wifi_join_note": "Der Streamer verlässt sein aktuelles Netzwerk für einige Sekunden. Antwortet „{name}“ nicht, kehrt er zurück und hier steht der Grund. Ist „{name}“ ein anderes Netzwerk, verbinden Sie auch das Telefon damit.",
   "mob.wifi_forget_body": "Der Streamer trennt sich vom Netzwerk und schaltet seinen eigenen Zugangspunkt ein. Die App verliert die Verbindung zu ihm.",
   "mob.wifi_forget_back": "Um zurückzukommen, verbinden Sie das Telefon mit „{name}“ und fügen Sie den Streamer unter {ip} hinzu.",
-  "mob.pair_elsewhere": "Auf einem anderen Gerät beantwortet."
+  "mob.pair_elsewhere": "Auf einem anderen Gerät beantwortet.",
+  "mob.access_login": "Anmeldung mit Passwort",
+  "mob.fw_restarting": "Installiert. Der Streamer startet neu — {n} s",
+  "mob.backup_save": "In Datei speichern",
+  "mob.fw_pick": ".bin-Datei wählen",
+  "mob.fw_not_image": "Das ist kein Firmware-Image"
 }
