@@ -1531,9 +1531,13 @@ void main() {
     await settings(tester, 'Перезапустити');
     expect(find.text('Перезапустити стрімер?'), findsOne);
     await tester.tap(find.widgetWithText(FilledButton, 'Перезапустити'));
-    await tester.pumpAndSettle();
+    // the demo's link goes away for 4 s, as a streamer's does
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Перезапуск…'), findsOne);
-    await tester.pump(const Duration(minutes: 1));
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('Перезапуск…'), findsOne);
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(find.text('Перезапуск…'), findsNothing);
   });

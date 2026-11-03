@@ -31,6 +31,8 @@ class PanelEndpoint {
   PanelEndpoint withLogin(String user, String password) =>
       PanelEndpoint(host, port: port, user: user, password: password);
 
+  PanelEndpoint withoutLogin() => PanelEndpoint(host, port: port);
+
   /// An address as a person types it: "192.168.1.216", "modesp-2c4c.local", "host:8080",
   /// "http://host/". Null when it is not one.
   static PanelEndpoint? parse(String text) {

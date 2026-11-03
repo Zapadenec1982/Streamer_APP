@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'eq.dart';
 import 'keys.dart';
+import 'maintenance.dart';
 import 'models.dart';
 import 'speakers.dart';
 import 'streamer.dart';
@@ -157,6 +158,38 @@ abstract interface class DeviceApi {
   /// Saves the settings, stops the modules, restarts.
   Future<void> restart();
 
+  /// The streamer's login: on or off, and its name (without a login itself).
+  Future<AuthInfo> auth();
+
+  /// A change of the login: on or off, the name, or the password — which needs the one it has
+  /// (403 `wrong_password`).
+  Future<void> setAuth({
+    bool? enabled,
+    String? username,
+    String? currentPassword,
+    String? newPassword,
+  });
+
+  /// What runs now (without a login).
+  Future<OtaInfo> otaInfo();
+
+  /// A firmware image to the other slot; the streamer restarts into it. [progress] 0…1 as it goes
+  /// out. An image of another board is refused, 400 `board_mismatch` with both names.
+  Future<void> otaUpload(Uint8List image, {void Function(double)? progress});
+
+  /// The person's own files — the station list, the EQ and «Власний», the remote devices, the
+  /// track to resume — as one document.
+  Future<Map<String, Object?>> userFiles();
+
+  /// Those files back: staged, they go in at the next start; how many were.
+  Future<int> restoreUserFiles(Map<String, Object?> doc);
+
+  /// Every persisted setting.
+  Future<Map<String, Object?>> settingsBackup();
+
+  /// The settings back, every key at once; the streamer restarts to apply them.
+  Future<void> restoreSettings(Map<String, Object?> doc);
+
   Future<StationList> stations();
 
   /// The glass's listen(): a station not tuned is a tune, the one tuned a play if it is off.
@@ -195,9 +228,6 @@ abstract interface class DeviceApi {
 
   /// A browser command, packed with its row and revision (`browseCode`).
   Future<void> dlnaCommand(int code);
-
-  /// A page of the panel's web interface ("system/sound/eq"), or null where there is none.
-  Uri? web(String route);
 
   /// The picture of [NowPlaying.coverKey]; null when there is none to show.
   Future<Uint8List?> cover(String key);

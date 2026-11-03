@@ -10,6 +10,7 @@ import 'package:streamer/device/panel/panel_device_api.dart';
 import 'package:streamer/device/panel/panel_link.dart';
 
 import 'support/fake_panel.dart';
+import 'support/images.dart';
 
 /// The app against a panel on the loopback: plain tests, no widgets, so the real network stack
 /// (a widget test would put a fake HttpClient in its place).
@@ -361,6 +362,87 @@ void main() {
     expect(last(), {'pair': 'accept', 'seq': 4});
     await api.restart();
     expect(panel.restarts, 1);
+  });
+
+  test('the login, the firmware and the backups go to their routes as the '
+      'streamer takes them', () async {
+    final api = PanelDeviceApi(link);
+    Map<String, Object?> last() =>
+        (panel.requests.last.body! as Map).cast<String, Object?>();
+    Matcher refused(String code) =>
+        throwsA(isA<PanelError>().having((e) => e.code, 'code', code));
+    panel.password = 'modesp';
+    // the login is read without one; changed only with it
+    expect((await api.auth()).enabled, isTrue);
+    await expectLater(
+      api.setAuth(username: 'kitchen'),
+      throwsA(isA<PanelError>().having((e) => e.unauthorized, '401', isTrue)),
+    );
+    link.endpoint = link.endpoint.withLogin('admin', 'modesp');
+    await expectLater(
+      api.setAuth(currentPassword: 'nope', newPassword: 'lantern42'),
+      refused('wrong_password'),
+    );
+    expect(last(), {'current_pass': 'nope', 'new_pass': 'lantern42'});
+    await api.setAuth(
+      username: 'kitchen',
+      currentPassword: 'modesp',
+      newPassword: 'lantern42',
+    );
+    expect(last(), {
+      'username': 'kitchen',
+      'current_pass': 'modesp',
+      'new_pass': 'lantern42',
+    });
+    expect((panel.user, panel.password), ('kitchen', 'lantern42'));
+    link.endpoint = link.endpoint.withLogin('kitchen', 'lantern42');
+    await api.setAuth(enabled: false);
+    expect(last(), {'enabled': false});
+    expect(panel.password, isNull);
+    expect((await api.auth()).username, 'kitchen');
+
+    // the firmware: raw bytes with their length, the pieces followed
+    final info = await api.otaInfo();
+    expect(
+      (info.board, info.partition, info.version),
+      ('modesp_p4_player', 'ota_0', '0.1.0'),
+    );
+    final sent = <double>[];
+    await api.otaUpload(
+      appImage('modesp_p4_player', size: 40000),
+      progress: sent.add,
+    );
+    expect(panel.otaImage, hasLength(40000));
+    expect(panel.requests.last.contentType, 'application/octet-stream');
+    expect(sent, [16384 / 40000, 32768 / 40000, 1.0]);
+    await expectLater(
+      api.otaUpload(appImage('modesp_c6_bridge')),
+      throwsA(
+        isA<PanelError>()
+            .having((e) => e.code, 'code', 'board_mismatch')
+            .having((e) => e.body?['incoming'], 'incoming', 'modesp_c6_bridge')
+            .having((e) => e.body?['running'], 'running', 'modesp_p4_player'),
+      ),
+    );
+
+    // the person's files: staged; one the streamer cannot read refuses them all
+    final files = await api.userFiles();
+    expect(files['modesp_userdata'], 1);
+    expect(await api.restoreUserFiles(files), 2);
+    expect(panel.restoredFiles, files);
+    panel.badFile = 'eq.json';
+    await expectLater(
+      api.restoreUserFiles(files),
+      throwsA(
+        isA<PanelError>()
+            .having((e) => e.code, 'code', 'bad_file')
+            .having((e) => e.body?['file'], 'file', 'eq.json'),
+      ),
+    );
+    final settings = await api.settingsBackup();
+    expect(settings['modesp_backup'], 1);
+    await api.restoreSettings(settings);
+    expect(panel.restoredSettings, settings);
   });
 
   test('the streamer\'s own settings in a snapshot', () {

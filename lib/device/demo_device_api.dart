@@ -6,6 +6,7 @@ import 'demo_art.dart';
 import 'device_api.dart';
 import 'eq.dart';
 import 'keys.dart';
+import 'maintenance.dart';
 import 'media.dart';
 import 'models.dart';
 import 'panel/panel_link.dart';
@@ -1032,7 +1033,114 @@ class DemoDeviceApi implements DeviceApi {
 
   /// The demo has nothing to restart: it comes straight back.
   @override
-  Future<void> restart() async {}
+  Future<void> restart() async => _goAway();
+
+  /// A restart as the demo plays one: the link away for a few seconds, then back as it was.
+  LinkStatus _link = LinkStatus.ready;
+  Timer? _away;
+
+  void _goAway() {
+    _link = LinkStatus.connecting;
+    _emit();
+    _away?.cancel();
+    _away = Timer(const Duration(seconds: 4), () {
+      _link = LinkStatus.ready;
+      _emit();
+    });
+  }
+
+  /// The streamer's login: off in the demo, and its factory password (admin / modesp) to change.
+  bool _login = false;
+  String _loginName = 'admin';
+  String _loginPassword = 'modesp';
+
+  @override
+  Future<AuthInfo> auth() async =>
+      AuthInfo(enabled: _login, username: _loginName);
+
+  @override
+  Future<void> setAuth({
+    bool? enabled,
+    String? username,
+    String? currentPassword,
+    String? newPassword,
+  }) async {
+    if (newPassword != null) {
+      if (currentPassword != _loginPassword) {
+        throw const PanelError(403, 'wrong_password');
+      }
+      _loginPassword = newPassword;
+    }
+    _login = enabled ?? _login;
+    _loginName = username ?? _loginName;
+  }
+
+  @override
+  Future<OtaInfo> otaInfo() async => const OtaInfo(
+    partition: 'ota_0',
+    version: 'demo',
+    idf: 'v5.5.5',
+    date: 'Nov  2 2026',
+    time: '23:00:00',
+    board: 'modesp_p4_player',
+  );
+
+  /// The demo takes an image as the streamer would and restarts as it does, into what it was:
+  /// there is nothing to flash.
+  @override
+  Future<void> otaUpload(
+    Uint8List image, {
+    void Function(double)? progress,
+  }) async {
+    for (final at in const [0.25, 0.5, 0.75, 1.0]) {
+      progress?.call(at);
+    }
+    _goAway();
+  }
+
+  @override
+  Future<Map<String, Object?>> userFiles() async => {
+    'modesp_userdata': 1,
+    'files': {
+      'stations.json': {
+        'stations': [
+          for (final s in _list) {'name': s.name, 'url': s.url},
+        ],
+        'presets': _presets,
+      },
+      'eq.json': {'preset': _sound},
+    },
+  };
+
+  @override
+  Future<int> restoreUserFiles(Map<String, Object?> doc) async {
+    final files = doc['files'];
+    return files is Map ? files.length : 0;
+  }
+
+  @override
+  Future<Map<String, Object?>> settingsBackup() async => {
+    'modesp_backup': 1,
+    'keys': {
+      'audio.volume': _volume,
+      'audio.bass_db': _bass,
+      'audio.treble_db': _treble,
+      'audio.loudness': _loudnessLevel,
+      'ui.backlight': _backlight,
+      'ui.theme': _scheme,
+    },
+  };
+
+  /// The settings applied, and a restart, as the streamer does after a restore.
+  @override
+  Future<void> restoreSettings(Map<String, Object?> doc) async {
+    final keys = doc['keys'];
+    if (keys is! Map) return;
+    if (keys['audio.volume'] case final int v) _volume = v.clamp(0, 100);
+    if (keys['ui.backlight'] case final int v) _backlight = v.clamp(0, 100);
+    if (keys['ui.theme'] case final int v) _scheme = v.clamp(0, 3);
+    _goAway();
+  }
 
   @override
   Future<StationList> stations() async => StationList(
@@ -1170,10 +1278,6 @@ class DemoDeviceApi implements DeviceApi {
     ),
   ];
 
-  /// The demo has no web interface.
-  @override
-  Uri? web(String route) => null;
-
   /// The demo draws its own covers (DemoArt).
   @override
   Future<Uint8List?> cover(String key) async => null;
@@ -1194,6 +1298,7 @@ class DemoDeviceApi implements DeviceApi {
   @override
   void dispose() {
     suspend();
+    _away?.cancel();
     _changes.close();
   }
 
@@ -1212,6 +1317,7 @@ class DemoDeviceApi implements DeviceApi {
       name: panelName,
       scheme: _scheme,
       now: now,
+      status: _link,
       // the Player's background follows the cover, as the panel's does (ui.cover_rgb)
       backdrop: cover != null && now.kind != NowKind.radio
           ? DemoArt.of(cover).backdrop

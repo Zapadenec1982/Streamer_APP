@@ -6,16 +6,19 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 /// A panel on the loopback, as far as the app uses one (the firmware's NETWORK.md): the WebSocket
-/// gives the whole state and then the keys that changed; POST /api/settings takes JSON only (415),
-/// the login when one is set (401) and a body with its Content-Length (400); a busy panel closes a
-/// new socket with 1013.
+/// gives the whole state and then the keys that changed; a POST takes JSON only (415) — but the
+/// firmware image, raw — the login when one is set (401) and a body with its Content-Length (400);
+/// a busy panel closes a new socket with 1013.
 class FakePanel {
   FakePanel([Map<String, Object?> state = const {}]) : state = {...state};
 
   final Map<String, Object?> state;
 
-  /// When set, a POST needs Basic admin:[password].
+  /// When set, a POST needs Basic [user]:[password] — the streamer's login on. Off, the password
+  /// it would have is [keptPassword].
   String? password;
+  String user = 'admin';
+  String keptPassword = 'modesp';
 
   /// A new socket is closed with 1013, as when the panel has its three clients.
   bool busy = false;
@@ -83,6 +86,34 @@ class FakePanel {
       'presets': [1, 0, 9, -1, -1, -1],
     },
   };
+
+  /// What runs (`GET /api/ota`), and the image a `POST /api/ota` took.
+  Map<String, Object?> ota = const {
+    'partition': 'ota_0',
+    'version': '0.1.0',
+    'idf': 'v5.5.5',
+    'date': 'Nov  2 2026',
+    'time': '23:58:01',
+    'board': 'modesp_p4_player',
+  };
+  Uint8List? otaImage;
+
+  /// The person's files (`/api/userdata`) and the settings (`/api/backup`) as the panel gives
+  /// them; what a restore brought. [badFile] refuses the next files restore over that file.
+  Map<String, Object?> userdata = const {
+    'modesp_userdata': 1,
+    'files': {
+      'stations.json': '{"stations":[]}',
+      'last_track': '/sdcard/a.flac',
+    },
+  };
+  Map<String, Object?> backup = const {
+    'modesp_backup': 1,
+    'keys': {'audio.volume': 30, 'ui.backlight': 80},
+  };
+  Map<String, Object?>? restoredFiles;
+  Map<String, Object?>? restoredSettings;
+  String? badFile;
 
   /// The card's index (`/api/library`): paths under [libraryRoot].
   List<String> library = const [];
@@ -157,6 +188,7 @@ class FakePanel {
       ws.listen((_) {}, onDone: () => _sockets.remove(ws));
       return;
     }
+    if (req.method == 'POST' && path == '/api/ota') return _ota(req);
     final text = await utf8.decodeStream(req);
     Object? body;
     try {
@@ -174,10 +206,7 @@ class FakePanel {
         req.headers.contentType?.mimeType != 'application/json') {
       return _reply(req, 415, {'error': 'content_type'});
     }
-    if (req.method == 'POST' &&
-        password != null &&
-        req.headers.value(HttpHeaders.authorizationHeader) !=
-            'Basic ${base64.encode(utf8.encode('admin:$password'))}') {
+    if (req.method == 'POST' && !_authorized(req)) {
       return _reply(req, 401, {'error': 'unauthorized'});
     }
     // httpd reads a body by its Content-Length alone: one sent in chunks arrives empty
@@ -190,10 +219,45 @@ class FakePanel {
     }
     switch ((req.method, path)) {
       case ('GET', '/api/ota'):
+        return _reply(req, 200, ota);
+      case ('GET', '/api/auth'):
         return _reply(req, 200, {
-          'board': 'modesp_p4_player',
-          'version': '0.1.0',
+          'enabled': password != null,
+          'username': user,
         });
+      // new_pass needs current_pass; all checked before anything is written
+      case ('POST', '/api/auth'):
+        final b = (body! as Map).cast<String, Object?>();
+        final now = password ?? keptPassword;
+        if (b['new_pass'] is String && b['current_pass'] != now) {
+          return _reply(req, 403, {'error': 'wrong_password'});
+        }
+        if (b['username'] case final String name) user = name;
+        final next = b['new_pass'] is String ? b['new_pass']! as String : now;
+        final on = b['enabled'] is bool
+            ? b['enabled']! as bool
+            : password != null;
+        password = on ? next : null;
+        keptPassword = next;
+        return _reply(req, 200, {'ok': true});
+      case ('GET', '/api/userdata'):
+        return _reply(req, 200, userdata);
+      case ('POST', '/api/userdata'):
+        if (badFile case final file?) {
+          badFile = null;
+          return _reply(req, 400, {'error': 'bad_file', 'file': file});
+        }
+        restoredFiles = (body! as Map).cast<String, Object?>();
+        final files = restoredFiles!['files'];
+        return _reply(req, 200, {
+          'ok': true,
+          'staged': files is Map ? files.length : 0,
+        });
+      case ('GET', '/api/backup'):
+        return _reply(req, 200, backup);
+      case ('POST', '/api/restore'):
+        restoredSettings = (body! as Map).cast<String, Object?>();
+        return _reply(req, 200, {'ok': true});
       case ('POST', '/api/settings'):
         _apply((body! as Map).cast<String, Object?>());
         return _reply(req, 200, {'ok': true});
@@ -312,6 +376,59 @@ class FakePanel {
       default:
         return _reply(req, 404, {'error': 'not_found'});
     }
+  }
+
+  bool _authorized(HttpRequest req) =>
+      password == null ||
+      req.headers.value(HttpHeaders.authorizationHeader) ==
+          'Basic ${base64.encode(utf8.encode('$user:$password'))}';
+
+  /// `POST /api/ota` as the panel takes it (http_service.cpp): the raw image with its
+  /// Content-Length and the login; 256 B … 4 MB; 0xE9 first; the board's project_name.
+  Future<void> _ota(HttpRequest req) async {
+    final bytes = await req.fold<BytesBuilder>(
+      BytesBuilder(copy: false),
+      (b, d) => b..add(d),
+    );
+    final image = bytes.takeBytes();
+    requests.add((
+      method: req.method,
+      path: '/api/ota',
+      contentType: req.headers.contentType?.mimeType,
+      body: image.length,
+    ));
+    Future<void> plain(int status, String text) {
+      req.response
+        ..statusCode = status
+        ..write(text);
+      return req.response.close();
+    }
+
+    if (!_authorized(req)) return _reply(req, 401, {'error': 'unauthorized'});
+    if (req.contentLength <= 0) return plain(400, 'Empty body');
+    if (image.length > 4 * 1024 * 1024) return plain(400, 'Firmware too large');
+    if (image.length < 256) return plain(400, 'File too small');
+    if (image[0] != 0xE9) return plain(400, 'Not a valid ESP32 firmware');
+    final desc = ByteData.sublistView(image).getUint32(0x20, Endian.little);
+    if (desc == 0xABCD5432) {
+      final field = image.sublist(0x50, 0x70);
+      final end = field.indexOf(0);
+      final incoming = utf8.decode(end < 0 ? field : field.sublist(0, end));
+      final running = ota['board']! as String;
+      if (incoming != running) {
+        return _reply(req, 400, {
+          'error': 'board_mismatch',
+          'running': running,
+          'incoming': incoming,
+        });
+      }
+    }
+    otaImage = image;
+    restarts++;
+    return _reply(req, 200, {
+      'status': 'ok',
+      'message': 'Firmware updated. Restarting...',
+    });
   }
 
   void _apply(Map<String, Object?> body) {

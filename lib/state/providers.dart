@@ -8,6 +8,7 @@ import '../device/demo_device_api.dart';
 import '../device/device_api.dart';
 import '../device/eq.dart';
 import '../device/keys.dart';
+import '../device/maintenance.dart';
 import '../device/models.dart';
 import '../device/panel/panel_device_api.dart';
 import '../device/panel/panel_link.dart';
@@ -452,6 +453,46 @@ class NoPanelApi implements DeviceApi {
   Future<void> restart() async {}
 
   @override
+  Future<AuthInfo> auth() async =>
+      const AuthInfo(enabled: false, username: 'admin');
+
+  @override
+  Future<void> setAuth({
+    bool? enabled,
+    String? username,
+    String? currentPassword,
+    String? newPassword,
+  }) async {}
+
+  @override
+  Future<OtaInfo> otaInfo() async => const OtaInfo(
+    partition: '',
+    version: '',
+    idf: '',
+    date: '',
+    time: '',
+    board: '',
+  );
+
+  @override
+  Future<void> otaUpload(
+    Uint8List image, {
+    void Function(double)? progress,
+  }) async {}
+
+  @override
+  Future<Map<String, Object?>> userFiles() async => const {};
+
+  @override
+  Future<int> restoreUserFiles(Map<String, Object?> doc) async => 0;
+
+  @override
+  Future<Map<String, Object?>> settingsBackup() async => const {};
+
+  @override
+  Future<void> restoreSettings(Map<String, Object?> doc) async {}
+
+  @override
   Future<void> setLeveler(bool on) async {}
 
   @override
@@ -484,9 +525,6 @@ class NoPanelApi implements DeviceApi {
 
   @override
   Future<List<Genre>> radioGenres() async => const [];
-
-  @override
-  Uri? web(String route) => null;
 
   @override
   Future<Uint8List?> cover(String key) async => null;

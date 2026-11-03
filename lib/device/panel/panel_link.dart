@@ -124,6 +124,43 @@ class PanelLink {
     return text.isEmpty ? null : jsonDecode(text);
   }
 
+  /// A file to the HTTP API as `application/octet-stream` — a firmware image — with its
+  /// Content-Length, in pieces, so [progress] (0…1) follows what has gone out. The panel writes
+  /// what it gets as it comes, so its answer waits for the whole of it: [wait] long.
+  Future<Object?> postBytes(
+    String path,
+    Uint8List bytes, {
+    void Function(double sent)? progress,
+    Duration wait = const Duration(minutes: 3),
+  }) async {
+    final HttpClientResponse res;
+    try {
+      final req = await _http
+          .openUrl('POST', endpoint.http(path))
+          .timeout(timeout);
+      final auth = endpoint.authorization;
+      if (auth != null) req.headers.set(HttpHeaders.authorizationHeader, auth);
+      req.headers.contentType = ContentType.binary;
+      req.contentLength = bytes.length;
+      const piece = 16 * 1024;
+      for (var at = 0; at < bytes.length; at += piece) {
+        final end = min(at + piece, bytes.length);
+        req.add(Uint8List.sublistView(bytes, at, end));
+        await req.flush().timeout(wait);
+        progress?.call(end / bytes.length);
+      }
+      res = await req.close().timeout(wait);
+    } on SocketException {
+      throw const PanelError(0);
+    } on TimeoutException {
+      throw const PanelError(0);
+    } on HttpException {
+      throw const PanelError(0);
+    }
+    final text = await _drain(res, ok: const [200]);
+    return text.isEmpty ? null : jsonDecode(text);
+  }
+
   /// A JSON GET of the HTTP API.
   Future<Object?> getJson(String path, [Map<String, String>? query]) async {
     final res = await _send('GET', endpoint.http(path, query));

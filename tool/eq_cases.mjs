@@ -1,5 +1,5 @@
-// eq_cases.mjs — the EQ edits and the whole system's curve, from the firmware's own
-// webui/src/lib/eqband.js and syscurve.js, for protocol/eq_cases.json: the cases the app's Dart
+// eq_cases.mjs — the EQ edits, the whole system's curve and filters as text, from the firmware's
+// own webui/src/lib/eqband.js, syscurve.js and eqfile.js, for protocol/eq_cases.json: the cases the app's Dart
 // ports (lib/device/eq.dart, lib/device/eq_math.dart) are tested on. The curve of the EQ alone is
 // the firmware's vectors (protocol/eq_curve_vectors.json, tool/sync_eq_vectors.py); these are the
 // rest of what the web computes about a set of bands.
@@ -18,6 +18,7 @@ const fw = resolve(process.env.MODESP_PLAYER_ROOT || resolve(root, '..', 'modesp
 const lib = (name) => import(pathToFileURL(resolve(fw, 'webui/src/lib', name)).href);
 const { clampBand, withType, passQIndex, freeFrequency, addBand } = await lib('eqband.js');
 const { systemBands, systemCurveDb } = await lib('syscurve.js');
+const { parseFilters, formatFilters, bwToQ, slopeToQ } = await lib('eqfile.js');
 
 const band = (type, f, gain, q, on = true) => ({ type, f, gain, q, on });
 const PRESET_F = [40, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 12000];
@@ -75,14 +76,27 @@ const stages = [
   return { ...c, stages: bands, curve: systemCurveDb(sets[c.eq], bands, c.fs, FREQS, c.eqOn) };
 });
 
-const out = { _comment: 'Written by tool/eq_cases.mjs from the firmware\'s eqband.js and syscurve.js - do not edit by hand.', freqs: FREQS, sets, free, clamp, retype, pass_q: passQ, stages };
+// filters as text: what the web reads of REW, Equalizer APO and AutoEQ lines, and what it writes
+const TEXTS = {
+  rew: 'Filter Settings file\n\nPreamp: -6.4 dB\nFilter 1: ON LSC Fc 105 Hz Gain 5.5 dB Q 0.71\nFilter  2: ON  PK       Fc   47.0 Hz  Gain  -0.7 dB  Q  0.39\nFilter 3: OFF None\nFilter 4: ON None\nFilter: ON PEQ Fc 100 Hz Gain 1.0 dB BW Oct 0.167\n',
+  kinds: 'Filter 1: ON LS 6dB Fc 100 Hz Gain 3 dB\nFilter 2: ON HSC 10.8 dB Fc 8 kHz Gain -4 dB\nFilter 3: ON LP Fc 18000 Hz\nFilter 4: ON HPQ Fc 30 Hz Q 0,5\nFilter 5: ON NO Fc 60 Hz Q 30\nFilter 6: ON BP Fc 1000 Hz Q 2\nFilter 7: ON Modal Fc 45 Hz Gain -8 dB Q 4\nFilter 8: ON LSC Fc 40 Hz Gain 9 dB\n',
+  broken: 'Filter 1: ON PK Gain 3 dB Q 1\nFilter 2: ON PK Fc 1000 Hz Q 1\nFilter 3: ON PK Fc 1000 Hz Gain 3 dB\nFilter 4: ON\nFilter 5: ON PK Fc 5 Hz Gain 30 dB Q 20\nFilter 6: ON LSC 40 dB Fc 100 Hz Gain 6 dB\n',
+  many: Array.from({ length: 13 }, (_, i) => `Filter ${i + 1}: ON PK Fc ${100 * (i + 1)} Hz Gain ${i % 5 - 2} dB Q 1.41`).join('\r\n'),
+  empty: '# nothing here\n',
+};
+const parsed = Object.entries(TEXTS).map(([name, text]) => ({ name, text, ...parseFilters(text) }));
+const written = Object.entries(sets).map(([name, bands]) => ({ name, text: formatFilters(bands, `P4 Player - ${name}`) }));
+const widths = [0.167, 0.5, 1, 2].map((n) => ({ octaves: n, q: bwToQ(n) }));
+const slopes = [[12, 6], [10.8, -4], [6, 3], [40, 6]].map(([s, g]) => ({ slope: s, gain: g, q: slopeToQ(s, g) }));
+
+const out = { _comment: 'Written by tool/eq_cases.mjs from the firmware\'s eqband.js, syscurve.js and eqfile.js - do not edit by hand.', freqs: FREQS, sets, free, clamp, retype, pass_q: passQ, stages, files: { parsed, written, widths, slopes } };
 const path = resolve(root, 'protocol', 'eq_cases.json');
 const text = JSON.stringify(out, null, 1) + '\n';
 if (process.argv.includes('--check')) {
   let current = '';
   try { current = readFileSync(path, 'utf8'); } catch { /* none yet */ }
   if (current !== text) {
-    console.log('protocol/eq_cases.json differs from eqband.js and syscurve.js: run node tool/eq_cases.mjs');
+    console.log('protocol/eq_cases.json differs from eqband.js, syscurve.js and eqfile.js: run node tool/eq_cases.mjs');
     process.exit(1);
   }
 } else {

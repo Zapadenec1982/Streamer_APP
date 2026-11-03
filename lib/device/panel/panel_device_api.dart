@@ -5,6 +5,7 @@ import '../device_api.dart';
 import '../eq.dart';
 import '../face.dart';
 import '../keys.dart';
+import '../maintenance.dart';
 import '../models.dart';
 import '../speakers.dart';
 import '../streamer.dart';
@@ -296,6 +297,53 @@ class PanelDeviceApi implements DeviceApi {
   Future<void> restart() => link.postJson('/api/restart', const {});
 
   @override
+  Future<AuthInfo> auth() async =>
+      AuthInfo.fromJson(await link.getJson('/api/auth'));
+
+  @override
+  Future<void> setAuth({
+    bool? enabled,
+    String? username,
+    String? currentPassword,
+    String? newPassword,
+  }) => link.postJson('/api/auth', {
+    'enabled': ?enabled,
+    'username': ?username,
+    'current_pass': ?currentPassword,
+    'new_pass': ?newPassword,
+  });
+
+  @override
+  Future<OtaInfo> otaInfo() async =>
+      OtaInfo.fromJson(await link.getJson('/api/ota'));
+
+  @override
+  Future<void> otaUpload(Uint8List image, {void Function(double)? progress}) =>
+      link.postBytes('/api/ota', image, progress: progress);
+
+  @override
+  Future<Map<String, Object?>> userFiles() async {
+    final doc = await link.getJson('/api/userdata');
+    return doc is Map ? doc.cast<String, Object?>() : const {};
+  }
+
+  @override
+  Future<int> restoreUserFiles(Map<String, Object?> doc) async {
+    final reply = await link.postJson('/api/userdata', doc);
+    return reply is Map && reply['staged'] is int ? reply['staged'] as int : 0;
+  }
+
+  @override
+  Future<Map<String, Object?>> settingsBackup() async {
+    final doc = await link.getJson('/api/backup');
+    return doc is Map ? doc.cast<String, Object?>() : const {};
+  }
+
+  @override
+  Future<void> restoreSettings(Map<String, Object?> doc) =>
+      link.postJson('/api/restore', doc);
+
+  @override
   Future<void> stopTone({SourceId? then, SpeakerWrite? write}) => link.write({
     Keys.audioSource.name: ?then?.value,
     Keys.audioToneMode.name: ToneMode.chain.value,
@@ -366,10 +414,6 @@ class PanelDeviceApi implements DeviceApi {
   @override
   Future<List<Genre>> radioGenres() async =>
       genresOf(await link.getJson('/radio_genres.json'));
-
-  @override
-  Uri? web(String route) =>
-      link.endpoint.http('/').replace(fragment: '/$route');
 
   /// The Player's cover: the panel's 280-pixel tile as a BMP (the firmware's UI.md, "Module HTTP
   /// routes"), asked again only when `ui.cover` names another picture — and then with the ETag of

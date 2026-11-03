@@ -121,3 +121,80 @@ extension StationEdits on StationList {
     'presets': presets,
   };
 }
+
+/// Stations in an .m3u, .m3u8 or .pls file, as the web's stations.js parsePlaylist reads them:
+/// their names, '' where the file gives none, and their streams.
+List<({String name, String url})> parsePlaylist(String text) {
+  final out = <({String name, String url})>[];
+  final lines = [for (final l in text.split(RegExp(r'\r?\n'))) l.trim()];
+  if (RegExp(
+    r'^\[playlist\]',
+    caseSensitive: false,
+  ).hasMatch(lines.firstOrNull ?? '')) {
+    final files = <String, String>{};
+    final titles = <String, String>{};
+    for (final l in lines) {
+      final file = RegExp(
+        r'^File(\d+)=(.+)$',
+        caseSensitive: false,
+      ).firstMatch(l);
+      if (file != null) files[file[1]!] = file[2]!.trim();
+      final title = RegExp(
+        r'^Title(\d+)=(.+)$',
+        caseSensitive: false,
+      ).firstMatch(l);
+      if (title != null) titles[title[1]!] = title[2]!.trim();
+    }
+    // in the order the web's Object.keys gives them: whole numbers ascending, then the rest
+    bool index(String k) =>
+        k == '0' ||
+        (!k.startsWith('0') &&
+            (k.length < 10 || (k.length == 10 && int.parse(k) < 4294967295)));
+    final keys = [
+      ...files.keys.where(index).toList()
+        ..sort((a, b) => int.parse(a).compareTo(int.parse(b))),
+      ...files.keys.where((k) => !index(k)),
+    ];
+    for (final k in keys) {
+      out.add((name: titles[k] ?? '', url: files[k]!));
+    }
+    return out;
+  }
+  var name = '';
+  for (final l in lines) {
+    if (l.isEmpty) continue;
+    if (RegExp('^#EXTINF:', caseSensitive: false).hasMatch(l)) {
+      name = l
+          .replaceFirst(RegExp('^#EXTINF:[^,]*,?', caseSensitive: false), '')
+          .trim();
+    } else if (!l.startsWith('#')) {
+      out.add((name: name, url: l));
+      name = '';
+    }
+  }
+  return out;
+}
+
+/// The list as an .m3u, as the web's toM3u writes it.
+String toM3u(List<Station> stations) {
+  final lines = [
+    '#EXTM3U',
+    for (final s in stations) ...['#EXTINF:-1,${s.name}', s.url],
+  ];
+  return '${lines.join('\n')}\n';
+}
+
+/// A playlist into the list: each stream the list can take, after the ones it has; how many came.
+({StationList list, int added}) importPlaylist(
+  StationList list,
+  List<({String name, String url})> entries,
+) {
+  var next = list;
+  var added = 0;
+  for (final e in entries) {
+    if (next.refuse(e.url) != null) continue;
+    next = next.add(e.name, e.url);
+    added++;
+  }
+  return (list: next, added: added);
+}

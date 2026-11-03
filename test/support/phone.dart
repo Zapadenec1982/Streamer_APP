@@ -7,6 +7,15 @@ class FakePhone {
   MockStreamHandlerEventSink? _sink;
   bool? intercepting;
 
+  /// What the document picker hands back next: a file by its name and bytes, or none (cancelled).
+  ({String name, Uint8List bytes})? picked;
+
+  /// The MIME types the app last asked the picker for.
+  List<String>? askedFor;
+
+  /// The files the app saved, by name: what it wrote.
+  final saved = <String, Uint8List>{};
+
   void install() {
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
@@ -26,6 +35,21 @@ class FakePhone {
         return {for (final c in codes) c: uk[c] ?? c};
       },
     );
+    messenger.setMockMethodCallHandler(const MethodChannel('streamer/files'), (
+      call,
+    ) async {
+      final args = (call.arguments as Map).cast<String, Object?>();
+      switch (call.method) {
+        case 'open':
+          askedFor = (args['types']! as List).cast<String>();
+          final file = picked;
+          return file == null ? null : {'name': file.name, 'bytes': file.bytes};
+        case 'save':
+          saved[args['name']! as String] = args['bytes']! as Uint8List;
+          return true;
+      }
+      return null;
+    });
     messenger.setMockStreamHandler(
       const EventChannel('streamer/volume_keys/presses'),
       MockStreamHandler.inline(
